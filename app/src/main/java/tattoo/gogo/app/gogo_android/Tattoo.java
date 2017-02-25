@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class Tattoo {
 
-    String artist = "gogo";
+    String link = "gogo/tattoo/";
     String title = "";
     String tattoodate = "2017-02-25T20:01:06+03:00";
     String date = "2017-02-25T20:01:06+03:00";
@@ -30,6 +30,14 @@ public class Tattoo {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
     }
 
     public String getTattoodate() {
@@ -127,11 +135,5 @@ public class Tattoo {
     public void setExtra(String extra) {
         this.extra = extra;
     }
-    public String getArtist() {
-        return artist;
-    }
 
-    public void setArtist(String artist) {
-        this.artist = artist;
-    }
 }
