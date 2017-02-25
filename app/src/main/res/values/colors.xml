@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#ff5f40</color>
+    <color name="colorPrimaryDark">#cc371a</color>
+    <color name="colorAccent">#ec9d0a</color>
+    <color name="gray">#74716f</color>
+
+    <color name="blackOlive">#39393F</color>
+    <color name="orange">@color/colorPrimary</color>
+    <color name="bg_tag_default">#7cd167</color>
+</resources>
