@@ -38,7 +38,7 @@
                 android:id="@+id/input_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hint_tattoo_title"
+                android:hint="@string/hint_piercing_title"
                 android:inputType="textCapSentences"
                 android:maxLines="1"/>
         </android.support.design.widget.TextInputLayout>

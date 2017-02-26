@@ -5,11 +5,11 @@
     <string name="welcome_message">Welcome to gogo.tattoo Android app.</string>
     <string name="description">It\'s one of the first builds, you\'re holding in your hands. So, simplicity is the main factor for us. Go go, simply tap the icon below to start a new tattoo project.</string>
     <string name="hint_tattoo_title">Tattoo title</string>
-    <string name="hint_made_at">Where was the tattoo made? chushangfeng?</string>
+    <string name="hint_made_at">Where was the it made? chushangfeng?</string>
     <string name="hint_made_by">Who made it? gogo?</string>
     <string name="hint_made_date">When was it made? Today?</string>
     <string name="share_to">Share to...</string>
-    <string name="hint_time_elapsed">How long time did this tattoo take to make?</string>
+    <string name="hint_time_elapsed">How long time did it take to make?</string>
     <string name="male">Male</string>
     <string name="female">Female</string>
     <string name="hint_made_city">City?</string>
@@ -19,4 +19,11 @@
     <string name="test_link_wait">Hold on a second…</string>
     <string name="test_link_available">[available]</string>
     <string name="test_link_taken">[taken]</string>
+    <string name="new_tattoo">New tattoo</string>
+    <string name="tattoo">Tattoo</string>
+    <string name="design">Design</string>
+    <string name="henna">Henna</string>
+    <string name="piercing">Piercing</string>
+    <string name="dreaklocks">Locks</string>
+    <string name="hint_piercing_title">Any cool name?</string>
 </resources>

@@ -2,6 +2,7 @@ package tattoo.gogo.app.gogo_android;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,24 +12,31 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment {
 
     private int countFabTapped;
-    private ImageView ivDoge;
+    @BindView(R.id.iv_doge) ImageView ivDoge;
+    private View flNewTattoo;
+    private FloatingActionButton fab;
     private Animation myFadeInAnimation;
     private Animation myFadeOutAnimation;
 
+
     public MainActivityFragment() {
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_main, container, false);
-        ivDoge = (ImageView) v.findViewById(R.id.iv_doge);
+        ButterKnife.bind(this, v);
         return v;
     }
 
@@ -71,14 +79,6 @@ public class MainActivityFragment extends Fragment {
             }
         });
 
-        ((MainActivity) getActivity()).getFloatingActionButton().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                fabClicked(view);
-                countFabTapped++;
-            }
-        });
         ivDoge.startAnimation(myFadeOutAnimation);
     }
 
@@ -88,7 +88,9 @@ public class MainActivityFragment extends Fragment {
         countFabTapped = 0;
     }
 
+
     private void fabClicked(final View view) {
+
         if (countFabTapped == 1) {
             getFragmentManager().beginTransaction()
                     .addToBackStack("xyz")

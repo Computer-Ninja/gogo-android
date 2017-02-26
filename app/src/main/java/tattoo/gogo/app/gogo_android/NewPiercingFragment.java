@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.text.Editable;
@@ -46,30 +45,25 @@ import static android.view.View.GONE;
 /**
  * Created by delirium on 2/22/17.
  */
-public class NewTattooFragment extends NewWorkFragment {
+public class NewPiercingFragment extends NewWorkFragment {
 
-    private Tattoo mTattoo;
-
-    @Override
-    protected int getLayout() {
-        return R.layout.fragment_new_tattoo;
-    }
+    private Piercing mPiercing;
 
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mTattoo = new Tattoo();
+        mPiercing = new Piercing();
         populateWithDelay(etAuthor, mTattooArtist, 600);
-        populateWithDelay(etMadeAt, mTattoo.getMade_at_shop(), 1000);
+        populateWithDelay(etMadeAt, mPiercing.getMade_at_shop(), 1000);
         String dateToday = watermarkDateFormat.format(new Date());
         populateWithDelay(etMadeDate, dateToday, 1400);
-        populateWithDelay(etTimeDuration, String.valueOf(mTattoo.getDuration_min()), 400);
-        populateWithDelay(etMadeCity, String.valueOf(mTattoo.getLocation_city()), 200);
-        populateWithDelay(etMadeCountry, String.valueOf(mTattoo.getLocation_country()), 700);
+        populateWithDelay(etTimeDuration, String.valueOf(mPiercing.getDuration_min()), 400);
+        populateWithDelay(etMadeCity, String.valueOf(mPiercing.getLocation_city()), 200);
+        populateWithDelay(etMadeCountry, String.valueOf(mPiercing.getLocation_country()), 700);
 
-        tetTags.setTags(mTattoo.getTags());
-        tetBodyParts.setTags(mTattoo.getBodypart());
+        tetTags.setTags(mPiercing.getTags());
+        tetBodyParts.setTags(mPiercing.getBodypart());
 
         setListeners();
 
@@ -86,7 +80,7 @@ public class NewTattooFragment extends NewWorkFragment {
             public void onClick(View v) {
                 btnFemale.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
                 btnMale.setTextColor(Color.GRAY);
-                mTattoo.setGender("female");
+                mPiercing.setGender("female");
             }
         });
 
@@ -95,7 +89,7 @@ public class NewTattooFragment extends NewWorkFragment {
             public void onClick(View v) {
                 btnMale.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
                 btnFemale.setTextColor(Color.GRAY);
-                mTattoo.setGender("male");
+                mPiercing.setGender("male");
             }
         });
 
@@ -129,7 +123,7 @@ public class NewTattooFragment extends NewWorkFragment {
 
             @Override
             public void afterTextChanged(Editable tattooTitle) {
-                mTattoo.setTitle(tattooTitle.toString().trim());
+                mPiercing.setTitle(tattooTitle.toString().trim());
                 updateLink();
 
 
@@ -137,7 +131,7 @@ public class NewTattooFragment extends NewWorkFragment {
                 workRunnable = new Runnable() {
                     @Override
                     public void run() {
-                        if (mTattoo.getTitle().length() < 4 || mTattooArtist.isEmpty()) {
+                        if (mPiercing.getTitle().length() < 4 || mTattooArtist.isEmpty()) {
                             ivQRgogo.setVisibility(GONE);
                             ivQRgithub.setVisibility(GONE);
                             tvGogoLink.setVisibility(GONE);
@@ -156,35 +150,41 @@ public class NewTattooFragment extends NewWorkFragment {
         ((MainActivity) getActivity()).getFloatingActionButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mTattoo.setTattoodate(sdf.format(new Date()));
+                mPiercing.setTattoodate(sdf.format(new Date()));
                 long t = Calendar.getInstance().getTimeInMillis();
-                mTattoo.setDate(sdf.format(new Date(t + (mTattoo.getDuration_min() * ONE_MINUTE_IN_MILLIS))));
-                mTattoo.setBodypart(tetBodyParts.getTags().toArray(new String[0]));
-                mTattoo.setTags(tetTags.getTags().toArray(new String[0]));
-                mTattoo.setLink(makeLink(MAIN_URL));
+                mPiercing.setDate(sdf.format(new Date(t + (mPiercing.getDuration_min() * ONE_MINUTE_IN_MILLIS))));
+                mPiercing.setBodypart(tetBodyParts.getTags().toArray(new String[0]));
+                mPiercing.setTags(tetTags.getTags().toArray(new String[0]));
+                mPiercing.setLink(makeLink(MAIN_URL));
                 sendForApprovalToPublish();
             }
         });
     }
+
 
     private void sendForApprovalToPublish() {
         if (!isAdded()) {
             return;
         }
         TomlWriter tomlWriter = new TomlWriter();
-        String tomlString = tomlWriter.write(mTattoo);
+        String tomlString = tomlWriter.write(mPiercing);
 
-        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        Intent sharingIntent = new Intent(Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
-        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, mTattoo.getTitle());
-        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, tomlString);
+        sharingIntent.putExtra(Intent.EXTRA_SUBJECT, mPiercing.getTitle());
+        sharingIntent.putExtra(Intent.EXTRA_TEXT, tomlString);
         startActivity(Intent.createChooser(sharingIntent, getResources().getString(R.string.share_to)));
 
     }
 
-    protected String makeLink(String mainUrl) {
-        String tattooTitleLinkified = mTattoo.getTitle().toLowerCase().replace(" ", "_");
-        return mainUrl + mTattooArtist.toLowerCase() + "/tattoo/" + tattooTitleLinkified;
-    }
 
+
+    protected String makeLink(String mainUrl) {
+        String tattooTitleLinkified = mPiercing.getTitle().toLowerCase().replace(" ", "_");
+        return mainUrl + mTattooArtist.toLowerCase() + "/piercing/" + tattooTitleLinkified;
+    }
+    @Override
+    protected int getLayout() {
+        return R.layout.fragment_new_piercing;
+    }
 }
