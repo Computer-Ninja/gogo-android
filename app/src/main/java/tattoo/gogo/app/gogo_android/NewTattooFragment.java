@@ -40,6 +40,7 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import tattoo.gogo.app.gogo_android.model.Tattoo;
 
 import static android.view.View.GONE;
 

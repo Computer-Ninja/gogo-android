@@ -15,39 +15,33 @@ import java.util.Calendar;
 import java.util.Date;
 
 import okhttp3.OkHttpClient;
-import tattoo.gogo.app.gogo_android.model.Design;
+import tattoo.gogo.app.gogo_android.model.Henna;
 
 import static android.view.View.GONE;
 
 /**
  * Created by delirium on 2/22/17.
  */
-public class NewDesignFragment extends NewWorkFragment {
+public class NewHennaFragment extends NewWorkFragment {
 
-    private Design mDesign;
-
-    @Override
-    protected int getLayout() {
-        return R.layout.fragment_new_tattoo;
-    }
+    private Henna mHenna;
 
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mDesign = new Design();
+        mHenna = new Henna();
         populateWithDelay(etAuthor, mTattooArtist, 600);
-        populateWithDelay(etMadeAt, mDesign.getMade_at_shop(), 1000);
+        populateWithDelay(etMadeAt, mHenna.getMade_at_shop(), 1000);
         String dateToday = watermarkDateFormat.format(new Date());
         populateWithDelay(etMadeDate, dateToday, 1400);
-        populateWithDelay(etTimeDuration, String.valueOf(mDesign.getDuration_min()), 400);
-        populateWithDelay(etMadeCity, String.valueOf(mDesign.getLocation_city()), 200);
-        populateWithDelay(etMadeCountry, String.valueOf(mDesign.getLocation_country()), 700);
+        populateWithDelay(etTimeDuration, String.valueOf(mHenna.getDuration_min()), 400);
+        populateWithDelay(etMadeCity, String.valueOf(mHenna.getLocation_city()), 200);
+        populateWithDelay(etMadeCountry, String.valueOf(mHenna.getLocation_country()), 700);
 
-        tetTags.setTags(mDesign.getTags());
-        tetBodyParts.setTags(mDesign.getBodypart());
+        tetTags.setTags(mHenna.getTags());
+        tetBodyParts.setTags(mHenna.getBodypart());
 
-        llGenderSelection.setVisibility(GONE);
         setListeners();
 
         btnFemale.performClick();
@@ -57,6 +51,24 @@ public class NewDesignFragment extends NewWorkFragment {
     }
 
     private void setListeners() {
+
+        btnFemale.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                btnFemale.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+                btnMale.setTextColor(Color.GRAY);
+                mHenna.setGender("female");
+            }
+        });
+
+        btnMale.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                btnMale.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+                btnFemale.setTextColor(Color.GRAY);
+                mHenna.setGender("male");
+            }
+        });
 
         etAuthor.addTextChangedListener(new TextWatcher() {
             @Override
@@ -88,7 +100,7 @@ public class NewDesignFragment extends NewWorkFragment {
 
             @Override
             public void afterTextChanged(Editable tattooTitle) {
-                mDesign.setTitle(tattooTitle.toString().trim());
+                mHenna.setTitle(tattooTitle.toString().trim());
                 updateLink();
 
 
@@ -96,7 +108,7 @@ public class NewDesignFragment extends NewWorkFragment {
                 workRunnable = new Runnable() {
                     @Override
                     public void run() {
-                        if (mDesign.getTitle().length() < 4 || mTattooArtist.isEmpty()) {
+                        if (mHenna.getTitle().length() < 4 || mTattooArtist.isEmpty()) {
                             ivQRgogo.setVisibility(GONE);
                             ivQRgithub.setVisibility(GONE);
                             tvGogoLink.setVisibility(GONE);
@@ -115,35 +127,41 @@ public class NewDesignFragment extends NewWorkFragment {
         ((MainActivity) getActivity()).getFloatingActionButton().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mDesign.setTattoodate(sdf.format(new Date()));
+                mHenna.setTattoodate(sdf.format(new Date()));
                 long t = Calendar.getInstance().getTimeInMillis();
-                mDesign.setDate(sdf.format(new Date(t + (mDesign.getDuration_min() * ONE_MINUTE_IN_MILLIS))));
-                mDesign.setBodypart(tetBodyParts.getTags().toArray(new String[0]));
-                mDesign.setTags(tetTags.getTags().toArray(new String[0]));
-                mDesign.setLink(makeLink(MAIN_URL));
+                mHenna.setDate(sdf.format(new Date(t + (mHenna.getDuration_min() * ONE_MINUTE_IN_MILLIS))));
+                mHenna.setBodypart(tetBodyParts.getTags().toArray(new String[0]));
+                mHenna.setTags(tetTags.getTags().toArray(new String[0]));
+                mHenna.setLink(makeLink(MAIN_URL));
                 sendForApprovalToPublish();
             }
         });
     }
+
 
     private void sendForApprovalToPublish() {
         if (!isAdded()) {
             return;
         }
         TomlWriter tomlWriter = new TomlWriter();
-        String tomlString = tomlWriter.write(mDesign);
+        String tomlString = tomlWriter.write(mHenna);
 
         Intent sharingIntent = new Intent(Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
-        sharingIntent.putExtra(Intent.EXTRA_SUBJECT, mDesign.getTitle());
+        sharingIntent.putExtra(Intent.EXTRA_SUBJECT, mHenna.getTitle());
         sharingIntent.putExtra(Intent.EXTRA_TEXT, tomlString);
         startActivity(Intent.createChooser(sharingIntent, getResources().getString(R.string.share_to)));
 
     }
 
-    protected String makeLink(String mainUrl) {
-        String tattooTitleLinkified = mDesign.getTitle().toLowerCase().replace(" ", "_");
-        return mainUrl + mTattooArtist.toLowerCase() + "/design/" + tattooTitleLinkified;
-    }
 
+
+    protected String makeLink(String mainUrl) {
+        String tattooTitleLinkified = mHenna.getTitle().toLowerCase().replace(" ", "_");
+        return mainUrl + mTattooArtist.toLowerCase() + "/henna/" + tattooTitleLinkified;
+    }
+    @Override
+    protected int getLayout() {
+        return R.layout.fragment_new_henna;
+    }
 }

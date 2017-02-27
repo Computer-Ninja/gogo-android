@@ -82,6 +82,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        newHenna.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                animateFAB();
+                getSupportFragmentManager().beginTransaction()
+                        .addToBackStack("xyz")
+                        .hide(getSupportFragmentManager().findFragmentByTag("welcome"))
+                        .add(R.id.fragment_container, new NewHennaFragment(), "new henna")
+                        .commit();
+            }
+        });
+
     }
 
     public void animateFAB() {
@@ -142,5 +154,22 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        if (isFabOpen) {
+            animateFAB();
+        } else {
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    animateFAB();
+                }
+            });
+
+            super.onBackPressed();
+        }
     }
 }

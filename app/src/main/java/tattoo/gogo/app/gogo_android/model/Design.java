@@ -1,4 +1,4 @@
-package tattoo.gogo.app.gogo_android;
+package tattoo.gogo.app.gogo_android.model;
 
 import java.util.ArrayList;
 
@@ -6,21 +6,21 @@ import java.util.ArrayList;
  * Created by delirium on 2/24/17.
  */
 
-public class Piercing {
+public class Design {
 
-    String link = "gogo/piercing/";
+    String link = "gogo/design/";
     String title = "";
     String tattoodate = "2017-02-25T20:01:06+03:00";
     String date = "2017-02-25T20:01:06+03:00";
-    String []tags = {"sharp"};
-    String [] bodypart = {"nose", "lip", "ear"};
+    String []tags = {"coloring", "watercolor", "cover", "scarcover", "color", "freehand", "black and gray", "bird", "animal", "dragon", "flower", "koi", "lotus", "stars", "butterfly", "skull", "cat",
+            "colorful", "simplicity", "crazy", "couple"};
+    String [] possible_bodypart = {"feet", "shoulder", "back", "hand", "arm", "chest", "leg"};
     String image_ipfs = "";
     ArrayList<String> images_ipfs = new ArrayList<>();
     String location_country = "China";
     String location_city = "Shanghai";
     String made_at_shop = "chushangfeng";
-    int duration_min = 30;
-    String gender = "female";
+    int duration_min = 120;
     String extra = "";
 
     public String getTitle() {
@@ -64,11 +64,11 @@ public class Piercing {
     }
 
     public String[] getBodypart() {
-        return bodypart;
+        return possible_bodypart;
     }
 
     public void setBodypart(String[] bodypart) {
-        this.bodypart = bodypart;
+        this.possible_bodypart = bodypart;
     }
 
     public String getImage_ipfs() {
@@ -117,14 +117,6 @@ public class Piercing {
 
     public void setDuration_min(int duration_min) {
         this.duration_min = duration_min;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
     }
 
     public String getExtra() {

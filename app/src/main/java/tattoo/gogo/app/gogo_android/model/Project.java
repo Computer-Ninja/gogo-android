@@ -1,26 +1,25 @@
-package tattoo.gogo.app.gogo_android;
+package tattoo.gogo.app.gogo_android.model;
 
 import java.util.ArrayList;
 
 /**
- * Created by delirium on 2/24/17.
+ * Created by delirium on 2/26/17.
  */
 
-public class Tattoo {
+public class Project {
 
-    String link = "gogo/tattoo/";
+    String link = "gogo/";
     String title = "";
-    String tattoodate = "2017-02-25T20:01:06+03:00";
+    String made_date = "2017-02-25T20:01:06+03:00";
     String date = "2017-02-25T20:01:06+03:00";
-    String []tags = {"coloring", "watercolor", "cover", "scarcover", "color", "freehand", "black and gray", "bird", "animal", "dragon", "flower", "koi", "lotus", "stars", "butterfly", "skull", "cat",
-            "colorful", "simplicity", "crazy", "couple"};
-    String [] bodypart = {"feet", "shoulder", "back", "hand", "arm", "chest", "leg"};
+    String [] tags = {"sharp"};
+    String [] bodypart = {"nose", "lip", "ear"};
     String image_ipfs = "";
     ArrayList<String> images_ipfs = new ArrayList<>();
     String location_country = "China";
     String location_city = "Shanghai";
-    String made_at_shop = "chushangfeng";
-    int duration_min = 120;
+    String made_at = "chushangfeng";
+    int duration_min = 30;
     String gender = "female";
     String extra = "";
 
@@ -41,11 +40,11 @@ public class Tattoo {
     }
 
     public String getTattoodate() {
-        return tattoodate;
+        return made_date;
     }
 
     public void setTattoodate(String tattoodate) {
-        this.tattoodate = tattoodate;
+        this.made_date = tattoodate;
     }
 
     public String getDate() {
@@ -105,11 +104,11 @@ public class Tattoo {
     }
 
     public String getMade_at_shop() {
-        return made_at_shop;
+        return made_at;
     }
 
     public void setMade_at_shop(String made_at_shop) {
-        this.made_at_shop = made_at_shop;
+        this.made_at = made_at_shop;
     }
 
     public int getDuration_min() {
@@ -135,5 +134,4 @@ public class Tattoo {
     public void setExtra(String extra) {
         this.extra = extra;
     }
-
 }
