@@ -1,45 +1,35 @@
 package tattoo.gogo.app.gogo_android;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.moandjiezana.toml.TomlWriter;
 
-import net.glxn.qrgen.android.QRCode;
-import net.glxn.qrgen.core.image.ImageType;
-
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Body;
+import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.Path;
 import tattoo.gogo.app.gogo_android.model.Tattoo;
 
 import static android.view.View.GONE;
@@ -163,7 +153,40 @@ public class NewTattooFragment extends NewWorkFragment {
                 mTattoo.setBodypart(tetBodyParts.getTags().toArray(new String[0]));
                 mTattoo.setTags(tetTags.getTags().toArray(new String[0]));
                 mTattoo.setLink(makeLink(MAIN_URL));
-                sendForApprovalToPublish();
+                mTattoo.setDuration_min(Integer.valueOf(etTimeDuration.getText().toString()));
+                mTattoo.setMade_at_shop(etMadeAt.getText().toString());
+                //sendForApprovalToPublish();
+                sendToApi();
+            }
+        });
+    }
+    public interface TattooService {
+        //@GET("tattoo/{artist}")
+        //Call<List<Tattoo>> tattoos(@Path("artist") String user);
+        @POST("tattoo/{id}")
+        Call<List<Tattoo>> tattoo(@Path("id") int id, @Body Tattoo tat);
+    }
+    private void sendToApi() {
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .client(client)
+                .baseUrl("http://tron.ink:12345/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        TattooService ts = retrofit.create(TattooService.class);
+
+        ts.tattoo(ThreadLocalRandom.current().nextInt(0, 10000), mTattoo).enqueue(new Callback<List<Tattoo>>() {
+            @Override
+            public void onResponse(Call<List<Tattoo>> call, Response<List<Tattoo>> response) {
+                Snackbar.make(etAuthor, response.body().get(response.body().size()-1).getTitle(), Snackbar.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(Call<List<Tattoo>> call, Throwable t) {
+                Snackbar.make(etAuthor, "Failed: " + t.getMessage(), Snackbar.LENGTH_LONG).show();
             }
         });
     }
@@ -172,8 +195,7 @@ public class NewTattooFragment extends NewWorkFragment {
         if (!isAdded()) {
             return;
         }
-        TomlWriter tomlWriter = new TomlWriter();
-        String tomlString = tomlWriter.write(mTattoo);
+        String tomlString = new TomlWriter().write(mTattoo);
 
         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
