@@ -69,8 +69,6 @@ public abstract class NewWorkFragment extends Fragment {
     @BindView(R.id.ll_gender_selection) LinearLayout llGenderSelection;
 
 
-
-
     Handler handler = new Handler(Looper.getMainLooper() /*UI thread*/);
     protected Runnable workRunnable;
 
@@ -109,13 +107,15 @@ public abstract class NewWorkFragment extends Fragment {
                     @Override
                     public void run() {
                         int strRes = R.string.test_link_available;
+                        int colorRes = R.color.colorAccent;
                         if (response.isSuccessful()) {
                             strRes = R.string.test_link_taken;
-                            tvTitleAvailability.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+                            colorRes =  R.color.colorPrimaryDark;
                         } else {
-                            tvTitleAvailability.setTextColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
-                        }
+                            }
                         tvTitleAvailability.setText(strRes);
+                        tvTitleAvailability.setTextColor(ContextCompat.getColor(getContext(), colorRes));
+
                     }
                 });
             }
