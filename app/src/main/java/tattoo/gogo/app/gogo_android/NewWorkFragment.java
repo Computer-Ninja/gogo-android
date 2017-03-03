@@ -2,15 +2,19 @@ package tattoo.gogo.app.gogo_android;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,12 +24,16 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.moandjiezana.toml.TomlWriter;
+
 import net.glxn.qrgen.android.QRCode;
 import net.glxn.qrgen.core.image.ImageType;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,6 +42,10 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import tattoo.gogo.app.gogo_android.model.ArtWork;
+import tattoo.gogo.app.gogo_android.model.Henna;
+
+import static android.view.View.GONE;
 
 /**
  * Created by delirium on 2/26/17.
@@ -71,8 +83,37 @@ public abstract class NewWorkFragment extends Fragment {
 
     Handler handler = new Handler(Looper.getMainLooper() /*UI thread*/);
     protected Runnable workRunnable;
+    private ArtWork mArtWork;
+    protected FloatingActionButton fab;
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        mArtWork = newArtWork();
+        populateWithDelay(etAuthor, mTattooArtist, 600);
+        populateWithDelay(etMadeAt, mArtWork.getMadeAtShop(), 1000);
+        String dateToday = watermarkDateFormat.format(new Date());
+        populateWithDelay(etMadeDate, dateToday, 1400);
+        populateWithDelay(etTimeDuration, String.valueOf(mArtWork.getDurationMin()), 400);
+        populateWithDelay(etMadeCity, String.valueOf(mArtWork.getMadeAtCity()), 200);
+        populateWithDelay(etMadeCountry, String.valueOf(mArtWork.getMadeAtCountry()), 700);
+
+        tetTags.setTags(mArtWork.getTags());
+        tetBodyParts.setTags(mArtWork.getBodypart());
+
+        fab = ((MainActivity) getActivity()).getFloatingActionButton();
+        setListeners();
+
+        btnFemale.performClick();
+        etTitle.requestFocus();
+
+        client = new OkHttpClient();
 
 
+    }
+
+    protected abstract ArtWork newArtWork();
 
     @Nullable
     @Override
@@ -86,6 +127,103 @@ public abstract class NewWorkFragment extends Fragment {
 
     protected abstract int getLayout();
 
+
+    protected void setListeners() {
+
+        btnFemale.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                btnFemale.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+                btnMale.setTextColor(Color.GRAY);
+                mArtWork.setGender("female");
+            }
+        });
+
+        btnMale.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                btnMale.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+                btnFemale.setTextColor(Color.GRAY);
+                mArtWork.setGender("male");
+            }
+        });
+
+        etAuthor.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable authorName) {
+                mTattooArtist = authorName.toString().trim();
+                updateLink();
+            }
+        });
+        etTitle.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable tattooTitle) {
+                mArtWork.setTitle(tattooTitle.toString().trim());
+                updateLink();
+
+
+                handler.removeCallbacks(workRunnable);
+                workRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mArtWork.getTitle().length() < 4 || mTattooArtist.isEmpty()) {
+                            ivQRgogo.setVisibility(GONE);
+                            ivQRgithub.setVisibility(GONE);
+                            tvGogoLink.setVisibility(GONE);
+                            tvGithubLink.setVisibility(GONE);
+                            return;
+                        }
+                        updateQRcodes();
+                        testLink();
+                    }
+                };
+                handler.postDelayed(workRunnable, 1500 /*delay*/);
+
+            }
+        });
+        fab.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                updateArtwork();
+                sendForApprovalToPublish();
+                return false;
+            }
+        });
+
+    }
+
+    private void sendForApprovalToPublish() {
+        if (!isAdded()) {
+            return;
+        }
+        String tomlString = new TomlWriter().write(mArtWork);
+
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        sharingIntent.setType("text/plain");
+        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, mArtWork.getTitle());
+        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, tomlString);
+        startActivity(Intent.createChooser(sharingIntent, getResources().getString(R.string.share_to)));
+
+    }
 
     protected void testLink() {
         Request request = new Request.Builder()
@@ -123,7 +261,28 @@ public abstract class NewWorkFragment extends Fragment {
 
     }
 
-    protected abstract String makeLink(String mainUrl);
+    protected void updateArtwork() {
+        mArtWork.setMadeDate(sdf.format(new Date()));
+        long t = Calendar.getInstance().getTimeInMillis();
+        mArtWork.setDate(sdf.format(new Date(t + (mArtWork.getDurationMin() * ONE_MINUTE_IN_MILLIS))));
+        mArtWork.setBodypart(tetBodyParts.getTags().toArray(new String[0]));
+        mArtWork.setTags(tetTags.getTags().toArray(new String[0]));
+        mArtWork.setLink(makeLink(MAIN_URL));
+        mArtWork.setDurationMin(Integer.valueOf(etTimeDuration.getText().toString()));
+        mArtWork.setMadeAtShop(etMadeAt.getText().toString());
+        mArtWork.setMadeAtCity(etMadeCity.getText().toString());
+        mArtWork.setMadeAtCountry(etMadeCountry.getText().toString());
+        try {
+            Date tattooDate = watermarkDateFormat.parse(etMadeDate.getText().toString());
+
+            mArtWork.setMadeDate(sdf.format(tattooDate));
+
+            mArtWork.setDate(sdf.format(new Date(tattooDate.getTime() +
+                    (mArtWork.getDurationMin() * ONE_MINUTE_IN_MILLIS))));
+        } catch (Exception x) {
+
+        }
+    }
 
     protected void updateQRcodes() {
 
@@ -193,4 +352,9 @@ public abstract class NewWorkFragment extends Fragment {
         }, delay);
     }
 
+
+    protected String makeLink(String mainUrl) {
+        String tattooTitleLinkified = mArtWork.getTitle().toLowerCase().replace(" ", "_");
+        return mainUrl + mTattooArtist.toLowerCase() + "/" + mArtWork.getShortName().toLowerCase() +"/" + tattooTitleLinkified;
+    }
 }

@@ -26,4 +26,6 @@
     <string name="piercing">Piercing</string>
     <string name="dreaklocks">Locks</string>
     <string name="hint_piercing_title">Any cool name?</string>
+    <string name="submit_success">New artwork is submitted succesfully</string>
+    <string name="submit_fail">Something went wrong</string>
 </resources>
