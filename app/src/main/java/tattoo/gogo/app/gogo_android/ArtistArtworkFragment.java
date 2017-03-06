@@ -78,6 +78,8 @@ public class ArtistArtworkFragment extends Fragment {
             mArtistMame = getArguments().getString(ARG_ARTIST_NAME, "gogo");
             mArtworkType = getArguments().getInt(ARG_ARTWORK_TYPE, ARTWORK_TYPE_TATTOO);
         }
+
+        getActivity().setTitle(mArtistMame + " @ gogo.tattoo");
     }
 
     @Override

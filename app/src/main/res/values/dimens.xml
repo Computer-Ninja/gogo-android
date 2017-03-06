@@ -4,4 +4,6 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+    <dimen name="slogan_text_size">30sp</dimen>
+    <dimen name="slogan_padding">30dp</dimen>
 </resources>

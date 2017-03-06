@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,6 +12,8 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
@@ -197,11 +200,44 @@ public class MainActivity extends AppCompatActivity implements ArtistArtworkFrag
         if (mItem.getImageIpfs().isEmpty()) {
             iv.setVisibility(GONE);
         } else {
+            final String url = "https://ipfs.io/ipfs/"+mItem.getImageIpfs();
             iv.setVisibility(View.VISIBLE);
             Picasso.with(this)
-                    .load("https://ipfs.io/ipfs/"+mItem.getImageIpfs())
+                    .load(url)
                     .placeholder(R.drawable.progress_animation)
+                    //.error(R.drawable.doge)
                     .into(iv);
+
+            // http://stackoverflow.com/questions/23978828/how-do-i-use-disk-caching-in-picasso
+            // the most popular stackoverflow answer doesn't seem to work well with ipfs and our file sizes
+            // TODO: try resizing before caching?
+//                    .networkPolicy(NetworkPolicy.OFFLINE)
+//                    .into(iv, new Callback() {
+//                        @Override
+//                        public void onSuccess() {
+//
+//                        }
+//
+//                        @Override
+//                        public void onError() {
+//                            //Try again online if cache failed
+//                            Picasso.with(MainActivity.this)
+//                                    .load(url)
+//                                    .error(R.drawable.doge)
+//                                    .into(iv, new Callback() {
+//                                        @Override
+//                                        public void onSuccess() {
+//
+//                                        }
+//
+//                                        @Override
+//                                        public void onError() {
+//                                            Log.v("Picasso","Could not fetch image: " + iv);
+//                                        }
+//                                    });
+//
+//                        }
+//                    });
         }
     }
 }
