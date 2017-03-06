@@ -18,16 +18,21 @@ import com.squareup.picasso.Picasso;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+
 /**
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment {
 
     private int countFabTapped;
-    @BindView(R.id.iv_doge) ImageView ivDoge;
-    @BindView(R.id.iv_artist_gogo) ImageView ivArtistGogo;
-    @BindView(R.id.iv_artist_aid) ImageView ivArtistAid;
-    @BindView(R.id.iv_artist_xizi) ImageView ivArtistXizi;
+    @BindView(R.id.iv_doge)
+    ImageView ivDoge;
+    @BindView(R.id.iv_artist_gogo)
+    ImageView ivArtistGogo;
+    @BindView(R.id.iv_artist_aid)
+    ImageView ivArtistAid;
+    @BindView(R.id.iv_artist_xizi)
+    ImageView ivArtistXizi;
 
     private View flNewTattoo;
     private FloatingActionButton fab;
@@ -88,29 +93,51 @@ public class MainActivityFragment extends Fragment {
 
         ivDoge.startAnimation(myFadeOutAnimation);
 
+        loadArtist(ivArtistGogo, "http://gogo.tattoo/gogo/images/strawberry.jpg", "gogo");
+        loadArtist(ivArtistAid, "http://gogo.tattoo/aid/images/aid.png", "aid");
+        loadArtist(ivArtistXizi, "http://gogo.tattoo/xizi/images/xizi.jpg", "xizi");
+
+
+    }
+
+    private void loadArtist(final ImageView iv, String link, final String artistName) {
         Picasso.with(getContext())
-                .load("http://gogo.tattoo/gogo/images/strawberry.jpg")
-                .transform(new CircleTransform())
-                .into(ivArtistGogo, new Callback() {
-                    @Override
-                    public void onSuccess() {
-                        ivArtistGogo.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                getFragmentManager().beginTransaction()
-                                        .addToBackStack("xyz")
-                                        .hide(MainActivityFragment.this)
-                                        .add(R.id.fragment_container, new ArtistTattooFragment())
-                                        .commit();
-                            }
-                        });
-                    }
+            .load(link)
+            .transform(new CircleTransform())
+            .into(iv, new Callback() {
+                @Override
+                public void onSuccess() {
+                    iv.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            getFragmentManager().beginTransaction()
+                                    .addToBackStack("xyz")
+                                    .hide(MainActivityFragment.this)
+                                    .add(R.id.fragment_container, ArtistArtworkFragment.newInstance(1,
+                                            artistName, ArtistArtworkFragment.ARTWORK_TYPE_TATTOO))
+                                    .commit();
+                        }
+                    });
+                    iv.setOnLongClickListener(new View.OnLongClickListener() {
+                        @Override
+                        public boolean onLongClick(View view) {
+                            getFragmentManager().beginTransaction()
+                                    .addToBackStack("xyz")
+                                    .hide(MainActivityFragment.this)
+                                    .add(R.id.fragment_container, ArtistArtworkFragment.newInstance(1,
+                                            artistName, ArtistArtworkFragment.ARTWORK_TYPE_DESIGN))
+                                    .commit();
+                            return true;
+                        }
+                    });
 
-                    @Override
-                    public void onError() {
+                }
 
-                    }
-                });
+                @Override
+                public void onError() {
+
+                }
+            });
     }
 
     @Override

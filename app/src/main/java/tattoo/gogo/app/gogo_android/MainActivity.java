@@ -1,6 +1,5 @@
 package tattoo.gogo.app.gogo_android;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -12,19 +11,15 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
-import com.koushikdutta.async.future.FutureCallback;
-import com.koushikdutta.ion.Ion;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import tattoo.gogo.app.gogo_android.dummy.DummyContent;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
-import tattoo.gogo.app.gogo_android.model.Tattoo;
 
 import static android.view.View.GONE;
 
-public class MainActivity extends AppCompatActivity implements ArtistTattooFragment.OnListFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener {
 
     private boolean isFabOpen;
     private Animation fab_open;
@@ -190,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements ArtistTattooFragm
     }
 
     @Override
-    public void loadThumbnail(final ImageView iv, Tattoo mItem) {
+    public void loadThumbnail(final ImageView iv, ArtWork mItem) {
 //        Ion.with(this)
 //                .load("https://ipfs.io/ipfs/"+mItem.getImageIpfs())
 //                .asBitmap().setCallback(new FutureCallback<Bitmap>() {

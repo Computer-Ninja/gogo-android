@@ -7,8 +7,8 @@
     <FrameLayout
         android:id="@+id/fl_new_piercing"
         android:layout_width="wrap_content"
-        android:layout_marginBottom="250dp"
-        android:layout_marginRight="110dp"
+        android:layout_marginBottom="220dp"
+        android:layout_marginRight="100dp"
         android:layout_height="wrap_content"
         android:visibility="invisible"
         android:layout_gravity="bottom|right">

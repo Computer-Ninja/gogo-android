@@ -40,7 +40,7 @@
         android:layout_alignParentStart="true"
         android:id="@+id/iv_doge"
         android:visibility="visible"/>
-    
+
     <ImageView
         android:id="@+id/iv_artist_gogo"
         android:layout_width="120dp"
@@ -48,14 +48,16 @@
         android:layout_centerInParent="true"/>
     <ImageView
         android:id="@+id/iv_artist_aid"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:padding="10dp"
         android:layout_toLeftOf="@id/iv_artist_gogo"
         android:layout_alignBottom="@id/iv_artist_gogo"/>
     <ImageView
         android:id="@+id/iv_artist_xizi"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:padding="10dp"
         android:layout_toRightOf="@id/iv_artist_gogo"
         android:layout_alignBottom="@id/iv_artist_gogo"/>
 

@@ -7,22 +7,22 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-
 import java.util.List;
 
-import tattoo.gogo.app.gogo_android.model.Tattoo;
+import tattoo.gogo.app.gogo_android.model.ArtWork;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link Tattoo} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link ArtWork} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class ArtistTattooRecyclerViewAdapter extends RecyclerView.Adapter<ArtistTattooRecyclerViewAdapter.ViewHolder> {
+public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecyclerViewAdapter.ViewHolder> {
 
-    private final List<Tattoo> mValues;
+    private final List<ArtWork> mValues;
     private final ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener mListener;
 
-    public ArtistTattooRecyclerViewAdapter(List<Tattoo> items, ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener listener) {
+    public ArtworkRecyclerViewAdapter(List<ArtWork> items,
+                                      ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -64,7 +64,7 @@ public class ArtistTattooRecyclerViewAdapter extends RecyclerView.Adapter<Artist
         public final TextView mContentView;
         public final ImageView ivThumbnail;
 
-        public Tattoo mItem;
+        public ArtWork mItem;
 
         public ViewHolder(View view) {
             super(view);

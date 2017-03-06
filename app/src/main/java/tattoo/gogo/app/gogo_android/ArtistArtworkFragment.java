@@ -22,43 +22,49 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import tattoo.gogo.app.gogo_android.api.GogoApi;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
-import tattoo.gogo.app.gogo_android.model.Tattoo;
 
 import static android.content.ContentValues.TAG;
 
 /**
  * A fragment representing a list of Items.
  * <p/>
- * Activities containing this fragment MUST implement the {@link OnArtistTattooFragmentInteractionListener}
+ * Activities containing this fragment MUST implement the {@link OnArtistArtworkFragmentInteractionListener}
  * interface.
  */
-public class ArtistTattooFragment extends Fragment {
+public class ArtistArtworkFragment extends Fragment {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private static final String ARG_ARTIST_NAME = "artist-name";
+    private static final String ARG_ARTWORK_TYPE = "artwork-type";
+
+    public static final int ARTWORK_TYPE_TATTOO = 0;
+    public static final int ARTWORK_TYPE_DESIGN = 1;
+    public static final int ARTWORK_TYPE_HENNA = 2;
+    public static final int ARTWORK_TYPE_PIERCING = 3;
 
     private int mColumnCount = 1;
-    private ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener mListener;
-    private List<Tattoo> mTattoos = new ArrayList<>();
+    private OnArtistArtworkFragmentInteractionListener mListener;
+    private List<ArtWork> mWorks = new ArrayList<>();
     private RecyclerView mRecyclerView;
     private String mArtistMame;
     private ImageView ivLoading;
     private TextView tvNothingHere;
+    private int mArtworkType;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ArtistTattooFragment() {
+    public ArtistArtworkFragment() {
     }
 
-    // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static ArtistTattooFragment newInstance(int columnCount, String artistName) {
-        ArtistTattooFragment fragment = new ArtistTattooFragment();
+    public static ArtistArtworkFragment newInstance(int columnCount, String artistName, int artType) {
+        ArtistArtworkFragment fragment = new ArtistArtworkFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         args.putString(ARG_ARTIST_NAME, artistName);
+        args.putInt(ARG_ARTWORK_TYPE, artType);
         fragment.setArguments(args);
         return fragment;
     }
@@ -70,6 +76,7 @@ public class ArtistTattooFragment extends Fragment {
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
             mArtistMame = getArguments().getString(ARG_ARTIST_NAME, "gogo");
+            mArtworkType = getArguments().getInt(ARG_ARTWORK_TYPE, ARTWORK_TYPE_TATTOO);
         }
     }
 
@@ -96,32 +103,48 @@ public class ArtistTattooFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         ivLoading.setVisibility(View.VISIBLE);
-        GogoApi.getApi().tattoo(mArtistMame).enqueue(new Callback<List<Tattoo>>() {
+        Callback callback = new Callback<List<ArtWork>>() {
             @Override
-            public void onResponse(Call<List<Tattoo>> call, Response<List<Tattoo>> response) {
+            public void onResponse(Call<List<ArtWork>> call, Response<List<ArtWork>> response) {
                 ivLoading.setVisibility(View.GONE);
                 if (!response.isSuccessful() || response.body() == null) {
                     Log.e(TAG, "onResponse: " + response.errorBody());
                     tvNothingHere.setVisibility(View.VISIBLE);
                     return;
                 }
-                for (Tattoo tat : response.body()) {
+                for (ArtWork tat : response.body()) {
                     if (!tat.getImageIpfs().isEmpty()) {
-                        mTattoos.add(tat);
+                        mWorks.add(tat);
                     }
                 }
                 mRecyclerView.setHasFixedSize(true);
                 mRecyclerView.setItemViewCacheSize(20);
                 mRecyclerView.setDrawingCacheEnabled(true);
                 mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-                mRecyclerView.setAdapter(new ArtistTattooRecyclerViewAdapter(mTattoos, mListener));
+                mRecyclerView.setAdapter(new ArtworkRecyclerViewAdapter(mWorks, mListener));
             }
 
             @Override
-            public void onFailure(Call<List<Tattoo>> call, Throwable t) {
+            public void onFailure(Call<List<ArtWork>> call, Throwable t) {
+                Log.e(TAG, "onFailure: ", t);
 
             }
-        });
+        };
+        switch (mArtworkType) {
+            case ARTWORK_TYPE_TATTOO:
+                GogoApi.getApi().tattoo(mArtistMame).enqueue(callback);
+                break;
+            case ARTWORK_TYPE_HENNA:
+                GogoApi.getApi().henna(mArtistMame).enqueue(callback);
+                break;
+            case ARTWORK_TYPE_PIERCING:
+                GogoApi.getApi().piercing(mArtistMame).enqueue(callback);
+                break;
+            case ARTWORK_TYPE_DESIGN:
+                GogoApi.getApi().design(mArtistMame).enqueue(callback);
+                break;
+        }
+
     }
 
     @Override
@@ -139,5 +162,21 @@ public class ArtistTattooFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p/>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnArtistArtworkFragmentInteractionListener {
+        void onListFragmentInteraction(ArtWork item);
+
+        void loadThumbnail(ImageView iv, ArtWork mItem);
     }
 }

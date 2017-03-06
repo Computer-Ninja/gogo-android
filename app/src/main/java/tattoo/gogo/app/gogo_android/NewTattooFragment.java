@@ -77,7 +77,7 @@ public class NewTattooFragment extends NewWorkFragment {
         try {
             Date tattooDate = watermarkDateFormat.parse(etMadeDate.getText().toString());
 
-            mTattoo.setTattoodate(sdf.format(tattooDate));
+            mTattoo.setMadeDate(sdf.format(tattooDate));
 
             mTattoo.setDate(sdf.format(new Date(tattooDate.getTime() +
                     (mTattoo.getDurationMin() * ONE_MINUTE_IN_MILLIS))));
