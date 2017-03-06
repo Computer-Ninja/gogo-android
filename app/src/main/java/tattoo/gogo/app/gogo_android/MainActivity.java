@@ -1,5 +1,6 @@
 package tattoo.gogo.app.gogo_android;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -9,11 +10,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
+import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import tattoo.gogo.app.gogo_android.dummy.DummyContent;
+import tattoo.gogo.app.gogo_android.model.ArtWork;
+import tattoo.gogo.app.gogo_android.model.Tattoo;
 
-public class MainActivity extends AppCompatActivity {
+import static android.view.View.GONE;
+
+public class MainActivity extends AppCompatActivity implements ArtistTattooFragment.OnListFragmentInteractionListener {
 
     private boolean isFabOpen;
     private Animation fab_open;
@@ -170,6 +181,32 @@ public class MainActivity extends AppCompatActivity {
             });
 
             super.onBackPressed();
+        }
+    }
+
+    @Override
+    public void onListFragmentInteraction(ArtWork artWork) {
+
+    }
+
+    @Override
+    public void loadThumbnail(final ImageView iv, Tattoo mItem) {
+//        Ion.with(this)
+//                .load("https://ipfs.io/ipfs/"+mItem.getImageIpfs())
+//                .asBitmap().setCallback(new FutureCallback<Bitmap>() {
+//            @Override
+//            public void onCompleted(Exception e, Bitmap result) {
+//                iv.setImageBitmap(result);
+//            }
+//        });
+        if (mItem.getImageIpfs().isEmpty()) {
+            iv.setVisibility(GONE);
+        } else {
+            iv.setVisibility(View.VISIBLE);
+            Picasso.with(this)
+                    .load("https://ipfs.io/ipfs/"+mItem.getImageIpfs())
+                    .placeholder(R.drawable.progress_animation)
+                    .into(iv);
         }
     }
 }

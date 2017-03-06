@@ -28,4 +28,5 @@
     <string name="hint_piercing_title">Any cool name?</string>
     <string name="submit_success">New artwork is submitted succesfully</string>
     <string name="submit_fail">Something went wrong</string>
+    <string name="hint_title">Artwork title</string>
 </resources>

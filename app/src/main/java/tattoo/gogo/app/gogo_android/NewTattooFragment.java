@@ -1,24 +1,13 @@
 package tattoo.gogo.app.gogo_android;
 
-import android.content.Intent;
-import android.graphics.Color;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-
-import com.moandjiezana.toml.TomlWriter;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;
 
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -27,7 +16,6 @@ import tattoo.gogo.app.gogo_android.model.ArtWork;
 import tattoo.gogo.app.gogo_android.model.Tattoo;
 
 import static android.content.ContentValues.TAG;
-import static android.view.View.GONE;
 
 /**
  * Created by delirium on 2/22/17.
@@ -57,24 +45,24 @@ public class NewTattooFragment extends NewWorkFragment {
     private void sendToApi() {
         GogoApi.getApi().tattoo(ThreadLocalRandom.current().nextInt(0, 10000), mTattoo)
                 .enqueue(new Callback<Tattoo>() {
-            @Override
-            public void onResponse(Call<Tattoo> call, Response<Tattoo> response) {
-                Tattoo tattoo = response.body();
-                if (response.isSuccessful()) {
-                    Snackbar.make(etAuthor, R.string.submit_success, Snackbar.LENGTH_LONG)
-                            .setText(tattoo.getTitle())
-                            .show();
-                } else {
-                    Snackbar.make(etAuthor, R.string.submit_fail, Snackbar.LENGTH_LONG).show();
-                }
-            }
+                    @Override
+                    public void onResponse(Call<Tattoo> call, Response<Tattoo> response) {
+                        Tattoo tattoo = response.body();
+                        if (response.isSuccessful()) {
+                            Snackbar.make(etAuthor, R.string.submit_success, Snackbar.LENGTH_LONG)
+                                    .setText(tattoo.getTitle())
+                                    .show();
+                        } else {
+                            Snackbar.make(etAuthor, R.string.submit_fail, Snackbar.LENGTH_LONG).show();
+                        }
+                    }
 
-            @Override
-            public void onFailure(Call<Tattoo> call, Throwable t) {
-                Log.e(TAG, "onFailure: ", t);
-                Snackbar.make(etAuthor, "Failed: " + t.getMessage(), Snackbar.LENGTH_LONG).show();
-            }
-        });
+                    @Override
+                    public void onFailure(Call<Tattoo> call, Throwable t) {
+                        Log.e(TAG, "onFailure: ", t);
+                        Snackbar.make(etAuthor, "Failed: " + t.getMessage(), Snackbar.LENGTH_LONG).show();
+                    }
+                });
     }
 
     @Override

@@ -12,8 +12,8 @@ import tattoo.gogo.app.gogo_android.BuildConfig;
 
 public class GogoApi {
 
-    private static final String HOST_URL = "http://tron.ink:12345/";
-    private static final String HOST_URL_DEBUG = "http://192.168.1.145:12345/";
+    private static final String HOST_URL = "http://api.gogo.tattoo:12345/";
+    // private static final String HOST_URL = "http://192.168.1.145:12345/";
     private static GogoService mApi;
 
     public static GogoService getApi() {
@@ -23,7 +23,7 @@ public class GogoApi {
             OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
             Retrofit retrofit = new Retrofit.Builder()
                     .client(client)
-                    .baseUrl(BuildConfig.DEBUG ? HOST_URL_DEBUG : HOST_URL)
+                    .baseUrl(HOST_URL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
 
