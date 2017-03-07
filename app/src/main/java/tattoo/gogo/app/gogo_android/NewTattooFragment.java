@@ -16,6 +16,8 @@ import tattoo.gogo.app.gogo_android.model.ArtWork;
 import tattoo.gogo.app.gogo_android.model.Tattoo;
 
 import static android.content.ContentValues.TAG;
+import static tattoo.gogo.app.gogo_android.GogoConst.ONE_MINUTE_IN_MILLIS;
+import static tattoo.gogo.app.gogo_android.GogoConst.sdf;
 
 /**
  * Created by delirium on 2/22/17.
@@ -75,7 +77,7 @@ public class NewTattooFragment extends NewWorkFragment {
     protected void updateArtwork() {
         super.updateArtwork();
         try {
-            Date tattooDate = watermarkDateFormat.parse(etMadeDate.getText().toString());
+            Date tattooDate = GogoConst.watermarkDateFormat.parse(etMadeDate.getText().toString());
 
             mTattoo.setMadeDate(sdf.format(tattooDate));
 

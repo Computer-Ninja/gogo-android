@@ -1,5 +1,8 @@
 package tattoo.gogo.app.gogo_android.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
@@ -8,7 +11,7 @@ import java.util.ArrayList;
  * Created by delirium on 2/26/17.
  */
 
-public class ArtWork {
+public class ArtWork implements Parcelable {
 
     String link = "gogo/tattoo/";
     String title = "";
@@ -34,6 +37,36 @@ public class ArtWork {
     String gender = "female";
     String extra = "";
 
+    public ArtWork() {}
+
+    protected ArtWork(Parcel in) {
+        link = in.readString();
+        title = in.readString();
+        made_date = in.readString();
+        date = in.readString();
+        tags = in.createStringArray();
+        bodypart = in.createStringArray();
+        image_ipfs = in.readString();
+        images_ipfs = in.createStringArrayList();
+        made_at_country = in.readString();
+        made_at_city = in.readString();
+        made_at_shop = in.readString();
+        duration_min = in.readInt();
+        gender = in.readString();
+        extra = in.readString();
+    }
+
+    public static final Creator<ArtWork> CREATOR = new Creator<ArtWork>() {
+        @Override
+        public ArtWork createFromParcel(Parcel in) {
+            return new ArtWork(in);
+        }
+
+        @Override
+        public ArtWork[] newArray(int size) {
+            return new ArtWork[size];
+        }
+    };
 
     public String getMadeAtCity() {
         return made_at_city;
@@ -149,5 +182,28 @@ public class ArtWork {
 
     public String getShortName() {
         return getClass().getSimpleName();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(link);
+        dest.writeString(title);
+        dest.writeString(made_date);
+        dest.writeString(date);
+        dest.writeStringArray(tags);
+        dest.writeStringArray(bodypart);
+        dest.writeString(image_ipfs);
+        dest.writeStringList(images_ipfs);
+        dest.writeString(made_at_country);
+        dest.writeString(made_at_city);
+        dest.writeString(made_at_shop);
+        dest.writeInt(duration_min);
+        dest.writeString(gender);
+        dest.writeString(extra);
     }
 }

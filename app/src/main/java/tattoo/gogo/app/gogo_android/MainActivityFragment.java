@@ -12,8 +12,10 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -101,49 +103,49 @@ public class MainActivityFragment extends Fragment {
     }
 
     private void loadArtist(final ImageView iv, String link, final String artistName) {
-        Picasso.with(getContext())
-            .load(link)
-            .transform(new CircleTransform())
-            .into(iv, new Callback() {
-                @Override
-                public void onSuccess() {
-                    iv.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            getFragmentManager().beginTransaction()
-                                    .addToBackStack("xyz")
-                                    .hide(MainActivityFragment.this)
-                                    .add(R.id.fragment_container, ArtistArtworkFragment.newInstance(1,
-                                            artistName, ArtistArtworkFragment.ARTWORK_TYPE_TATTOO))
-                                    .commit();
-                        }
-                    });
-                    iv.setOnLongClickListener(new View.OnLongClickListener() {
-                        @Override
-                        public boolean onLongClick(View view) {
-                            getFragmentManager().beginTransaction()
-                                    .addToBackStack("xyz")
-                                    .hide(MainActivityFragment.this)
-                                    .add(R.id.fragment_container, ArtistArtworkFragment.newInstance(1,
-                                            artistName, ArtistArtworkFragment.ARTWORK_TYPE_DESIGN))
-                                    .commit();
-                            return true;
-                        }
-                    });
 
-                }
-
-                @Override
-                public void onError() {
-
-                }
-            });
+        SimpleTarget target = new SimpleTarget<GlideBitmapDrawable>() {
+            @Override
+            public void onResourceReady(GlideBitmapDrawable bitmap, GlideAnimation glideAnimation) {
+                // do something with the bitmap
+                // for demonstration purposes, let's just set it to an ImageView
+                iv.setImageBitmap(bitmap.getBitmap());
+                iv.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        getFragmentManager().beginTransaction()
+                                .addToBackStack("xyz")
+                                .hide(MainActivityFragment.this)
+                                .add(R.id.fragment_container, ArtistArtworkListFragment.newInstance(1,
+                                        artistName, ArtistArtworkListFragment.ARTWORK_TYPE_TATTOO))
+                                .commit();
+                    }
+                });
+                iv.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        getFragmentManager().beginTransaction()
+                                .addToBackStack("xyz")
+                                .hide(MainActivityFragment.this)
+                                .add(R.id.fragment_container, ArtistArtworkListFragment.newInstance(1,
+                                        artistName, ArtistArtworkListFragment.ARTWORK_TYPE_DESIGN))
+                                .commit();
+                        return false;
+                    }
+                });
+            }
+        };
+        Glide.with(getContext())
+                .load(link)
+                .bitmapTransform(new CircleTransform(getContext()))
+                .into(target);
     }
 
     @Override
     public void onResume() {
         super.onResume();
         countFabTapped = 0;
+
     }
 
 

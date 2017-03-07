@@ -3,10 +3,10 @@ package tattoo.gogo.app.gogo_android;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,9 +16,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,7 +23,7 @@ import tattoo.gogo.app.gogo_android.model.ArtWork;
 
 import static android.view.View.GONE;
 
-public class MainActivity extends AppCompatActivity implements ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements ArtistArtworkListFragment.OnArtistArtworkFragmentInteractionListener {
 
     private boolean isFabOpen;
     private Animation fab_open;
@@ -113,7 +110,21 @@ public class MainActivity extends AppCompatActivity implements ArtistArtworkFrag
             }
         });
 
-    }
+        getSupportFragmentManager().addOnBackStackChangedListener(
+                new FragmentManager.OnBackStackChangedListener() {
+                    public void onBackStackChanged() {
+                        FragmentManager manager = getSupportFragmentManager();
+
+                        if (manager != null) {
+                            if (manager.getBackStackEntryCount() == 0) {
+                                setTitle(R.string.app_name);
+                            }
+                        }
+                    }
+                }
+    );
+
+}
 
     public void animateFAB() {
 
@@ -178,7 +189,6 @@ public class MainActivity extends AppCompatActivity implements ArtistArtworkFrag
 
     @Override
     public void onBackPressed() {
-
         if (isFabOpen) {
             animateFAB();
         } else {
@@ -194,24 +204,21 @@ public class MainActivity extends AppCompatActivity implements ArtistArtworkFrag
     }
 
     @Override
-    public void onListFragmentInteraction(ArtWork artWork) {
+    public void onListFragmentInteraction(Fragment fr, ArtWork artWork) {
 
+        getSupportFragmentManager().beginTransaction()
+                .addToBackStack("xyz")
+                .hide(fr)
+                .add(R.id.fragment_container,  ArtistArtworkFragment.newInstance("gogo", artWork), "new henna")
+                .commit();
     }
 
     @Override
     public void loadThumbnail(Fragment fr, final ImageView iv, ArtWork mItem) {
-//        Ion.with(this)
-//                .load("https://ipfs.io/ipfs/"+mItem.getImageIpfs())
-//                .asBitmap().setCallback(new FutureCallback<Bitmap>() {
-//            @Override
-//            public void onCompleted(Exception e, Bitmap result) {
-//                iv.setImageBitmap(result);
-//            }
-//        });
         if (mItem.getImageIpfs().isEmpty()) {
             iv.setVisibility(GONE);
         } else {
-            final String url = "https://ipfs.io/ipfs/" + mItem.getImageIpfs();
+            final String url = GogoConst.IPFS_GATEWAY_URL + mItem.getImageIpfs();
             iv.setVisibility(View.VISIBLE);
             Display display = getWindowManager().getDefaultDisplay();
             DisplayMetrics outMetrics = new DisplayMetrics();

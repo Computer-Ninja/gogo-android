@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:tools="http://schemas.android.com/tools"
+       xmlns:android="http://schemas.android.com/apk/res/android"
+       tools:showIn="@layout/fragment_new_tattoo">
+
+
+    <TextView
+        android:id="@+id/tv_gogo_link"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="12dp"
+        android:gravity="center"
+        android:textColor="@color/gray"/>
+
+    <ImageView
+        android:id="@+id/iv_qr_gogotattoo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <TextView
+        android:id="@+id/tv_github_link"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="256dp"
+        android:layout_marginBottom="12dp"
+        android:gravity="center"
+        android:textColor="@color/gray"/>
+
+    <ImageView
+        android:id="@+id/iv_qr_gogogithub"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="256dp"
+        />
+</merge>

@@ -20,11 +20,11 @@ import tattoo.gogo.app.gogo_android.model.ArtWork;
 public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecyclerViewAdapter.ViewHolder> {
 
     private final List<ArtWork> mValues;
-    private final ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener mListener;
+    private final ArtistArtworkListFragment.OnArtistArtworkFragmentInteractionListener mListener;
     private final Fragment mFragment;
 
     public ArtworkRecyclerViewAdapter(Fragment fr, List<ArtWork> items,
-                                      ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener listener) {
+                                      ArtistArtworkListFragment.OnArtistArtworkFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
         mFragment = fr;
@@ -49,7 +49,7 @@ public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecy
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
+                    mListener.onListFragmentInteraction(mFragment, holder.mItem);
                 }
             }
         });

@@ -1,12 +1,18 @@
 package tattoo.gogo.app.gogo_android.model;
 
+import android.os.Parcel;
+
 /**
  * Created by delirium on 2/24/17.
  */
 
 public class Piercing extends ArtWork {
 
-    public void Piercing() {
+    protected Piercing(Parcel in) {
+        super(in);
+    }
+
+    public  Piercing() {
         link = "gogo/piercing/";
     }
 

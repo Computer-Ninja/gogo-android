@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">app.gogo.tattoo</string>
-
+    <string name="app_name_short">gogo.tattoo</string>
     <string name="action_settings">Settings</string>
     <string name="welcome_message">Welcome to gogo.tattoo Android app.</string>
     <string name="description">It\'s one of the first builds, you\'re holding in your hands. So, simplicity is the main factor for us. Go go, simply tap the icon below to start a new tattoo project.</string>
@@ -31,4 +31,6 @@
     <string name="hint_title">Artwork title</string>
     <string name="nothing_here_yet">Nothing here yet.</string>
     <string name="slogan">Our mission is to better the world of tattoos</string>
+    <string name="tv_made_date">Made: %s</string>
+    <string name="tv_publish_date">Published: %s</string>
 </resources>

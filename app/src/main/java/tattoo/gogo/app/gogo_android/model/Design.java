@@ -1,5 +1,7 @@
 package tattoo.gogo.app.gogo_android.model;
 
+import android.os.Parcel;
+
 import java.util.ArrayList;
 
 /**
@@ -9,4 +11,9 @@ import java.util.ArrayList;
 public class Design extends ArtWork {
 
 
+    protected Design(Parcel in) {
+        super(in);
+    }
+
+    public Design() {}
 }

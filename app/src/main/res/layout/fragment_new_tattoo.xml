@@ -199,32 +199,7 @@
             TagsEditText:tagsTextSize="@dimen/defaultTagsTextSize"
             TagsEditText:tagsCloseImagePadding="@dimen/defaultTagsCloseImagePadding"/>
 
-        <TextView
-            android:id="@+id/tv_gogo_link"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:gravity="center"
-            android:textColor="@color/gray"/>
-        <ImageView
-            android:id="@+id/iv_qr_gogotattoo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            />
-
-        <TextView
-            android:id="@+id/tv_github_link"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="512dp"
-            android:gravity="center"
-            android:textColor="@color/gray"/>
-        <ImageView
-            android:id="@+id/iv_qr_gogogithub"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="256dp"
-            />
+        <include layout="@layout/qr_codes"/>
     </LinearLayout>
 
 </ScrollView>

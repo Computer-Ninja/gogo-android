@@ -51,12 +51,6 @@ import static android.view.View.GONE;
  * Created by delirium on 2/26/17.
  */
 public abstract class NewWorkFragment extends Fragment {
-    protected static final String MAIN_URL = "http://gogo.tattoo/";
-    protected static final String GITHUB_URL = "https://gogotattoo.github.io/";
-    static final long ONE_MINUTE_IN_MILLIS = 60000; //millisecs
-
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZZZ");
-    SimpleDateFormat watermarkDateFormat = new SimpleDateFormat("yyyy/MM/dd");
     protected OkHttpClient client;
     protected String mTattooArtist = "gogo";
 
@@ -93,7 +87,7 @@ public abstract class NewWorkFragment extends Fragment {
         mArtWork = newArtWork();
         populateWithDelay(etAuthor, mTattooArtist, 600);
         populateWithDelay(etMadeAt, mArtWork.getMadeAtShop(), 1000);
-        String dateToday = watermarkDateFormat.format(new Date());
+        String dateToday = GogoConst.watermarkDateFormat.format(new Date());
         populateWithDelay(etMadeDate, dateToday, 1400);
         populateWithDelay(etTimeDuration, String.valueOf(mArtWork.getDurationMin()), 400);
         populateWithDelay(etMadeCity, String.valueOf(mArtWork.getMadeAtCity()), 200);
@@ -227,7 +221,7 @@ public abstract class NewWorkFragment extends Fragment {
 
     protected void testLink() {
         Request request = new Request.Builder()
-                .url(makeLink(MAIN_URL))
+                .url(makeLink(GogoConst.MAIN_URL))
                 .head()
                 .build();
 
@@ -262,23 +256,23 @@ public abstract class NewWorkFragment extends Fragment {
     }
 
     protected void updateArtwork() {
-        mArtWork.setMadeDate(sdf.format(new Date()));
+        mArtWork.setMadeDate(GogoConst.sdf.format(new Date()));
         long t = Calendar.getInstance().getTimeInMillis();
-        mArtWork.setDate(sdf.format(new Date(t + (mArtWork.getDurationMin() * ONE_MINUTE_IN_MILLIS))));
+        mArtWork.setDate(GogoConst.sdf.format(new Date(t + (mArtWork.getDurationMin() * GogoConst.ONE_MINUTE_IN_MILLIS))));
         mArtWork.setBodypart(tetBodyParts.getTags().toArray(new String[0]));
         mArtWork.setTags(tetTags.getTags().toArray(new String[0]));
-        mArtWork.setLink(makeLink(MAIN_URL));
+        mArtWork.setLink(makeLink(GogoConst.MAIN_URL));
         mArtWork.setDurationMin(Integer.valueOf(etTimeDuration.getText().toString()));
         mArtWork.setMadeAtShop(etMadeAt.getText().toString());
         mArtWork.setMadeAtCity(etMadeCity.getText().toString());
         mArtWork.setMadeAtCountry(etMadeCountry.getText().toString());
         try {
-            Date tattooDate = watermarkDateFormat.parse(etMadeDate.getText().toString());
+            Date tattooDate = GogoConst.watermarkDateFormat.parse(etMadeDate.getText().toString());
 
-            mArtWork.setMadeDate(sdf.format(tattooDate));
+            mArtWork.setMadeDate(GogoConst.sdf.format(tattooDate));
 
-            mArtWork.setDate(sdf.format(new Date(tattooDate.getTime() +
-                    (mArtWork.getDurationMin() * ONE_MINUTE_IN_MILLIS))));
+            mArtWork.setDate(GogoConst.sdf.format(new Date(tattooDate.getTime() +
+                    (mArtWork.getDurationMin() * GogoConst.ONE_MINUTE_IN_MILLIS))));
         } catch (Exception x) {
 
         }
@@ -290,8 +284,8 @@ public abstract class NewWorkFragment extends Fragment {
         ivQRgithub.setVisibility(View.VISIBLE);
         tvGogoLink.setVisibility(View.VISIBLE);
         tvGithubLink.setVisibility(View.VISIBLE);
-        final String gogoTattooLink = makeLink(MAIN_URL);
-        final String gogoGithubLink = makeLink(GITHUB_URL);
+        final String gogoTattooLink = makeLink(GogoConst.MAIN_URL);
+        final String gogoGithubLink = makeLink(GogoConst.GITHUB_URL);
         tvGogoLink.setText(gogoTattooLink);
         tvGithubLink.setText(gogoGithubLink);
 
@@ -339,7 +333,7 @@ public abstract class NewWorkFragment extends Fragment {
 
 
     protected void updateLink() {
-        tvLink.setText(makeLink(MAIN_URL));
+        tvLink.setText(makeLink(GogoConst.MAIN_URL));
 
     }
 

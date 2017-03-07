@@ -1,10 +1,15 @@
 package tattoo.gogo.app.gogo_android;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,12 +20,23 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
+import net.glxn.qrgen.android.QRCode;
+import net.glxn.qrgen.core.image.ImageType;
+
+import java.io.File;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -28,6 +44,7 @@ import tattoo.gogo.app.gogo_android.api.GogoApi;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
 
 import static android.content.ContentValues.TAG;
+import static android.view.View.GONE;
 
 /**
  * A fragment representing a list of Items.
@@ -37,23 +54,31 @@ import static android.content.ContentValues.TAG;
  */
 public class ArtistArtworkFragment extends Fragment {
 
-    private static final String ARG_COLUMN_COUNT = "column-count";
     private static final String ARG_ARTIST_NAME = "artist-name";
     private static final String ARG_ARTWORK_TYPE = "artwork-type";
+    private static final String ARG_ARTWORK = "artwork";
 
-    public static final int ARTWORK_TYPE_TATTOO = 0;
-    public static final int ARTWORK_TYPE_DESIGN = 1;
-    public static final int ARTWORK_TYPE_HENNA = 2;
-    public static final int ARTWORK_TYPE_PIERCING = 3;
-
-    private int mColumnCount = 1;
-    private OnArtistArtworkFragmentInteractionListener mListener;
     private List<ArtWork> mWorks = new ArrayList<>();
-    private RecyclerView mRecyclerView;
     private String mArtistName;
-    private ImageView ivLoading;
-    private TextView tvNothingHere;
-    private int mArtworkType;
+    private String mArtworkType;
+
+    @BindView(R.id.tv_artwork_title)
+    TextView tvTitle;
+    @BindView(R.id.ll_artwork_images)
+    LinearLayout llImages;
+    @BindView(R.id.tv_artwork_made_date)
+    TextView tvMadeDate;
+    @BindView(R.id.tv_artwork_made_published)
+    TextView tvPublishedDate;
+    private ArtWork mArtwork;
+    @BindView(R.id.iv_qr_gogotattoo)
+    ImageView ivQRgogo;
+    @BindView(R.id.iv_qr_gogogithub)
+    ImageView ivQRgithub;
+    @BindView(R.id.tv_gogo_link)
+    TextView tvGogoLink;
+    @BindView(R.id.tv_github_link)
+    TextView tvGithubLink;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -62,13 +87,11 @@ public class ArtistArtworkFragment extends Fragment {
     public ArtistArtworkFragment() {
     }
 
-    @SuppressWarnings("unused")
-    public static ArtistArtworkFragment newInstance(int columnCount, String artistName, int artType) {
+    public static ArtistArtworkFragment newInstance(String artistName, ArtWork artWork) {
         ArtistArtworkFragment fragment = new ArtistArtworkFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
         args.putString(ARG_ARTIST_NAME, artistName);
-        args.putInt(ARG_ARTWORK_TYPE, artType);
+        args.putParcelable(ARG_ARTWORK, artWork);
         fragment.setArguments(args);
         return fragment;
     }
@@ -79,122 +102,67 @@ public class ArtistArtworkFragment extends Fragment {
         setHasOptionsMenu(true);
 
         if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
             mArtistName = getArguments().getString(ARG_ARTIST_NAME, "gogo");
-            mArtworkType = getArguments().getInt(ARG_ARTWORK_TYPE, ARTWORK_TYPE_TATTOO);
+            mArtworkType = getArguments().getString(ARG_ARTWORK_TYPE, ArtistArtworkListFragment.ARTWORK_TYPE_TATTOO);
+            mArtwork = getArguments().getParcelable(ARG_ARTWORK);
         }
 
-        getActivity().setTitle("gogo.tattoo/" + mArtistName);
+        getActivity().setTitle("gogo.tattoo/" + mArtistName + "/" + mArtworkType);
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_tattoo_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_artwork, container, false);
 
+        ButterKnife.bind(this, view);
         // Set the adapter
         Context context = view.getContext();
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.list);
-        ivLoading = (ImageView) view.findViewById(R.id.iv_loading);
-        tvNothingHere = (TextView) view.findViewById(R.id.tv_nothing_here_yet);
-        if (mColumnCount <= 1) {
-            mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-        } else {
-            mRecyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-        }
-
         return view;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        ivLoading.setVisibility(View.VISIBLE);
-        Callback callback = new Callback<List<ArtWork>>() {
-            @Override
-            public void onResponse(Call<List<ArtWork>> call, Response<List<ArtWork>> response) {
-                ivLoading.setVisibility(View.GONE);
-                if (!response.isSuccessful() || response.body() == null) {
-                    Log.e(TAG, "onResponse: " + response.errorBody());
-                    tvNothingHere.setVisibility(View.VISIBLE);
-                    return;
-                }
-                for (ArtWork tat : response.body()) {
-                    if (!tat.getImageIpfs().isEmpty()) {
-                        mWorks.add(tat);
-                    }
-                }
-                //mRecyclerView.setHasFixedSize(true);
-                mRecyclerView.setItemViewCacheSize(20);
-                mRecyclerView.setDrawingCacheEnabled(true);
-                //mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-                mRecyclerView.setAdapter(new ArtworkRecyclerViewAdapter(ArtistArtworkFragment.this, mWorks, mListener));
-            }
 
-            @Override
-            public void onFailure(Call<List<ArtWork>> call, Throwable t) {
-                Log.e(TAG, "onFailure: ", t);
-
-            }
-        };
-        switch (mArtworkType) {
-            case ARTWORK_TYPE_TATTOO:
-                GogoApi.getApi().tattoo(mArtistName).enqueue(callback);
-                break;
-            case ARTWORK_TYPE_HENNA:
-                GogoApi.getApi().henna(mArtistName).enqueue(callback);
-                break;
-            case ARTWORK_TYPE_PIERCING:
-                GogoApi.getApi().piercing(mArtistName).enqueue(callback);
-                break;
-            case ARTWORK_TYPE_DESIGN:
-                GogoApi.getApi().design(mArtistName).enqueue(callback);
-                break;
+        tvTitle.setText(mArtwork.getTitle());
+        try {
+            String shortMadeDate = GogoConst.watermarkDateFormat.format(GogoConst.sdf.parse(mArtwork.getMadeDate()));
+            tvMadeDate.setText(getString(R.string.tv_made_date, shortMadeDate));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        try {
+            String shortPublishDate = GogoConst.watermarkDateFormat.format(GogoConst.sdf.parse(mArtwork.getDate()));
+            tvPublishedDate.setText(getString(R.string.tv_publish_date, shortPublishDate));
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
 
+
+        updateQRcodes();
+
+
     }
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        addMenuItem(menu, R.string.tattoo, ArtistArtworkFragment.ARTWORK_TYPE_TATTOO);
-        addMenuItem(menu, R.string.design, ArtistArtworkFragment.ARTWORK_TYPE_DESIGN);
-        addMenuItem(menu, R.string.henna, ArtistArtworkFragment.ARTWORK_TYPE_HENNA);
-        addMenuItem(menu, R.string.piercing, ArtistArtworkFragment.ARTWORK_TYPE_PIERCING);
 
     }
 
-    private void addMenuItem(Menu menu, @StringRes int textResId, final int artworkTypeTattoo) {
-        menu.add(textResId).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                getFragmentManager().beginTransaction()
-                        //.addToBackStack("xyz")
-                        .hide(ArtistArtworkFragment.this)
-                        .add(R.id.fragment_container, ArtistArtworkFragment.newInstance(1,
-                                mArtistName, artworkTypeTattoo))
-                        .commit();
-                return false;
-            }
-        });
-    }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener) {
-            mListener = (ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnArtistTattooFragmentInteractionListener");
-        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
     /**
@@ -208,8 +176,100 @@ public class ArtistArtworkFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnArtistArtworkFragmentInteractionListener {
-        void onListFragmentInteraction(ArtWork item);
 
-        void loadThumbnail(Fragment fr, ImageView iv, ArtWork mItem);
+        void loadImage(Fragment fr, ImageView iv, String ipfsHash);
+    }
+
+
+    protected void updateQRcodes() {
+
+        ivQRgogo.setImageResource(R.drawable.progress_animation);
+        ivQRgithub.setImageResource(R.drawable.progress_animation);
+        ivQRgogo.setVisibility(View.VISIBLE);
+        ivQRgithub.setVisibility(View.VISIBLE);
+        tvGogoLink.setVisibility(View.VISIBLE);
+        tvGithubLink.setVisibility(View.VISIBLE);
+        final String gogoTattooLink = makeLink(GogoConst.MAIN_URL);
+        final String gogoGithubLink = makeLink(GogoConst.GITHUB_URL);
+        tvGogoLink.setText(gogoTattooLink);
+        tvGithubLink.setText(gogoGithubLink);
+
+        new AsyncTask<Void, Void, Boolean>() {
+            public Bitmap qrGithubBitmap;
+            public Bitmap qrGogoBitmap;
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                try {
+                    qrGogoBitmap = makeQRcode(gogoTattooLink);
+                    qrGithubBitmap = makeQRcode(gogoGithubLink);
+                } catch (OutOfMemoryError e) {
+                    return false;
+                }
+                return true;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aVoid) {
+                super.onPostExecute(aVoid);
+                if (qrGogoBitmap != null) {
+                    ivQRgogo.setImageBitmap(qrGogoBitmap);
+                } else {
+                    ivQRgogo.setVisibility(GONE);
+                }
+                if (qrGithubBitmap != null) {
+                    ivQRgithub.setImageBitmap(qrGithubBitmap);
+                } else {
+                    ivQRgithub.setVisibility(GONE);
+                }
+
+                loadImages();
+            }
+        }.execute();
+
+//        ivQRgithub.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent shareIntent = new Intent();
+//                shareIntent.setAction(Intent.ACTION_SEND);
+//                shareIntent.setType("images/png");
+//
+//                Uri uri = FileProvider.getUriForFile(getContext(), "tattoo.gogo.app.gogo_android", makeQRcodeFile(gogoGithubLink));
+//                shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+//                startActivity(Intent.createChooser(shareIntent, getResources().getText(R.string.share_to)));
+//            }
+//        });
+
+    }
+
+    private void loadImages() {
+        addImage(mArtwork.getImageIpfs());
+        for (String hash : mArtwork.getImagesIpfs()) {
+            addImage(hash);
+        }
+    }
+
+    private void addImage(String imageIpfs) {
+        ImageView iv = new ImageView(getContext());
+        iv.setAdjustViewBounds(true);
+        iv.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        iv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        iv.setPadding(0, 20, 0, 20);
+        llImages.addView(iv);
+
+        Glide.with(this)
+                .load(GogoConst.IPFS_GATEWAY_URL + imageIpfs)
+                .placeholder(R.drawable.progress_animation)
+                .error(R.drawable.doge)
+                .into(iv);
+    }
+
+    protected Bitmap makeQRcode(String link) throws OutOfMemoryError {
+        return QRCode.from(link).withSize(1024, 1024).bitmap();
+    }
+
+    protected String makeLink(String mainUrl) {
+        String tattooTitleLinkified = mArtwork.getTitle().toLowerCase().replace(" ", "_");
+        return mainUrl + mArtistName.toLowerCase() + "/" + mArtwork.getShortName().toLowerCase() + "/" + tattooTitleLinkified;
     }
 }
