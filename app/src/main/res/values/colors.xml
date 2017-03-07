@@ -8,4 +8,5 @@
     <color name="blackOlive">#39393F</color>
     <color name="orange">@color/colorPrimary</color>
     <color name="bg_tag_default">#7cd167</color>
+    <color name="slogan_white">#EFEFEF</color>
 </resources>

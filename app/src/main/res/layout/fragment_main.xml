@@ -5,12 +5,33 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="tattoo.gogo.app.gogo_android.MainActivityFragment"
     tools:showIn="@layout/activity_main">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/banner"
+        android:layout_above="@+id/iv_artist_aid"
+        android:layout_below="@+id/tv_welcome_message"
+        android:scaleType="centerCrop"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/slogan"
+        android:gravity="center"
+        android:layout_above="@+id/iv_artist_gogo"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="30dp"
+        android:textColor="@color/slogan_white"
+        android:textSize="@dimen/slogan_text_size"
+        android:textStyle="bold"
+        android:padding="@dimen/slogan_padding"
+        android:shadowColor="@color/colorPrimary"
+        android:shadowDx="0.0"
+        android:shadowDy="0.0"
+        android:shadowRadius="20"
+        />
 
     <TextView
         android:id="@+id/tv_welcome_message"
@@ -19,17 +40,23 @@
         android:gravity="center"
         android:text="@string/welcome_message"
         android:padding="18dp"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"/>
 
     <TextView
         android:id="@+id/tv_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:layout_below="@id/tv_welcome_message"
         android:padding="18dp"
         android:textStyle="italic"
-        android:text="@string/description"/>
+        android:text="@string/description"
+        android:layout_below="@+id/iv_artist_gogo"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="33dp"/>
 
     <ImageView
         android:layout_width="490dp"
