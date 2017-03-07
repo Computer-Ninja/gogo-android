@@ -9,6 +9,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -46,7 +49,7 @@ public class ArtistArtworkFragment extends Fragment {
     private OnArtistArtworkFragmentInteractionListener mListener;
     private List<ArtWork> mWorks = new ArrayList<>();
     private RecyclerView mRecyclerView;
-    private String mArtistMame;
+    private String mArtistName;
     private ImageView ivLoading;
     private TextView tvNothingHere;
     private int mArtworkType;
@@ -72,10 +75,11 @@ public class ArtistArtworkFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-            mArtistMame = getArguments().getString(ARG_ARTIST_NAME, "gogo");
+            mArtistName = getArguments().getString(ARG_ARTIST_NAME, "gogo");
             mArtworkType = getArguments().getInt(ARG_ARTWORK_TYPE, ARTWORK_TYPE_TATTOO);
         }
     }
@@ -132,19 +136,75 @@ public class ArtistArtworkFragment extends Fragment {
         };
         switch (mArtworkType) {
             case ARTWORK_TYPE_TATTOO:
-                GogoApi.getApi().tattoo(mArtistMame).enqueue(callback);
+                GogoApi.getApi().tattoo(mArtistName).enqueue(callback);
                 break;
             case ARTWORK_TYPE_HENNA:
-                GogoApi.getApi().henna(mArtistMame).enqueue(callback);
+                GogoApi.getApi().henna(mArtistName).enqueue(callback);
                 break;
             case ARTWORK_TYPE_PIERCING:
-                GogoApi.getApi().piercing(mArtistMame).enqueue(callback);
+                GogoApi.getApi().piercing(mArtistName).enqueue(callback);
                 break;
             case ARTWORK_TYPE_DESIGN:
-                GogoApi.getApi().design(mArtistMame).enqueue(callback);
+                GogoApi.getApi().design(mArtistName).enqueue(callback);
                 break;
         }
 
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        menu.add(R.string.tattoo).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                                                                 @Override
+                                                                 public boolean onMenuItemClick(MenuItem menuItem) {
+                                                                     getFragmentManager().beginTransaction()
+                                                                             .addToBackStack("xyz")
+                                                                             .hide(ArtistArtworkFragment.this)
+                                                                             .add(R.id.fragment_container, ArtistArtworkFragment.newInstance(1,
+                                                                                     mArtistName, ArtistArtworkFragment.ARTWORK_TYPE_TATTOO))
+                                                                             .commit();
+                                                                     return false;
+                                                                 }
+                                                             });
+
+        menu.add(R.string.design).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                getFragmentManager().beginTransaction()
+                        .addToBackStack("xyz")
+                        .hide(ArtistArtworkFragment.this)
+                        .add(R.id.fragment_container, ArtistArtworkFragment.newInstance(1,
+                                mArtistName, ArtistArtworkFragment.ARTWORK_TYPE_DESIGN))
+                        .commit();
+                return false;
+            }
+        });
+        menu.add(R.string.henna).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                getFragmentManager().beginTransaction()
+                        .addToBackStack("xyz")
+                        .hide(ArtistArtworkFragment.this)
+                        .add(R.id.fragment_container, ArtistArtworkFragment.newInstance(1,
+                                mArtistName, ArtistArtworkFragment.ARTWORK_TYPE_HENNA))
+                        .commit();
+                return false;
+
+            }
+        });
+        menu.add(R.string.piercing).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                getFragmentManager().beginTransaction()
+                        .addToBackStack("xyz")
+                        .hide(ArtistArtworkFragment.this)
+                        .add(R.id.fragment_container, ArtistArtworkFragment.newInstance(1,
+                                mArtistName, ArtistArtworkFragment.ARTWORK_TYPE_PIERCING))
+                        .commit();
+                return false;
+            }
+        });
     }
 
     @Override
