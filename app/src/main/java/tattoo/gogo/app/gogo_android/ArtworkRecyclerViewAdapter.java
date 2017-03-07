@@ -1,5 +1,6 @@
 package tattoo.gogo.app.gogo_android;
 
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,11 +21,13 @@ public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecy
 
     private final List<ArtWork> mValues;
     private final ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener mListener;
+    private final Fragment mFragment;
 
-    public ArtworkRecyclerViewAdapter(List<ArtWork> items,
+    public ArtworkRecyclerViewAdapter(Fragment fr, List<ArtWork> items,
                                       ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
+        mFragment = fr;
     }
 
     @Override
@@ -50,7 +53,7 @@ public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecy
                 }
             }
         });
-        mListener.loadThumbnail(holder.ivThumbnail, holder.mItem);
+        mListener.loadThumbnail(mFragment, holder.ivThumbnail, holder.mItem);
     }
 
     @Override

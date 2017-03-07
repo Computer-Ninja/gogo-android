@@ -3,6 +3,7 @@ package tattoo.gogo.app.gogo_android;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -127,7 +128,7 @@ public class ArtistArtworkFragment extends Fragment {
                 mRecyclerView.setItemViewCacheSize(20);
                 mRecyclerView.setDrawingCacheEnabled(true);
                 //mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-                mRecyclerView.setAdapter(new ArtworkRecyclerViewAdapter(mWorks, mListener));
+                mRecyclerView.setAdapter(new ArtworkRecyclerViewAdapter(ArtistArtworkFragment.this, mWorks, mListener));
             }
 
             @Override
@@ -157,52 +158,22 @@ public class ArtistArtworkFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        menu.add(R.string.tattoo).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                                                                 @Override
-                                                                 public boolean onMenuItemClick(MenuItem menuItem) {
-                                                                     getFragmentManager().beginTransaction()
-                                                                             .addToBackStack("xyz")
-                                                                             .hide(ArtistArtworkFragment.this)
-                                                                             .add(R.id.fragment_container, ArtistArtworkFragment.newInstance(1,
-                                                                                     mArtistName, ArtistArtworkFragment.ARTWORK_TYPE_TATTOO))
-                                                                             .commit();
-                                                                     return false;
-                                                                 }
-                                                             });
+        addMenuItem(menu, R.string.tattoo, ArtistArtworkFragment.ARTWORK_TYPE_TATTOO);
+        addMenuItem(menu, R.string.design, ArtistArtworkFragment.ARTWORK_TYPE_DESIGN);
+        addMenuItem(menu, R.string.henna, ArtistArtworkFragment.ARTWORK_TYPE_HENNA);
+        addMenuItem(menu, R.string.piercing, ArtistArtworkFragment.ARTWORK_TYPE_PIERCING);
 
-        menu.add(R.string.design).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                getFragmentManager().beginTransaction()
-                        .addToBackStack("xyz")
-                        .hide(ArtistArtworkFragment.this)
-                        .add(R.id.fragment_container, ArtistArtworkFragment.newInstance(1,
-                                mArtistName, ArtistArtworkFragment.ARTWORK_TYPE_DESIGN))
-                        .commit();
-                return false;
-            }
-        });
-        menu.add(R.string.henna).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                getFragmentManager().beginTransaction()
-                        .addToBackStack("xyz")
-                        .hide(ArtistArtworkFragment.this)
-                        .add(R.id.fragment_container, ArtistArtworkFragment.newInstance(1,
-                                mArtistName, ArtistArtworkFragment.ARTWORK_TYPE_HENNA))
-                        .commit();
-                return false;
+    }
 
-            }
-        });
-        menu.add(R.string.piercing).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+    private void addMenuItem(Menu menu, @StringRes int textResId, final int artworkTypeTattoo) {
+        menu.add(textResId).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
                 getFragmentManager().beginTransaction()
-                        .addToBackStack("xyz")
+                        //.addToBackStack("xyz")
                         .hide(ArtistArtworkFragment.this)
                         .add(R.id.fragment_container, ArtistArtworkFragment.newInstance(1,
-                                mArtistName, ArtistArtworkFragment.ARTWORK_TYPE_PIERCING))
+                                mArtistName, artworkTypeTattoo))
                         .commit();
                 return false;
             }
@@ -239,6 +210,6 @@ public class ArtistArtworkFragment extends Fragment {
     public interface OnArtistArtworkFragmentInteractionListener {
         void onListFragmentInteraction(ArtWork item);
 
-        void loadThumbnail(ImageView iv, ArtWork mItem);
+        void loadThumbnail(Fragment fr, ImageView iv, ArtWork mItem);
     }
 }

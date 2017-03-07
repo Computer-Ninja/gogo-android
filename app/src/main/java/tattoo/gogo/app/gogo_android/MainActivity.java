@@ -2,6 +2,7 @@ package tattoo.gogo.app.gogo_android;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
@@ -198,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements ArtistArtworkFrag
     }
 
     @Override
-    public void loadThumbnail(final ImageView iv, ArtWork mItem) {
+    public void loadThumbnail(Fragment fr, final ImageView iv, ArtWork mItem) {
 //        Ion.with(this)
 //                .load("https://ipfs.io/ipfs/"+mItem.getImageIpfs())
 //                .asBitmap().setCallback(new FutureCallback<Bitmap>() {
@@ -216,11 +217,8 @@ public class MainActivity extends AppCompatActivity implements ArtistArtworkFrag
             DisplayMetrics outMetrics = new DisplayMetrics();
             display.getMetrics(outMetrics);
 
-            float density = getResources().getDisplayMetrics().density;
-            float dpHeight = outMetrics.heightPixels / density;
-            float dpWidth = outMetrics.widthPixels / density;
 
-            Glide.with(this)
+            Glide.with(fr)
                     .load(url)
                     .placeholder(R.drawable.progress_animation)
                     .error(R.drawable.doge)
