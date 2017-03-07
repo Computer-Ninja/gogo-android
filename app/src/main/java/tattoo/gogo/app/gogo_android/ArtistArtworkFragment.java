@@ -83,7 +83,7 @@ public class ArtistArtworkFragment extends Fragment {
             mArtworkType = getArguments().getInt(ARG_ARTWORK_TYPE, ARTWORK_TYPE_TATTOO);
         }
 
-        getActivity().setTitle(mArtistMame + " @ gogo.tattoo");
+        getActivity().setTitle("gogo.tattoo/" + mArtistName);
     }
 
     @Override
@@ -123,10 +123,10 @@ public class ArtistArtworkFragment extends Fragment {
                         mWorks.add(tat);
                     }
                 }
-                mRecyclerView.setHasFixedSize(true);
+                //mRecyclerView.setHasFixedSize(true);
                 mRecyclerView.setItemViewCacheSize(20);
                 mRecyclerView.setDrawingCacheEnabled(true);
-                mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+                //mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
                 mRecyclerView.setAdapter(new ArtworkRecyclerViewAdapter(mWorks, mListener));
             }
 

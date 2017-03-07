@@ -4,7 +4,9 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,6 +14,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -29,12 +32,18 @@ public class MainActivity extends AppCompatActivity implements ArtistArtworkFrag
     private Animation fab_close;
     private Animation rotate_forward;
     private Animation rotate_backward;
-    @BindView(R.id.fab) FloatingActionButton fab;
-    @BindView(R.id.fl_new_tattoo) View newTattoo;
-    @BindView(R.id.fl_new_design) View newDesign;
-    @BindView(R.id.fl_new_dreadlocks) View newDreadlocks;
-    @BindView(R.id.fl_new_piercing) View newPiercing;
-    @BindView(R.id.fl_new_henna) View newHenna;
+    @BindView(R.id.fab)
+    FloatingActionButton fab;
+    @BindView(R.id.fl_new_tattoo)
+    View newTattoo;
+    @BindView(R.id.fl_new_design)
+    View newDesign;
+    @BindView(R.id.fl_new_dreadlocks)
+    View newDreadlocks;
+    @BindView(R.id.fl_new_piercing)
+    View newPiercing;
+    @BindView(R.id.fl_new_henna)
+    View newHenna;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,6 +148,7 @@ public class MainActivity extends AppCompatActivity implements ArtistArtworkFrag
 
         }
     }
+
     public FloatingActionButton getFloatingActionButton() {
         return (FloatingActionButton) findViewById(R.id.fab);
     }
@@ -200,44 +210,23 @@ public class MainActivity extends AppCompatActivity implements ArtistArtworkFrag
         if (mItem.getImageIpfs().isEmpty()) {
             iv.setVisibility(GONE);
         } else {
-            final String url = "https://ipfs.io/ipfs/"+mItem.getImageIpfs();
+            final String url = "https://ipfs.io/ipfs/" + mItem.getImageIpfs();
             iv.setVisibility(View.VISIBLE);
-            Picasso.with(this)
+            Display display = getWindowManager().getDefaultDisplay();
+            DisplayMetrics outMetrics = new DisplayMetrics();
+            display.getMetrics(outMetrics);
+
+            float density = getResources().getDisplayMetrics().density;
+            float dpHeight = outMetrics.heightPixels / density;
+            float dpWidth = outMetrics.widthPixels / density;
+
+            Glide.with(this)
                     .load(url)
                     .placeholder(R.drawable.progress_animation)
-                    //.error(R.drawable.doge)
+                    .error(R.drawable.doge)
+                    .override(outMetrics.widthPixels, outMetrics.heightPixels)
                     .into(iv);
 
-            // http://stackoverflow.com/questions/23978828/how-do-i-use-disk-caching-in-picasso
-            // the most popular stackoverflow answer doesn't seem to work well with ipfs and our file sizes
-            // TODO: try resizing before caching?
-//                    .networkPolicy(NetworkPolicy.OFFLINE)
-//                    .into(iv, new Callback() {
-//                        @Override
-//                        public void onSuccess() {
-//
-//                        }
-//
-//                        @Override
-//                        public void onError() {
-//                            //Try again online if cache failed
-//                            Picasso.with(MainActivity.this)
-//                                    .load(url)
-//                                    .error(R.drawable.doge)
-//                                    .into(iv, new Callback() {
-//                                        @Override
-//                                        public void onSuccess() {
-//
-//                                        }
-//
-//                                        @Override
-//                                        public void onError() {
-//                                            Log.v("Picasso","Could not fetch image: " + iv);
-//                                        }
-//                                    });
-//
-//                        }
-//                    });
         }
     }
 }
