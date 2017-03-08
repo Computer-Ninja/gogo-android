@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            xmlns:TagsEditText="http://schemas.android.com/apk/res-auto"
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:TagsEditText="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:padding="16dp"
+    android:scrollbars="none"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     >
 
     <LinearLayout
@@ -50,6 +55,7 @@
             android:layout_marginTop="24dp"
             android:gravity="center"
             android:textColor="@color/gray"/>
+
         <TextView
             android:id="@+id/tv_future_link_availability"
             android:layout_width="match_parent"
@@ -63,36 +69,38 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/input_layout_made_city"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginTop="48dp">
 
-            <EditText
-                android:id="@+id/input_made_city"
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/input_layout_made_city"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hint_made_city"
-                android:maxLines="1"/>
-        </android.support.design.widget.TextInputLayout>
+                android:layout_marginTop="48dp"
+                android:layout_weight="1">
 
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/input_layout_made_country"
-            android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="48dp">
+                <EditText
+                    android:id="@+id/input_made_city"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_made_city"
+                    android:maxLines="1"/>
+            </android.support.design.widget.TextInputLayout>
 
-            <EditText
-                android:id="@+id/input_made_country"
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/input_layout_made_country"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hint_made_country"
-                android:maxLines="1"/>
-        </android.support.design.widget.TextInputLayout>
+                android:layout_marginTop="48dp"
+                android:layout_weight="1">
+
+                <EditText
+                    android:id="@+id/input_made_country"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_made_country"
+                    android:maxLines="1"/>
+            </android.support.design.widget.TextInputLayout>
         </LinearLayout>
+
         <android.support.design.widget.TextInputLayout
             android:id="@+id/input_layout_made_at"
             android:layout_width="match_parent"
@@ -142,52 +150,54 @@
             android:id="@+id/ll_gender_selection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
+
             <Button
                 android:id="@+id/btn_female"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="@string/female"
-                android:textAllCaps="true"
-                android:layout_weight="1"/>
+                android:textAllCaps="true"/>
+
             <Button
                 android:id="@+id/btn_male"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAllCaps="true"
+                android:layout_weight="1"
 
                 android:text="@string/male"
-                android:layout_weight="1"/>
+                android:textAllCaps="true"/>
 
         </LinearLayout>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/tags"
-            android:gravity="center"
+            android:layout_marginBottom="8dp"
             android:layout_marginTop="12dp"
-            android:layout_marginBottom="8dp"/>
+            android:gravity="center"
+            android:text="@string/tags"/>
 
         <tattoo.gogo.app.gogo_android.ImprovedTagsEditText
             android:id="@+id/tet_tags"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            TagsEditText:allowSpaceInTag="true"
             android:layout_marginBottom="18dp"
+            TagsEditText:allowSpaceInTag="true"
             TagsEditText:tagsBackground="@drawable/tag"
+            TagsEditText:tagsCloseImagePadding="@dimen/defaultTagsCloseImagePadding"
             TagsEditText:tagsCloseImageRight="@drawable/tag_close"
-            TagsEditText:tagsTextSize="@dimen/defaultTagsTextSize"
-            TagsEditText:tagsCloseImagePadding="@dimen/defaultTagsCloseImagePadding"/>
+            TagsEditText:tagsTextSize="@dimen/defaultTagsTextSize"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/body_parts"
-            android:gravity="center"
+            android:layout_marginBottom="8dp"
             android:layout_marginTop="12dp"
-            android:layout_marginBottom="8dp"/>
+            android:gravity="center"
+            android:text="@string/body_parts"/>
 
         <tattoo.gogo.app.gogo_android.ImprovedTagsEditText
             android:id="@+id/tet_body_parts"
@@ -196,9 +206,9 @@
             android:layout_marginBottom="18dp"
             TagsEditText:allowSpaceInTag="true"
             TagsEditText:tagsBackground="@drawable/tag"
+            TagsEditText:tagsCloseImagePadding="@dimen/defaultTagsCloseImagePadding"
             TagsEditText:tagsCloseImageRight="@drawable/tag_close"
-            TagsEditText:tagsTextSize="@dimen/defaultTagsTextSize"
-            TagsEditText:tagsCloseImagePadding="@dimen/defaultTagsCloseImagePadding"/>
+            TagsEditText:tagsTextSize="@dimen/defaultTagsTextSize"/>
 
         <TextView
             android:id="@+id/tv_gogo_link"
@@ -207,6 +217,7 @@
             android:layout_marginTop="24dp"
             android:gravity="center"
             android:textColor="@color/gray"/>
+
         <ImageView
             android:id="@+id/iv_qr_gogotattoo"
             android:layout_width="match_parent"
@@ -220,6 +231,7 @@
             android:layout_marginTop="512dp"
             android:gravity="center"
             android:textColor="@color/gray"/>
+
         <ImageView
             android:id="@+id/iv_qr_gogogithub"
             android:layout_width="match_parent"
@@ -228,4 +240,4 @@
             />
     </LinearLayout>
 
-</ScrollView>
+</android.support.v4.widget.NestedScrollView>

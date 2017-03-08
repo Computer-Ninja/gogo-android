@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
+    android:fitsSystemWindows="false"
     tools:context="tattoo.gogo.app.gogo_android.MainActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -18,6 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
+            app:layout_scrollFlags="scroll|enterAlways"
             app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
     </android.support.design.widget.AppBarLayout>
@@ -30,11 +31,68 @@
         <include layout="@layout/content_main"/>
     </LinearLayout>
 
-    <include layout="@layout/fab_new_tattoo"/>
-    <include layout="@layout/fab_new_design"/>
-    <include layout="@layout/fab_new_henna"/>
-    <include layout="@layout/fab_new_piercing"/>
-    <include layout="@layout/fab_new_dreadlocks"/>
+    <FrameLayout
+        android:id="@+id/fl_new_tattoo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="80dp"
+        android:layout_marginRight="40dp"
+        android:visibility="invisible">
+
+        <include layout="@layout/fab_new_tattoo"/>
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/fl_new_design"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="80dp"
+        android:layout_marginRight="100dp"
+        android:visibility="invisible">
+
+        <include layout="@layout/fab_new_design"/>
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/fl_new_henna"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="80dp"
+        android:layout_marginRight="160dp"
+        android:visibility="invisible">
+
+        <include layout="@layout/fab_new_henna"/>
+    </FrameLayout>
+
+
+    <FrameLayout
+        android:id="@+id/fl_new_piercing"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="80dp"
+        android:layout_marginRight="220dp"
+        android:visibility="invisible">
+
+        <include layout="@layout/fab_new_piercing"/>
+    </FrameLayout>
+
+
+    <FrameLayout
+        android:id="@+id/fl_new_dreadlocks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="80dp"
+        android:layout_marginRight="280dp"
+        android:visibility="invisible">
+
+        <include
+            layout="@layout/fab_new_dreadlocks"/>
+    </FrameLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

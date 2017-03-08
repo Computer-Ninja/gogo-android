@@ -156,9 +156,9 @@ public class MainActivityFragment extends Fragment {
 
         if (countFabTapped == 1) {
             getFragmentManager().beginTransaction()
-                    .addToBackStack("xyz")
                     .hide(MainActivityFragment.this)
                     .add(R.id.fragment_container, new NewTattooFragment())
+                    .addToBackStack("xyz")
                     .commit();
             countFabTapped = 0;
             return;

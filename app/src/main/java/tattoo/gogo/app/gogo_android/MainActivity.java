@@ -74,10 +74,11 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
                 animateFAB();
+                String tag = "gogo/tattoo/new";
                 getSupportFragmentManager().beginTransaction()
-                        .addToBackStack("xyz")
                         .hide(getSupportFragmentManager().findFragmentByTag("welcome"))
-                        .add(R.id.fragment_container, new NewTattooFragment(), "new tattoo")
+                        .add(R.id.fragment_container, new NewTattooFragment(), tag)
+                        .addToBackStack(tag)
                         .commit();
             }
         });
@@ -86,10 +87,11 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
                 animateFAB();
+                String tag = "gogo/piercing/new";
                 getSupportFragmentManager().beginTransaction()
-                        .addToBackStack("xyz")
                         .hide(getSupportFragmentManager().findFragmentByTag("welcome"))
-                        .add(R.id.fragment_container, new NewPiercingFragment(), "new piercing")
+                        .add(R.id.fragment_container, new NewPiercingFragment(), tag)
+                        .addToBackStack(tag)
                         .commit();
             }
         });
@@ -98,10 +100,11 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
                 animateFAB();
+                String tag = "gogo/design/new";
                 getSupportFragmentManager().beginTransaction()
-                        .addToBackStack("xyz")
                         .hide(getSupportFragmentManager().findFragmentByTag("welcome"))
-                        .add(R.id.fragment_container, new NewDesignFragment(), "new design")
+                        .add(R.id.fragment_container, new NewDesignFragment(), tag)
+                        .addToBackStack(tag)
                         .commit();
             }
         });
@@ -110,10 +113,11 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
                 animateFAB();
+                String tag = "gogo/henna/new";
                 getSupportFragmentManager().beginTransaction()
-                        .addToBackStack("xyz")
                         .hide(getSupportFragmentManager().findFragmentByTag("welcome"))
-                        .add(R.id.fragment_container, new NewHennaFragment(), "new henna")
+                        .add(R.id.fragment_container, new NewHennaFragment(), tag)
+                        .addToBackStack(tag)
                         .commit();
             }
         });
