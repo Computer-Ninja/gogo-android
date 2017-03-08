@@ -16,4 +16,6 @@ public class Tattoo extends ArtWork {
         link = "gogo/tattoo";
     }
 
+    public String getType() { return "tattoo"; }
+
 }

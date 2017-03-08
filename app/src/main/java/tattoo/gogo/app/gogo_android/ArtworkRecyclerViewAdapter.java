@@ -14,7 +14,7 @@ import tattoo.gogo.app.gogo_android.model.ArtWork;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link ArtWork} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
+ * specified {@link ArtistArtworkListFragment.OnArtistArtworkFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
 public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecyclerViewAdapter.ViewHolder> {
@@ -22,12 +22,15 @@ public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecy
     private final List<ArtWork> mValues;
     private final ArtistArtworkListFragment.OnArtistArtworkFragmentInteractionListener mListener;
     private final Fragment mFragment;
+    private final String mArtistName;
 
     public ArtworkRecyclerViewAdapter(Fragment fr, List<ArtWork> items,
-                                      ArtistArtworkListFragment.OnArtistArtworkFragmentInteractionListener listener) {
+                                      ArtistArtworkListFragment.OnArtistArtworkFragmentInteractionListener listener,
+                                      String artistName) {
         mValues = items;
         mListener = listener;
         mFragment = fr;
+        mArtistName = artistName;
     }
 
     @Override
@@ -49,7 +52,7 @@ public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecy
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(mFragment, holder.mItem);
+                    mListener.onListFragmentInteraction(mFragment, mArtistName, holder.mItem);
                 }
             }
         });

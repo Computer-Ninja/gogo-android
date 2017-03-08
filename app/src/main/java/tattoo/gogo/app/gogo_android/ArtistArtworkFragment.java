@@ -243,10 +243,10 @@ public class ArtistArtworkFragment extends Fragment {
     }
 
     private void loadImages() {
-        addImage(mArtwork.getImageIpfs());
         for (String hash : mArtwork.getImagesIpfs()) {
             addImage(hash);
         }
+        addImage(mArtwork.getImageIpfs());
     }
 
     private void addImage(String imageIpfs) {

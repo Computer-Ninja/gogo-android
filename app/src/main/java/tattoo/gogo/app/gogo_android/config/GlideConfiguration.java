@@ -1,4 +1,4 @@
-package tattoo.gogo.app.gogo_android;
+package tattoo.gogo.app.gogo_android.config;
 
 import android.content.Context;
 

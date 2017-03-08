@@ -16,4 +16,6 @@ public class Design extends ArtWork {
     }
 
     public Design() {}
+
+    public String getType() { return "design"; }
 }

@@ -16,4 +16,5 @@ public class Henna extends ArtWork {
         link = "gogo/henna";
     }
 
+    public String getType() { return "henna"; }
 }

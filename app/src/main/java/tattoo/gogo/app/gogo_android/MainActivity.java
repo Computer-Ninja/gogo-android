@@ -204,12 +204,12 @@ public class MainActivity extends AppCompatActivity implements ArtistArtworkList
     }
 
     @Override
-    public void onListFragmentInteraction(Fragment fr, ArtWork artWork) {
-
+    public void onListFragmentInteraction(Fragment fr, String artistName, ArtWork artWork) {
+        String tag = artistName + "/" + artWork.getType();
         getSupportFragmentManager().beginTransaction()
-                .addToBackStack("xyz")
                 .hide(fr)
-                .add(R.id.fragment_container,  ArtistArtworkFragment.newInstance("gogo", artWork), "new henna")
+                .add(R.id.fragment_container,  ArtistArtworkFragment.newInstance(artistName, artWork), tag)
+                .addToBackStack(tag)
                 .commit();
     }
 

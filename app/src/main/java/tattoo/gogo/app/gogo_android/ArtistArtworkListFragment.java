@@ -30,7 +30,7 @@ import tattoo.gogo.app.gogo_android.model.ArtWork;
 import static android.content.ContentValues.TAG;
 
 /**
- * A fragment representing a list of Items.
+ * A fragment representing a list of Artist's Artworks.
  * <p/>
  * Activities containing this fragment MUST implement the {@link OnArtistArtworkFragmentInteractionListener}
  * interface.
@@ -109,6 +109,19 @@ public class ArtistArtworkListFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        loadList();
+    }
+
+    private void loadList() {
+        mWorks.clear();
+        mRecyclerView.invalidate();
         ivLoading.setVisibility(View.VISIBLE);
         Callback callback = new Callback<List<ArtWork>>() {
             @Override
@@ -128,7 +141,7 @@ public class ArtistArtworkListFragment extends Fragment {
                 mRecyclerView.setItemViewCacheSize(20);
                 mRecyclerView.setDrawingCacheEnabled(true);
                 //mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-                mRecyclerView.setAdapter(new ArtworkRecyclerViewAdapter(ArtistArtworkListFragment.this, mWorks, mListener));
+                mRecyclerView.setAdapter(new ArtworkRecyclerViewAdapter(ArtistArtworkListFragment.this, mWorks, mListener, mArtistName));
             }
 
             @Override
@@ -151,16 +164,18 @@ public class ArtistArtworkListFragment extends Fragment {
                 GogoApi.getApi().design(mArtistName).enqueue(callback);
                 break;
         }
-
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-
+        if (!mArtworkType.equals(ARTWORK_TYPE_TATTOO))
         addMenuItem(menu, R.string.tattoo, ArtistArtworkListFragment.ARTWORK_TYPE_TATTOO);
+        if (!mArtworkType.equals(ARTWORK_TYPE_DESIGN))
         addMenuItem(menu, R.string.design, ArtistArtworkListFragment.ARTWORK_TYPE_DESIGN);
+        if (!mArtworkType.equals(ARTWORK_TYPE_HENNA))
         addMenuItem(menu, R.string.henna, ArtistArtworkListFragment.ARTWORK_TYPE_HENNA);
+        if (!mArtworkType.equals(ARTWORK_TYPE_PIERCING))
         addMenuItem(menu, R.string.piercing, ArtistArtworkListFragment.ARTWORK_TYPE_PIERCING);
 
     }
@@ -170,11 +185,12 @@ public class ArtistArtworkListFragment extends Fragment {
         menu.add(textResId).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
+                String tag = mArtistName + "/" + artworkTypeTattoo;
                 getFragmentManager().beginTransaction()
-                        //.addToBackStack("xyz")
                         .hide(ArtistArtworkListFragment.this)
                         .add(R.id.fragment_container, ArtistArtworkListFragment.newInstance(1,
-                                mArtistName, artworkTypeTattoo))
+                                mArtistName, artworkTypeTattoo), tag)
+                        .addToBackStack(tag)
                         .commit();
                 return false;
             }
@@ -209,7 +225,7 @@ public class ArtistArtworkListFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnArtistArtworkFragmentInteractionListener {
-        void onListFragmentInteraction(Fragment fr, ArtWork item);
+        void onListFragmentInteraction(Fragment fr, String artistName, ArtWork item);
 
         void loadThumbnail(Fragment fr, ImageView iv, ArtWork mItem);
     }

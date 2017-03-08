@@ -1,4 +1,4 @@
-package tattoo.gogo.app.gogo_android;
+package tattoo.gogo.app.gogo_android.utils;
 
 /**
  * Copyright (C) 2015 Wasabeef

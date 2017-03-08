@@ -14,8 +14,8 @@
         android:theme="@style/AppTheme"
         tools:replace="android:label">
 
-        <meta-data android:name=".GlideConfiguration"
-                   android:value=".GlideModule"/>
+        <!--<meta-data android:name=".config.GlideConfiguration"-->
+                   <!--android:value=".config.GlideModule"/>-->
 
         <activity
             android:name=".MainActivity"

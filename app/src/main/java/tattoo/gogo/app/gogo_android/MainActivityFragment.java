@@ -19,6 +19,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import tattoo.gogo.app.gogo_android.utils.CircleTransform;
 
 
 /**
@@ -113,24 +114,26 @@ public class MainActivityFragment extends Fragment {
                 iv.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        String tag = artistName+"/"+ArtistArtworkListFragment.ARTWORK_TYPE_TATTOO;
                         getFragmentManager().beginTransaction()
-                                .addToBackStack("xyz")
                                 .hide(MainActivityFragment.this)
                                 .add(R.id.fragment_container, ArtistArtworkListFragment.newInstance(1,
-                                        artistName, ArtistArtworkListFragment.ARTWORK_TYPE_TATTOO))
+                                        artistName, ArtistArtworkListFragment.ARTWORK_TYPE_TATTOO), tag)
+                                .addToBackStack(tag)
                                 .commit();
                     }
                 });
                 iv.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View view) {
+                        String tag = artistName+"/"+ArtistArtworkListFragment.ARTWORK_TYPE_DESIGN;
                         getFragmentManager().beginTransaction()
-                                .addToBackStack("xyz")
                                 .hide(MainActivityFragment.this)
                                 .add(R.id.fragment_container, ArtistArtworkListFragment.newInstance(1,
-                                        artistName, ArtistArtworkListFragment.ARTWORK_TYPE_DESIGN))
+                                        artistName, ArtistArtworkListFragment.ARTWORK_TYPE_DESIGN), tag)
+                                .addToBackStack(tag)
                                 .commit();
-                        return false;
+                        return true;
                     }
                 });
             }

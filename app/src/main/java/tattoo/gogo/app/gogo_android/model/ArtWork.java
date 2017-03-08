@@ -206,4 +206,6 @@ public class ArtWork implements Parcelable {
         dest.writeString(gender);
         dest.writeString(extra);
     }
+
+    public String getType() { return "art"; }
 }
