@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 public class ArtWork implements Parcelable {
 
+    @SerializedName("link")
     String link = "gogo/tattoo/";
     String title = "";
     @SerializedName("made_date")

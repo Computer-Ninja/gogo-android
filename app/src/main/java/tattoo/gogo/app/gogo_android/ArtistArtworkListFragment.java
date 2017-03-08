@@ -18,6 +18,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.zxing.common.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,7 +86,7 @@ public class ArtistArtworkListFragment extends Fragment {
             mArtworkType = getArguments().getString(ARG_ARTWORK_TYPE, ARTWORK_TYPE_TATTOO);
         }
 
-        getActivity().setTitle("gogo.tattoo/" + mArtistName + "/" + mArtworkType);
+        getActivity().setTitle(GogoConst.GOGO_TATTOO + "/"  + mArtistName + "/" + mArtworkType);
     }
 
     @Override
@@ -147,6 +149,8 @@ public class ArtistArtworkListFragment extends Fragment {
             @Override
             public void onFailure(Call<List<ArtWork>> call, Throwable t) {
                 Log.e(TAG, "onFailure: ", t);
+
+                getFragmentManager().popBackStack();
 
             }
         };

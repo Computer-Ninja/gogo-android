@@ -1,5 +1,6 @@
 package tattoo.gogo.app.gogo_android;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -16,6 +17,11 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.Request;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SizeReadyCallback;
+import com.bumptech.glide.request.target.Target;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -23,7 +29,9 @@ import tattoo.gogo.app.gogo_android.model.ArtWork;
 
 import static android.view.View.GONE;
 
-public class MainActivity extends AppCompatActivity implements ArtistArtworkListFragment.OnArtistArtworkFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements
+        ArtistArtworkListFragment.OnArtistArtworkFragmentInteractionListener,
+        FragmentManager.OnBackStackChangedListener {
 
     private boolean isFabOpen;
     private Animation fab_open;
@@ -110,21 +118,9 @@ public class MainActivity extends AppCompatActivity implements ArtistArtworkList
             }
         });
 
-        getSupportFragmentManager().addOnBackStackChangedListener(
-                new FragmentManager.OnBackStackChangedListener() {
-                    public void onBackStackChanged() {
-                        FragmentManager manager = getSupportFragmentManager();
+        getSupportFragmentManager().addOnBackStackChangedListener(this);
 
-                        if (manager != null) {
-                            if (manager.getBackStackEntryCount() == 0) {
-                                setTitle(R.string.app_name);
-                            }
-                        }
-                    }
-                }
-    );
-
-}
+    }
 
     public void animateFAB() {
 
@@ -205,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements ArtistArtworkList
 
     @Override
     public void onListFragmentInteraction(Fragment fr, String artistName, ArtWork artWork) {
-        String tag = artistName + "/" + artWork.getType();
+        String tag = artistName + "/" + artWork.getType() + "/"+ artWork.getLink();
         getSupportFragmentManager().beginTransaction()
                 .hide(fr)
                 .add(R.id.fragment_container,  ArtistArtworkFragment.newInstance(artistName, artWork), tag)
@@ -213,25 +209,44 @@ public class MainActivity extends AppCompatActivity implements ArtistArtworkList
                 .commit();
     }
 
-    @Override
-    public void loadThumbnail(Fragment fr, final ImageView iv, ArtWork mItem) {
-        if (mItem.getImageIpfs().isEmpty()) {
-            iv.setVisibility(GONE);
-        } else {
-            final String url = GogoConst.IPFS_GATEWAY_URL + mItem.getImageIpfs();
-            iv.setVisibility(View.VISIBLE);
-            Display display = getWindowManager().getDefaultDisplay();
-            DisplayMetrics outMetrics = new DisplayMetrics();
-            display.getMetrics(outMetrics);
+    public void onBackStackChanged() {
+        FragmentManager manager = getSupportFragmentManager();
 
+        if (manager != null) {
+            if (manager.getBackStackEntryCount() == 0) {
+                setActionBarTitle(getString(R.string.app_name_short));
+            } else {
+                FragmentManager.BackStackEntry bse =
+                        manager.getBackStackEntryAt(manager.getBackStackEntryCount() - 1);
+                String title = getString(R.string.app_name_short) + "/" + bse.getName();
+                if (title.length() > 24) {
+                    title = "/" + bse.getName();
+                }
 
-            Glide.with(fr)
-                    .load(url)
-                    .placeholder(R.drawable.progress_animation)
-                    .error(R.drawable.doge)
-                    .override(outMetrics.widthPixels, outMetrics.heightPixels)
-                    .into(iv);
-
+                setActionBarTitle(title);
+            }
         }
+    }
+
+    @Override
+    public void loadThumbnail(final Fragment fr, final ImageView iv, final ArtWork mItem) {
+        final String url = GogoConst.IPFS_GATEWAY_URL + mItem.getImageIpfs();
+        iv.setVisibility(View.VISIBLE);
+        Display display = getWindowManager().getDefaultDisplay();
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        display.getMetrics(outMetrics);
+
+
+        Glide.with(fr)
+                .load(url)
+                .placeholder(R.drawable.progress_animation)
+                .error(R.drawable.doge)
+                .override(outMetrics.widthPixels, outMetrics.heightPixels)
+                .into(iv);
+
+    }
+
+    public void setActionBarTitle(String title) {
+        getSupportActionBar().setTitle(title);
     }
 }

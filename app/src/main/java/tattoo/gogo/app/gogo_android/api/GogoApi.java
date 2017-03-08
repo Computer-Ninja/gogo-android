@@ -1,5 +1,7 @@
 package tattoo.gogo.app.gogo_android.api;
 
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -20,7 +22,11 @@ public class GogoApi {
         if (mApi == null) {
             HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-            OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .addInterceptor(interceptor)
+                    .connectTimeout(1, TimeUnit.MINUTES)
+                    .readTimeout(3, TimeUnit.MINUTES)
+                    .build();
             Retrofit retrofit = new Retrofit.Builder()
                     .client(client)
                     .baseUrl(HOST_URL)

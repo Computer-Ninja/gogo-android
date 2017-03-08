@@ -70,7 +70,6 @@ public class ArtistArtworkFragment extends Fragment {
     TextView tvMadeDate;
     @BindView(R.id.tv_artwork_made_published)
     TextView tvPublishedDate;
-    private ArtWork mArtwork;
     @BindView(R.id.iv_qr_gogotattoo)
     ImageView ivQRgogo;
     @BindView(R.id.iv_qr_gogogithub)
@@ -79,6 +78,9 @@ public class ArtistArtworkFragment extends Fragment {
     TextView tvGogoLink;
     @BindView(R.id.tv_github_link)
     TextView tvGithubLink;
+
+
+    private ArtWork mArtwork;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -106,8 +108,9 @@ public class ArtistArtworkFragment extends Fragment {
             mArtworkType = getArguments().getString(ARG_ARTWORK_TYPE, ArtistArtworkListFragment.ARTWORK_TYPE_TATTOO);
             mArtwork = getArguments().getParcelable(ARG_ARTWORK);
         }
-
-        getActivity().setTitle("gogo.tattoo/" + mArtistName + "/" + mArtworkType);
+//
+//        String title = mArtwork.getLink().replace("http://gogo.tattoo", "");
+//        ((MainActivity) getActivity()).setActionBarTitle(title);
 
     }
 
