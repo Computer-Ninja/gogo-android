@@ -219,7 +219,7 @@ public class ArtWork implements Parcelable {
 
     public String getMonth() {
         try {
-            return new SimpleDateFormat("MMMM YYYY").format(GogoConst.sdf.parse(getMadeDate()));
+            return new SimpleDateFormat("MMMM yyyy").format(GogoConst.sdf.parse(getMadeDate()));
         } catch (ParseException e) {
             return "";
         }
