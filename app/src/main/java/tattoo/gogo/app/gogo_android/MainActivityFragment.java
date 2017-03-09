@@ -25,7 +25,7 @@ import tattoo.gogo.app.gogo_android.utils.CircleTransform;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends ArtFragment {
 
     private int countFabTapped;
     @BindView(R.id.iv_doge)

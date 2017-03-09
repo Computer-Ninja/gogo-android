@@ -5,7 +5,11 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+
+import tattoo.gogo.app.gogo_android.GogoConst;
 
 /**
  * Created by delirium on 2/26/17.
@@ -38,7 +42,8 @@ public class ArtWork implements Parcelable {
     String gender = "female";
     String extra = "";
 
-    public ArtWork() {}
+    public ArtWork() {
+    }
 
     protected ArtWork(Parcel in) {
         link = in.readString();
@@ -208,5 +213,16 @@ public class ArtWork implements Parcelable {
         dest.writeString(extra);
     }
 
-    public String getType() { return "art"; }
+    public String getType() {
+        return "art";
+    }
+
+    public String getMonth() {
+        try {
+            return new SimpleDateFormat("MMMM YYYY").format(GogoConst.sdf.parse(getMadeDate()));
+        } catch (ParseException e) {
+            return "";
+        }
+    }
+
 }

@@ -6,7 +6,7 @@ import java.text.SimpleDateFormat;
  * Created by delirium on 17-3-7.
  */
 
-class GogoConst {
+public class GogoConst {
     public static final String IPFS_GATEWAY_URL = "https://ipfs.io/ipfs/";
 
     protected static final String MAIN_URL = "http://gogo.tattoo/";
