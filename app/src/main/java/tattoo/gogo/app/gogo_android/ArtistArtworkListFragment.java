@@ -4,10 +4,14 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,10 +19,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.google.zxing.common.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +61,8 @@ public class ArtistArtworkListFragment extends Fragment {
     private ImageView ivLoading;
     private TextView tvNothingHere;
     private String mArtworkType;
+    private AppBarLayout mAppbar;
+    private FloatingActionButton mFabButton;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -121,6 +128,35 @@ public class ArtistArtworkListFragment extends Fragment {
         loadList();
     }
 
+    public abstract class HidingScrollListener extends RecyclerView.OnScrollListener {
+        private static final int HIDE_THRESHOLD = 20;
+        private int scrolledDistance = 0;
+        private boolean controlsVisible = true;
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+
+            if (scrolledDistance > HIDE_THRESHOLD && controlsVisible) {
+                onHide();
+                controlsVisible = false;
+                scrolledDistance = 0;
+            } else if (scrolledDistance < -HIDE_THRESHOLD && !controlsVisible) {
+                onShow();
+                controlsVisible = true;
+                scrolledDistance = 0;
+            }
+
+            if((controlsVisible && dy>0) || (!controlsVisible && dy<0)) {
+                scrolledDistance += dy;
+            }
+        }
+
+        public abstract void onHide();
+        public abstract void onShow();
+
+    }
+
     private void loadList() {
         mWorks.clear();
         mRecyclerView.invalidate();
@@ -144,6 +180,18 @@ public class ArtistArtworkListFragment extends Fragment {
                 mRecyclerView.setDrawingCacheEnabled(true);
                 //mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
                 mRecyclerView.setAdapter(new ArtworkRecyclerViewAdapter(ArtistArtworkListFragment.this, mWorks, mListener, mArtistName));
+                mAppbar = (AppBarLayout) getActivity().findViewById(R.id.appbar);
+                mFabButton = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+                mRecyclerView.setOnScrollListener(new HidingScrollListener() {
+                    @Override
+                    public void onHide() {
+                        hideViews();
+                    }
+                    @Override
+                    public void onShow() {
+                        showViews();
+                    }
+                });
             }
 
             @Override
@@ -168,6 +216,20 @@ public class ArtistArtworkListFragment extends Fragment {
                 GogoApi.getApi().design(mArtistName).enqueue(callback);
                 break;
         }
+    }
+    
+    
+    private void hideViews() {
+        mAppbar.animate().translationY(-mAppbar.getHeight()).setInterpolator(new AccelerateInterpolator(2)).start();
+
+        CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) mFabButton.getLayoutParams();
+        int fabBottomMargin = lp.bottomMargin;
+        mFabButton.animate().translationY(mFabButton.getHeight()+fabBottomMargin).setInterpolator(new AccelerateInterpolator(2)).start();
+    }
+
+    private void showViews() {
+        mAppbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+        mFabButton.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
     }
 
     @Override
@@ -231,6 +293,7 @@ public class ArtistArtworkListFragment extends Fragment {
     public interface OnArtistArtworkFragmentInteractionListener {
         void onListFragmentInteraction(Fragment fr, String artistName, ArtWork item);
 
-        void loadThumbnail(Fragment fr, ImageView iv, ArtWork mItem);
+        void loadThumbnail(Fragment fr, ArtworkRecyclerViewAdapter.ViewHolder holder);
     }
+
 }

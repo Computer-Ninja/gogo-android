@@ -2,6 +2,7 @@ package tattoo.gogo.app.gogo_android;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -12,8 +13,10 @@ import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -22,10 +25,12 @@ import com.bumptech.glide.request.Request;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SizeReadyCallback;
 import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.target.ViewTarget;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
+import tattoo.gogo.app.gogo_android.utils.GlideImageGetter;
 
 import static android.view.View.GONE;
 
@@ -50,6 +55,10 @@ public class MainActivity extends AppCompatActivity implements
     View newPiercing;
     @BindView(R.id.fl_new_henna)
     View newHenna;
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
+    @BindView(R.id.appbar)
+    AppBarLayout mAppbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -215,10 +224,11 @@ public class MainActivity extends AppCompatActivity implements
 
     public void onBackStackChanged() {
         FragmentManager manager = getSupportFragmentManager();
-
+        mAppbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
         if (manager != null) {
             if (manager.getBackStackEntryCount() == 0) {
                 setActionBarTitle(getString(R.string.app_name_short));
+                fab.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
             } else {
                 FragmentManager.BackStackEntry bse =
                         manager.getBackStackEntryAt(manager.getBackStackEntryCount() - 1);
@@ -233,9 +243,9 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void loadThumbnail(final Fragment fr, final ImageView iv, final ArtWork mItem) {
-        final String url = GogoConst.IPFS_GATEWAY_URL + mItem.getImageIpfs();
-        iv.setVisibility(View.VISIBLE);
+    public void loadThumbnail(final Fragment fr, ArtworkRecyclerViewAdapter.ViewHolder holder) {
+        final String url = GogoConst.IPFS_GATEWAY_URL + holder.mItem.getImageIpfs();
+        holder.ivThumbnail.setVisibility(View.VISIBLE);
         Display display = getWindowManager().getDefaultDisplay();
         final DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -245,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements
                 .placeholder(R.drawable.progress_animation)
                 .error(R.drawable.doge)
                 .override(outMetrics.widthPixels, outMetrics.heightPixels)
-                .into(iv);
+                .into(holder.ivThumbnail);
 //
 //        iv.setOnLongClickListener(new View.OnLongClickListener() {
 //            @Override
