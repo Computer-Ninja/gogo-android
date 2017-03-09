@@ -237,9 +237,8 @@ public class MainActivity extends AppCompatActivity implements
         final String url = GogoConst.IPFS_GATEWAY_URL + mItem.getImageIpfs();
         iv.setVisibility(View.VISIBLE);
         Display display = getWindowManager().getDefaultDisplay();
-        DisplayMetrics outMetrics = new DisplayMetrics();
+        final DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
-
 
         Glide.with(fr)
                 .load(url)
@@ -247,6 +246,20 @@ public class MainActivity extends AppCompatActivity implements
                 .error(R.drawable.doge)
                 .override(outMetrics.widthPixels, outMetrics.heightPixels)
                 .into(iv);
+//
+//        iv.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View view) {
+//
+//                Glide.with(fr)
+//                        .load(url)
+//                        .placeholder(R.drawable.progress_animation)
+//                        .error(R.drawable.doge)
+//                        .override(outMetrics.widthPixels, outMetrics.heightPixels)
+//                        .into(iv);
+//                return true;
+//            }
+//        });
 
     }
 
