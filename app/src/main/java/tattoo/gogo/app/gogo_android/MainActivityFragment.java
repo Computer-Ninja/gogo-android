@@ -6,11 +6,13 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
@@ -19,6 +21,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import hello.Hello;
 import tattoo.gogo.app.gogo_android.utils.CircleTransform;
 
 
@@ -28,14 +31,11 @@ import tattoo.gogo.app.gogo_android.utils.CircleTransform;
 public class MainActivityFragment extends Fragment {
 
     private int countFabTapped;
-    @BindView(R.id.iv_doge)
-    ImageView ivDoge;
-    @BindView(R.id.iv_artist_gogo)
-    ImageView ivArtistGogo;
-    @BindView(R.id.iv_artist_aid)
-    ImageView ivArtistAid;
-    @BindView(R.id.iv_artist_xizi)
-    ImageView ivArtistXizi;
+    @BindView(R.id.iv_doge) ImageView ivDoge;
+    @BindView(R.id.iv_artist_gogo) ImageView ivArtistGogo;
+    @BindView(R.id.iv_artist_aid) ImageView ivArtistAid;
+    @BindView(R.id.iv_artist_xizi) ImageView ivArtistXizi;
+    @BindView(R.id.tv_description) TextView tvDescription;
 
     private View flNewTattoo;
     private FloatingActionButton fab;
@@ -100,6 +100,7 @@ public class MainActivityFragment extends Fragment {
         loadArtist(ivArtistAid, "http://gogo.tattoo/aid/images/aid.png", "aid");
         loadArtist(ivArtistXizi, "http://gogo.tattoo/xizi/images/xizi.jpg", "xizi");
 
+        tvDescription.setText(Hello.greetings("This is a greeting from golang, WOW!"));
 
     }
 
