@@ -1,19 +1,43 @@
 buildscript {
     repositories {
         maven { url 'https://maven.fabric.io/public' }
+        maven { url "https://plugins.gradle.org/m2/"}
     }
 
     dependencies {
         classpath 'io.fabric.tools:gradle:1.+'
+        classpath "gradle.plugin.org.golang.mobile.bind:gobindPlugin:0.2.8"
     }
 }
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
+apply plugin: "org.golang.mobile.bind"
+
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
 }
 
+gobind {
+    pkg = "golang.org/x/mobile/example/bind/hello"
+
+    GOPATH = "/Users/delirium/go"
+
+    // Optional path to the go executable.
+     GO = "/Users/delirium/go/bin/go"
+
+    // Optionally, set the absolute path to the gomobile binary.
+    GOMOBILE = "/Users/delirium/go/bin/gomobile"
+
+    // Pass extra parameters to command line. Optional.
+    // GOMOBILEFLAGS="-javapkg my.java.package"
+
+    // Absolute path to the gobind binary. Optional.
+    GOBIND="/Users/delirium/go/bin/gobind"
+
+    // Optional list of architectures. Defaults to all supported architectures.
+    // GOARCH="arm amd64"
+}
 
 android {
     compileSdkVersion 25
