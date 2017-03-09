@@ -252,8 +252,8 @@ public class ArtistArtworkFragment extends Fragment {
         addImage(mArtwork.getImageIpfs());
     }
 
-    private void addImage(String imageIpfs) {
-        ImageView iv = new ImageView(getContext());
+    private void addImage(final String imageIpfs) {
+        final ImageView iv = new ImageView(getContext());
         iv.setAdjustViewBounds(true);
         iv.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         iv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -265,6 +265,19 @@ public class ArtistArtworkFragment extends Fragment {
                 .placeholder(R.drawable.progress_animation)
                 .error(R.drawable.doge)
                 .into(iv);
+//
+//        iv.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View view) {
+//
+//                Glide.with(ArtistArtworkFragment.this)
+//                        .load(GogoConst.IPFS_GATEWAY_URL + imageIpfs)
+//                        .placeholder(R.drawable.progress_animation)
+//                        .error(R.drawable.doge)
+//                        .into(iv);
+//                return true;
+//            }
+//        });
     }
 
     protected Bitmap makeQRcode(String link) throws OutOfMemoryError {
