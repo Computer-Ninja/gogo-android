@@ -253,6 +253,9 @@ public class ArtistArtworkFragment extends Fragment {
     }
 
     private void addImage(final String imageIpfs) {
+        if (getContext() == null) {
+            return;
+        }
         final ImageView iv = new ImageView(getContext());
         iv.setAdjustViewBounds(true);
         iv.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
