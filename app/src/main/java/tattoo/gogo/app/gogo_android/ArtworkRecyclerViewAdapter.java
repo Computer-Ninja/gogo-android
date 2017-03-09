@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 import tattoo.gogo.app.gogo_android.model.ArtWork;
@@ -43,7 +45,7 @@ public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecy
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        //holder.mIdView.setText(mValues.get(position).());
+        //holder.tvHeaderMonth.setText(mValues.get(position).());
         holder.mContentView.setText(mValues.get(position).getTitle());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -56,7 +58,13 @@ public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecy
                 }
             }
         });
-        mListener.loadThumbnail(mFragment, holder.ivThumbnail, holder.mItem);
+        mListener.loadThumbnail(mFragment, holder);
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(ViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        Glide.clear(holder.ivThumbnail);
     }
 
     @Override
@@ -66,17 +74,17 @@ public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecy
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView mIdView;
+        public final TextView tvHeaderMonth;
         public final TextView mContentView;
-        public final ImageView ivThumbnail;
+        public ImageView ivThumbnail;
 
         public ArtWork mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.id);
-            mContentView = (TextView) view.findViewById(R.id.name);
+            tvHeaderMonth = (TextView) view.findViewById(R.id.tv_header_month);
+            mContentView = (TextView) view.findViewById(R.id.tv_artwork_title);
             ivThumbnail = (ImageView) view.findViewById(R.id.iv_thumbnail);
         }
 

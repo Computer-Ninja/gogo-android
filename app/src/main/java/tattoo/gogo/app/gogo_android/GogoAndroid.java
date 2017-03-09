@@ -17,5 +17,6 @@ public class GogoAndroid extends Application {
 //        built.setLoggingEnabled(true);
 //        Picasso.setSingletonInstance(built);
 
+
     }
 }
