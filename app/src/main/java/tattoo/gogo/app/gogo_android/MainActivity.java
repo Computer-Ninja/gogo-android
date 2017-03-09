@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,6 +21,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.Request;
 import com.bumptech.glide.request.animation.GlideAnimation;
@@ -37,7 +39,7 @@ import static android.view.View.GONE;
 public class MainActivity extends AppCompatActivity implements
         ArtistArtworkListFragment.OnArtistArtworkFragmentInteractionListener,
         FragmentManager.OnBackStackChangedListener {
-
+    private static final String TAG = "MainActivity";
     private boolean isFabOpen;
     private Animation fab_open;
     private Animation fab_close;
@@ -65,8 +67,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setSupportActionBar(mToolbar);
 
         fab_open = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
         fab_close = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
@@ -224,7 +225,9 @@ public class MainActivity extends AppCompatActivity implements
 
     public void onBackStackChanged() {
         FragmentManager manager = getSupportFragmentManager();
-        mAppbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+        //mAppbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+        mAppbar.setExpanded(true, true);
+        mToolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
         if (manager != null) {
             if (manager.getBackStackEntryCount() == 0) {
                 setActionBarTitle(getString(R.string.app_name_short));
@@ -244,16 +247,18 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void loadThumbnail(final Fragment fr, ArtworkRecyclerViewAdapter.ViewHolder holder) {
+        Log.d(TAG, "loadThumbnail: " + holder.mItem.getTitle());
         final String url = GogoConst.IPFS_GATEWAY_URL + holder.mItem.getImageIpfs();
         holder.ivThumbnail.setVisibility(View.VISIBLE);
         Display display = getWindowManager().getDefaultDisplay();
         final DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        Glide.with(fr)
+        Glide.with(getApplicationContext())
                 .load(url)
                 .placeholder(R.drawable.progress_animation)
                 .error(R.drawable.doge)
+                .diskCacheStrategy(DiskCacheStrategy.RESULT)
                 .override(outMetrics.widthPixels, outMetrics.heightPixels)
                 .into(holder.ivThumbnail);
 //

@@ -10,9 +10,11 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -52,7 +54,7 @@ import static android.view.View.GONE;
  * Activities containing this fragment MUST implement the {@link OnArtistArtworkFragmentInteractionListener}
  * interface.
  */
-public class ArtistArtworkFragment extends Fragment {
+public class ArtistArtworkFragment extends ArtFragment {
 
     private static final String ARG_ARTIST_NAME = "artist-name";
     private static final String ARG_ARTWORK_TYPE = "artwork-type";
@@ -120,8 +122,6 @@ public class ArtistArtworkFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_artwork, container, false);
 
         ButterKnife.bind(this, view);
-        // Set the adapter
-        Context context = view.getContext();
         return view;
     }
 

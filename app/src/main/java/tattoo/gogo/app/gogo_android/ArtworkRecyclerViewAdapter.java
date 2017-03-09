@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import tattoo.gogo.app.gogo_android.model.ArtWork;
@@ -45,8 +47,13 @@ public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecy
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        //holder.tvHeaderMonth.setText(mValues.get(position).());
-        holder.mContentView.setText(mValues.get(position).getTitle());
+        if (position == 0 || !mValues.get(position - 1).getMonth().equals(holder.mItem.getMonth())) {
+            holder.tvHeaderMonth.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvHeaderMonth.setVisibility(View.GONE);
+        }
+        holder.tvHeaderMonth.setText(holder.mItem.getMonth());
+        holder.mContentView.setText(holder.mItem.getTitle());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,7 +71,7 @@ public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecy
     @Override
     public void onViewDetachedFromWindow(ViewHolder holder) {
         super.onViewDetachedFromWindow(holder);
-        Glide.clear(holder.ivThumbnail);
+        //Glide.clear(holder.ivThumbnail);
     }
 
     @Override
@@ -76,7 +83,7 @@ public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecy
         public final View mView;
         public final TextView tvHeaderMonth;
         public final TextView mContentView;
-        public ImageView ivThumbnail;
+        public final ImageView ivThumbnail;
 
         public ArtWork mItem;
 

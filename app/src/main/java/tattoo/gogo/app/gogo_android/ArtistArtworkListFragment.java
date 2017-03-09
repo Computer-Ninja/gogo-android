@@ -33,6 +33,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import tattoo.gogo.app.gogo_android.api.GogoApi;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
+import tattoo.gogo.app.gogo_android.model.Piercing;
 
 import static android.content.ContentValues.TAG;
 
@@ -42,7 +43,7 @@ import static android.content.ContentValues.TAG;
  * Activities containing this fragment MUST implement the {@link OnArtistArtworkFragmentInteractionListener}
  * interface.
  */
-public class ArtistArtworkListFragment extends Fragment {
+public class ArtistArtworkListFragment extends ArtFragment {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private static final String ARG_ARTIST_NAME = "artist-name";
@@ -61,8 +62,7 @@ public class ArtistArtworkListFragment extends Fragment {
     private ImageView ivLoading;
     private TextView tvNothingHere;
     private String mArtworkType;
-    private AppBarLayout mAppbar;
-    private FloatingActionButton mFabButton;
+    private List<ArtWork> mAllWorks = new ArrayList<>();
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -115,11 +115,6 @@ public class ArtistArtworkListFragment extends Fragment {
         return view;
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-    }
 
     @Override
     public void onResume() {
@@ -162,6 +157,7 @@ public class ArtistArtworkListFragment extends Fragment {
         mRecyclerView.invalidate();
         ivLoading.setVisibility(View.VISIBLE);
         Callback callback = new Callback<List<ArtWork>>() {
+
             @Override
             public void onResponse(Call<List<ArtWork>> call, Response<List<ArtWork>> response) {
                 ivLoading.setVisibility(View.GONE);
@@ -170,9 +166,15 @@ public class ArtistArtworkListFragment extends Fragment {
                     tvNothingHere.setVisibility(View.VISIBLE);
                     return;
                 }
+                mAllWorks.addAll(response.body());
+                int count = 0;
                 for (ArtWork tat : response.body()) {
                     if (!tat.getImageIpfs().isEmpty()) {
+                        //if (count > 5) {
+                        //    break;
+                        //}
                         mWorks.add(tat);
+                        count ++;
                     }
                 }
                 //mRecyclerView.setHasFixedSize(true);
@@ -180,13 +182,25 @@ public class ArtistArtworkListFragment extends Fragment {
                 mRecyclerView.setDrawingCacheEnabled(true);
                 //mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
                 mRecyclerView.setAdapter(new ArtworkRecyclerViewAdapter(ArtistArtworkListFragment.this, mWorks, mListener, mArtistName));
-                mAppbar = (AppBarLayout) getActivity().findViewById(R.id.appbar);
-                mFabButton = (FloatingActionButton) getActivity().findViewById(R.id.fab);
-                mRecyclerView.setOnScrollListener(new HidingScrollListener() {
+                final LinearLayoutManager lm = (LinearLayoutManager) mRecyclerView.getLayoutManager();
+                mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                    @Override
+                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                        int visibleItemCount = lm.getChildCount();
+                        int totalItemCount = lm.getItemCount();
+                        int pastVisibleItems = lm.findFirstVisibleItemPosition();
+                        if (pastVisibleItems + visibleItemCount >= totalItemCount) {
+                            mWorks.add(mAllWorks.remove(0));
+                            mRecyclerView.invalidate();
+                        }
+                    }
+                });
+                mRecyclerView.addOnScrollListener(new HidingScrollListener() {
                     @Override
                     public void onHide() {
                         hideViews();
                     }
+
                     @Override
                     public void onShow() {
                         showViews();
@@ -216,20 +230,6 @@ public class ArtistArtworkListFragment extends Fragment {
                 GogoApi.getApi().design(mArtistName).enqueue(callback);
                 break;
         }
-    }
-    
-    
-    private void hideViews() {
-        mAppbar.animate().translationY(-mAppbar.getHeight()).setInterpolator(new AccelerateInterpolator(2)).start();
-
-        CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) mFabButton.getLayoutParams();
-        int fabBottomMargin = lp.bottomMargin;
-        mFabButton.animate().translationY(mFabButton.getHeight()+fabBottomMargin).setInterpolator(new AccelerateInterpolator(2)).start();
-    }
-
-    private void showViews() {
-        mAppbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
-        mFabButton.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
     }
 
     @Override
