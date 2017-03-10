@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import java.lang.ref.WeakReference;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -61,17 +62,23 @@ public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecy
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(mFragment, mArtistName, holder.mItem);
+                    mListener.onListFragmentInteraction(new WeakReference<>(mFragment), mArtistName, holder.mItem);
                 }
             }
         });
-        mListener.loadThumbnail(mFragment, holder);
+        mListener.loadThumbnail(new WeakReference<>(mFragment), holder);
     }
 
     @Override
     public void onViewDetachedFromWindow(ViewHolder holder) {
         super.onViewDetachedFromWindow(holder);
-        //Glide.clear(holder.ivThumbnail);
+        //
+    }
+
+    @Override
+    public void onViewRecycled(ViewHolder holder) {
+        super.onViewRecycled(holder);
+        Glide.clear(holder.ivThumbnail);
     }
 
     @Override

@@ -25,6 +25,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -291,9 +292,9 @@ public class ArtistArtworkListFragment extends ArtFragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnArtistArtworkFragmentInteractionListener {
-        void onListFragmentInteraction(Fragment fr, String artistName, ArtWork item);
+        void onListFragmentInteraction(WeakReference<Fragment> fr, String artistName, ArtWork item);
 
-        void loadThumbnail(Fragment fr, ArtworkRecyclerViewAdapter.ViewHolder holder);
+        void loadThumbnail(WeakReference<Fragment> fr, ArtworkRecyclerViewAdapter.ViewHolder holder);
     }
 
 }

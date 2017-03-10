@@ -1,5 +1,6 @@
 package tattoo.gogo.app.gogo_android;
 
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -25,9 +26,12 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.Request;
 import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.SizeReadyCallback;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.target.ViewTarget;
+
+import java.lang.ref.WeakReference;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -218,10 +222,14 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onListFragmentInteraction(Fragment fr, String artistName, ArtWork artWork) {
+    public void onListFragmentInteraction(WeakReference<Fragment> fr, String artistName, ArtWork artWork) {
+        if (fr.get() == null) {
+            Log.d(TAG, "loadThumbnail: Fragment is null");
+            return;
+        }
         String tag = artistName + "/" + artWork.getType() + "/"+ artWork.getLink();
         getSupportFragmentManager().beginTransaction()
-                .hide(fr)
+                .hide(fr.get())
                 .add(R.id.fragment_container,  ArtistArtworkFragment.newInstance(artistName, artWork), tag)
                 .addToBackStack(tag)
                 .commit();
@@ -254,21 +262,46 @@ public class MainActivity extends AppCompatActivity implements
 
 
     @Override
-    public void loadThumbnail(final Fragment fr, ArtworkRecyclerViewAdapter.ViewHolder holder) {
+    public void loadThumbnail(WeakReference<Fragment> fr, ArtworkRecyclerViewAdapter.ViewHolder holder) {
         Log.d(TAG, "loadThumbnail: " + holder.mItem.getTitle());
+        if (fr.get() == null) {
+            Log.d(TAG, "loadThumbnail: Fragment is null");
+            return;
+        }
         final String url = GogoConst.IPFS_GATEWAY_URL + holder.mItem.getImageIpfs();
         holder.ivThumbnail.setVisibility(View.VISIBLE);
         Display display = getWindowManager().getDefaultDisplay();
         final DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        Glide.with(getApplicationContext())
+        Glide.with(fr.get())
                 .load(url)
                 .placeholder(R.drawable.progress_animation)
                 .error(R.drawable.doge)
                 .diskCacheStrategy(DiskCacheStrategy.RESULT)
                 .override(outMetrics.widthPixels, outMetrics.heightPixels)
                 .into(holder.ivThumbnail);
+
+//
+//        Glide.with(fr.get())
+//                .load(url)
+//                .asBitmap()
+//                .dontAnimate()
+//                //.placeholder(R.drawable.progress_animation)
+//                //.error(R.drawable.doge)
+//                .diskCacheStrategy(DiskCacheStrategy.RESULT)
+//                //.override(outMetrics.widthPixels, outMetrics.heightPixels)
+//                .into(new SimpleTarget<Bitmap>() {
+//                    @Override
+//                    public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
+//
+//                        if (bitmap != null) {
+//
+//                            holder.ivThumbnail.setImageBitmap(bitmap);
+//
+//                        }
+//                    }
+//                });
 //
 //        iv.setOnLongClickListener(new View.OnLongClickListener() {
 //            @Override
