@@ -69,6 +69,8 @@ public class MainActivity extends AppCompatActivity implements
         ButterKnife.bind(this);
         setSupportActionBar(mToolbar);
 
+        getSupportActionBar().setHomeButtonEnabled(true);
+
         fab_open = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
         fab_close = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
         rotate_forward = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_forward);
@@ -192,6 +194,8 @@ public class MainActivity extends AppCompatActivity implements
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == android.R.id.home) {
+            onBackPressed();
         }
 
         return super.onOptionsItemSelected(item);
@@ -232,6 +236,7 @@ public class MainActivity extends AppCompatActivity implements
             if (manager.getBackStackEntryCount() == 0) {
                 setActionBarTitle(getString(R.string.app_name_short));
                 fab.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             } else {
                 FragmentManager.BackStackEntry bse =
                         manager.getBackStackEntryAt(manager.getBackStackEntryCount() - 1);
@@ -241,9 +246,12 @@ public class MainActivity extends AppCompatActivity implements
                 }
 
                 setActionBarTitle(title);
+
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             }
         }
     }
+
 
     @Override
     public void loadThumbnail(final Fragment fr, ArtworkRecyclerViewAdapter.ViewHolder holder) {
