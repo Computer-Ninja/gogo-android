@@ -2,6 +2,9 @@ buildscript {
     repositories {
         maven { url 'https://maven.fabric.io/public' }
         maven { url "https://plugins.gradle.org/m2/"}
+        flatDir {
+            dirs 'libs'
+        }
     }
 
     dependencies {
@@ -20,20 +23,22 @@ repositories {
 
 gobind {
     pkg = "golang.org/x/mobile/example/bind/hello"
+    //pkg = "github.com/gogotattoo/gogo-upload/watermark"
+    //pkg = "github.com/skip2/go-qrcode"
 
-    GOPATH = "/Users/delirium/go"
+    GOPATH = "/home/delirium/go"
 
     // Optional path to the go executable.
-     GO = "/Users/delirium/go/bin/go"
+     GO = "/home/delirium/go/bin/go"
 
     // Optionally, set the absolute path to the gomobile binary.
-    GOMOBILE = "/Users/delirium/go/bin/gomobile"
+    GOMOBILE = "/home/delirium/go/bin/gomobile"
 
     // Pass extra parameters to command line. Optional.
     // GOMOBILEFLAGS="-javapkg my.java.package"
 
     // Absolute path to the gobind binary. Optional.
-    GOBIND="/Users/delirium/go/bin/gobind"
+    GOBIND="/home/delirium/go/bin/gobind"
 
     // Optional list of architectures. Defaults to all supported architectures.
     // GOARCH="arm amd64"
@@ -88,6 +93,9 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics-ndk:1.1.6@aar') {
         transitive = true;
     }
+
+//    compile(name:'watermark', ext:'aar')
+
 }
 
 crashlytics {
