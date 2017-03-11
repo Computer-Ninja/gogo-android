@@ -10,7 +10,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.text.Editable;
@@ -31,7 +30,6 @@ import net.glxn.qrgen.core.image.ImageType;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -43,14 +41,13 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
-import tattoo.gogo.app.gogo_android.model.Henna;
 
 import static android.view.View.GONE;
 
 /**
  * Created by delirium on 2/26/17.
  */
-public abstract class NewWorkFragment extends Fragment {
+public abstract class NewWorkFragment extends ArtFragment {
     protected OkHttpClient client;
     protected String mTattooArtist = "gogo";
 

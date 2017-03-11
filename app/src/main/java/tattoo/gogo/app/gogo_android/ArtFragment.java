@@ -1,18 +1,16 @@
 package tattoo.gogo.app.gogo_android;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import net.glxn.qrgen.android.QRCode;
 
 /**
  * Created by delirium on 17-3-9.
@@ -45,4 +43,7 @@ public class ArtFragment extends Fragment {
         mFabButton.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
     }
 
+    protected Bitmap makeQRcode(String link) throws OutOfMemoryError {
+        return QRCode.from(link).withSize(1024, 1024).bitmap();
+    }
 }

@@ -2,16 +2,11 @@ package tattoo.gogo.app.gogo_android;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,9 +14,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -34,7 +26,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import tattoo.gogo.app.gogo_android.api.GogoApi;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
-import tattoo.gogo.app.gogo_android.model.Piercing;
 
 import static android.content.ContentValues.TAG;
 
@@ -54,16 +45,19 @@ public class ArtistArtworkListFragment extends ArtFragment {
     public static final String ARTWORK_TYPE_DESIGN = "design";
     public static final String ARTWORK_TYPE_HENNA = "henna";
     public static final String ARTWORK_TYPE_PIERCING = "piercing";
+    private static final String PARAM_WORKS = "works";
+    private static final String PARAM_BUNDLE = "bundle";
 
     private int mColumnCount = 1;
     private OnArtistArtworkFragmentInteractionListener mListener;
-    private List<ArtWork> mWorks = new ArrayList<>();
+    private ArrayList<ArtWork> mWorks = new ArrayList<>();
     private RecyclerView mRecyclerView;
     private String mArtistName;
     private ImageView ivLoading;
     private TextView tvNothingHere;
     private String mArtworkType;
     private List<ArtWork> mAllWorks = new ArrayList<>();
+    private Bundle savedState = null;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -94,7 +88,7 @@ public class ArtistArtworkListFragment extends ArtFragment {
             mArtworkType = getArguments().getString(ARG_ARTWORK_TYPE, ARTWORK_TYPE_TATTOO);
         }
 
-        getActivity().setTitle(GogoConst.GOGO_TATTOO + "/"  + mArtistName + "/" + mArtworkType);
+        getActivity().setTitle(GogoConst.GOGO_TATTOO + "/" + mArtistName + "/" + mArtworkType);
     }
 
     @Override
@@ -112,6 +106,14 @@ public class ArtistArtworkListFragment extends ArtFragment {
         } else {
             mRecyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
         }
+        if (savedInstanceState != null && savedState == null) {
+            savedState = savedInstanceState.getBundle(PARAM_BUNDLE);
+        }
+        if (savedState != null) {
+            mWorks = savedState.getParcelableArrayList(PARAM_WORKS);
+            setupRecyclerView();
+        }
+        savedState = null;
 
         return view;
     }
@@ -121,7 +123,33 @@ public class ArtistArtworkListFragment extends ArtFragment {
     public void onResume() {
         super.onResume();
 
-        loadList();
+        if (mWorks == null || mWorks.isEmpty()) {
+            loadList();
+        } else {
+            ivLoading.setVisibility(View.GONE);
+        }
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        savedState = saveState(); /* vstup defined here for sure */
+    }
+
+    private Bundle saveState() { /* called either from onDestroyView() or onSaveInstanceState() */
+        Bundle state = new Bundle();
+        state.putParcelableArrayList(PARAM_WORKS, mWorks);
+        return state;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        /* If onDestroyView() is called first, we can use the previously savedState but we can't call saveState() anymore */
+        /* If onSaveInstanceState() is called first, we don't have savedState, so we need to call saveState() */
+        /* => (?:) operator inevitable! */
+        outState.putBundle(PARAM_BUNDLE, (savedState != null) ? savedState : saveState());
     }
 
     public abstract class HidingScrollListener extends RecyclerView.OnScrollListener {
@@ -143,12 +171,13 @@ public class ArtistArtworkListFragment extends ArtFragment {
                 scrolledDistance = 0;
             }
 
-            if((controlsVisible && dy>0) || (!controlsVisible && dy<0)) {
+            if ((controlsVisible && dy > 0) || (!controlsVisible && dy < 0)) {
                 scrolledDistance += dy;
             }
         }
 
         public abstract void onHide();
+
         public abstract void onShow();
 
     }
@@ -175,38 +204,10 @@ public class ArtistArtworkListFragment extends ArtFragment {
                         //    break;
                         //}
                         mWorks.add(tat);
-                        count ++;
+                        count++;
                     }
                 }
-                //mRecyclerView.setHasFixedSize(true);
-                mRecyclerView.setItemViewCacheSize(20);
-                mRecyclerView.setDrawingCacheEnabled(true);
-                //mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-                mRecyclerView.setAdapter(new ArtworkRecyclerViewAdapter(ArtistArtworkListFragment.this, mWorks, mListener, mArtistName));
-                final LinearLayoutManager lm = (LinearLayoutManager) mRecyclerView.getLayoutManager();
-                mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                    @Override
-                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                        int visibleItemCount = lm.getChildCount();
-                        int totalItemCount = lm.getItemCount();
-                        int pastVisibleItems = lm.findFirstVisibleItemPosition();
-                        if (pastVisibleItems + visibleItemCount >= totalItemCount) {
-                            mWorks.add(mAllWorks.remove(0));
-                            mRecyclerView.invalidate();
-                        }
-                    }
-                });
-                mRecyclerView.addOnScrollListener(new HidingScrollListener() {
-                    @Override
-                    public void onHide() {
-                        hideViews();
-                    }
-
-                    @Override
-                    public void onShow() {
-                        showViews();
-                    }
-                });
+                setupRecyclerView();
             }
 
             @Override
@@ -233,17 +234,49 @@ public class ArtistArtworkListFragment extends ArtFragment {
         }
     }
 
+    private void setupRecyclerView() {
+        //mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setItemViewCacheSize(20);
+        mRecyclerView.setDrawingCacheEnabled(true);
+        //mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        mRecyclerView.setAdapter(new ArtworkRecyclerViewAdapter(ArtistArtworkListFragment.this, mWorks, mListener, mArtistName));
+        final LinearLayoutManager lm = (LinearLayoutManager) mRecyclerView.getLayoutManager();
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                int visibleItemCount = lm.getChildCount();
+                int totalItemCount = lm.getItemCount();
+                int pastVisibleItems = lm.findFirstVisibleItemPosition();
+                if (pastVisibleItems + visibleItemCount >= totalItemCount) {
+                    // mWorks.add(mAllWorks.remove(0));
+                    mRecyclerView.invalidate();
+                }
+            }
+        });
+        mRecyclerView.addOnScrollListener(new HidingScrollListener() {
+            @Override
+            public void onHide() {
+                hideViews();
+            }
+
+            @Override
+            public void onShow() {
+                showViews();
+            }
+        });
+    }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         if (!mArtworkType.equals(ARTWORK_TYPE_TATTOO))
-        addMenuItem(menu, R.string.tattoo, ArtistArtworkListFragment.ARTWORK_TYPE_TATTOO);
+            addMenuItem(menu, R.string.tattoo, ArtistArtworkListFragment.ARTWORK_TYPE_TATTOO);
         if (!mArtworkType.equals(ARTWORK_TYPE_DESIGN))
-        addMenuItem(menu, R.string.design, ArtistArtworkListFragment.ARTWORK_TYPE_DESIGN);
+            addMenuItem(menu, R.string.design, ArtistArtworkListFragment.ARTWORK_TYPE_DESIGN);
         if (!mArtworkType.equals(ARTWORK_TYPE_HENNA))
-        addMenuItem(menu, R.string.henna, ArtistArtworkListFragment.ARTWORK_TYPE_HENNA);
+            addMenuItem(menu, R.string.henna, ArtistArtworkListFragment.ARTWORK_TYPE_HENNA);
         if (!mArtworkType.equals(ARTWORK_TYPE_PIERCING))
-        addMenuItem(menu, R.string.piercing, ArtistArtworkListFragment.ARTWORK_TYPE_PIERCING);
+            addMenuItem(menu, R.string.piercing, ArtistArtworkListFragment.ARTWORK_TYPE_PIERCING);
 
     }
 

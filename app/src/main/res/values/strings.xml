@@ -8,7 +8,7 @@
     <string name="hint_made_at">Where was the it made? chushangfeng?</string>
     <string name="hint_made_by">Who made it? gogo?</string>
     <string name="hint_made_date">When was it made? Today?</string>
-    <string name="share_to">Share to...</string>
+    <string name="share_to">Share to…</string>
     <string name="hint_time_elapsed">How long time did it take to make?</string>
     <string name="male">Male</string>
     <string name="female">Female</string>
@@ -26,11 +26,20 @@
     <string name="piercing">Piercing</string>
     <string name="dreaklocks">Locks</string>
     <string name="hint_piercing_title">Any cool name?</string>
-    <string name="submit_success">New artwork is submitted succesfully</string>
+    <string name="submit_success">New artwork is submitted successfully</string>
     <string name="submit_fail">Something went wrong</string>
     <string name="hint_title">Artwork title</string>
     <string name="nothing_here_yet">Nothing here yet.</string>
     <string name="slogan">Our mission is to better the world of tattoos</string>
     <string name="tv_made_date">Made: %s</string>
     <string name="tv_publish_date">Published: %s</string>
+    <string name="photo_download_succeess">Photo was downloaded to your SDCard successfully</string>
+    <string name="photo_download_fail">Something went wrong</string>
+    <string name="photo_download_started">Downloading this photo to SD card…</string>
+    <string name="save_to_phone">Save to Phone</string>
+    <string name="refresh_image">Refresh</string>
+    <string name="share_all">Share all</string>
+    <string name="share_original_to">Share original file</string>
+    <string name="photo_download_for_sharing">Fetching image to share…</string>
+    <string name="something_went_wrong">Something went wrong, please report an issue ; )</string>
 </resources>

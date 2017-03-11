@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -21,7 +23,6 @@ import com.bumptech.glide.request.target.SimpleTarget;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import hello.Hello;
 import tattoo.gogo.app.gogo_android.utils.CircleTransform;
 
 
@@ -100,7 +101,8 @@ public class MainActivityFragment extends ArtFragment {
         loadArtist(ivArtistAid, "http://gogo.tattoo/aid/images/aid.png", "aid");
         loadArtist(ivArtistXizi, "http://gogo.tattoo/xizi/images/xizi.jpg", "xizi");
 
-        tvDescription.setText(Hello.greetings("This is a greeting from golang, WOW!"));
+        //tvDescription.setText(Hello.greetings("This is a greeting from golang, WOW!"));
+
 
     }
 

@@ -1,51 +1,30 @@
 package tattoo.gogo.app.gogo_android;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.FileProvider;
-import android.support.v4.widget.NestedScrollView;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import net.glxn.qrgen.android.QRCode;
-import net.glxn.qrgen.core.image.ImageType;
-
-import java.io.File;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import tattoo.gogo.app.gogo_android.api.GogoApi;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
+import tattoo.gogo.app.gogo_android.utils.IntentUtils;
 
-import static android.content.ContentValues.TAG;
 import static android.view.View.GONE;
 
 /**
@@ -60,9 +39,7 @@ public class ArtistArtworkFragment extends ArtFragment {
     private static final String ARG_ARTWORK_TYPE = "artwork-type";
     private static final String ARG_ARTWORK = "artwork";
 
-    private List<ArtWork> mWorks = new ArrayList<>();
     private String mArtistName;
-    private String mArtworkType;
 
     @BindView(R.id.tv_artwork_title)
     TextView tvTitle;
@@ -83,6 +60,8 @@ public class ArtistArtworkFragment extends ArtFragment {
 
 
     private ArtWork mArtwork;
+    private OnArtistArtworkFragmentInteractionListener mListener;
+    private List<View> mViews = new ArrayList<>();
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -107,7 +86,6 @@ public class ArtistArtworkFragment extends ArtFragment {
 
         if (getArguments() != null) {
             mArtistName = getArguments().getString(ARG_ARTIST_NAME, "gogo");
-            mArtworkType = getArguments().getString(ARG_ARTWORK_TYPE, ArtistArtworkListFragment.ARTWORK_TYPE_TATTOO);
             mArtwork = getArguments().getParcelable(ARG_ARTWORK);
         }
 //
@@ -143,7 +121,7 @@ public class ArtistArtworkFragment extends ArtFragment {
             e.printStackTrace();
         }
 
-
+        hideViews();
         updateQRcodes();
 
 
@@ -154,6 +132,12 @@ public class ArtistArtworkFragment extends ArtFragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
+        menu.clear();
+
+        menu.add(R.string.share_all).setOnMenuItemClickListener(menuItem -> {
+            mListener.sharePhotos(mViews);
+            return false;
+        });
 
     }
 
@@ -161,6 +145,13 @@ public class ArtistArtworkFragment extends ArtFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
+        if (context instanceof ArtistArtworkListFragment.OnArtistArtworkFragmentInteractionListener) {
+            mListener = (OnArtistArtworkFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnArtistTattooFragmentInteractionListener");
+        }
     }
 
     @Override
@@ -180,7 +171,19 @@ public class ArtistArtworkFragment extends ArtFragment {
      */
     public interface OnArtistArtworkFragmentInteractionListener {
 
-        void loadImage(Fragment fr, ImageView iv, String ipfsHash);
+        void savePhoto(String hash);
+        void shareOriginalPhoto(String hash);
+        void sharePhoto(View view);
+        void sharePhotos(List<View> views);
+
+        void showLoading();
+        void hideLoading();
+
+        void showContextMenu(ImageView iv, String hash, OnImageRefreshListener l);
+    }
+
+    public interface OnImageRefreshListener {
+        void onImageRefresh(String hash, ImageView iv);
     }
 
 
@@ -195,7 +198,9 @@ public class ArtistArtworkFragment extends ArtFragment {
         final String gogoTattooLink = makeLink(GogoConst.MAIN_URL);
         final String gogoGithubLink = makeLink(GogoConst.GITHUB_URL);
         tvGogoLink.setText(gogoTattooLink);
+        tvGogoLink.setOnClickListener(view -> IntentUtils.opentUrl(getActivity(), gogoTattooLink));
         tvGithubLink.setText(gogoGithubLink);
+        tvGithubLink.setOnClickListener(view -> IntentUtils.opentUrl(getActivity(), gogoGithubLink));
 
         new AsyncTask<Void, Void, Boolean>() {
             public Bitmap qrGithubBitmap;
@@ -215,80 +220,77 @@ public class ArtistArtworkFragment extends ArtFragment {
             @Override
             protected void onPostExecute(Boolean aVoid) {
                 super.onPostExecute(aVoid);
+                loadQRviews();
+
+                loadImages();
+
+                if (qrGithubBitmap != null) {
+                    mViews.add(ivQRgithub);
+                } else if (qrGogoBitmap != null) {
+                    mViews.add(ivQRgogo);
+                }
+            }
+
+            private void loadQRviews() {
                 if (qrGogoBitmap != null) {
                     ivQRgogo.setImageBitmap(qrGogoBitmap);
+                    ivQRgogo.setOnClickListener(v -> mListener.sharePhoto(ivQRgogo));
                 } else {
                     ivQRgogo.setVisibility(GONE);
                 }
                 if (qrGithubBitmap != null) {
                     ivQRgithub.setImageBitmap(qrGithubBitmap);
+                    ivQRgithub.setOnClickListener(v -> mListener.sharePhoto(ivQRgithub));
                 } else {
                     ivQRgithub.setVisibility(GONE);
                 }
-
-                loadImages();
             }
         }.execute();
 
-//        ivQRgithub.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent shareIntent = new Intent();
-//                shareIntent.setAction(Intent.ACTION_SEND);
-//                shareIntent.setType("images/png");
-//
-//                Uri uri = FileProvider.getUriForFile(getContext(), "tattoo.gogo.app.gogo_android", makeQRcodeFile(gogoGithubLink));
-//                shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-//                startActivity(Intent.createChooser(shareIntent, getResources().getText(R.string.share_to)));
-//            }
-//        });
+
 
     }
+
 
     private void loadImages() {
         for (String hash : mArtwork.getImagesIpfs()) {
-            addImage(hash);
+            mViews.add(addImage(hash));
         }
-        addImage(mArtwork.getImageIpfs());
+        mViews.add(addImage(mArtwork.getImageIpfs()));
+        mListener.hideLoading();
     }
 
-    private void addImage(final String imageIpfs) {
+    private ImageView addImage(final String imageIpfs) {
         if (getContext() == null) {
-            return;
+            return null;
         }
         final ImageView iv = new ImageView(getContext());
         iv.setAdjustViewBounds(true);
         iv.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         iv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        iv.setPadding(0, 20, 0, 20);
+        iv.setPadding(8, 8, 8, 8);
         llImages.addView(iv);
 
+        loadImage(imageIpfs, iv);
+        return iv;
+
+    }
+
+    private void loadImage(final String hash, final ImageView iv) {
         Glide.with(this)
-                .load(GogoConst.IPFS_GATEWAY_URL + imageIpfs)
+                .load(GogoConst.IPFS_GATEWAY_URL + hash)
                 .placeholder(R.drawable.progress_animation)
                 .error(R.drawable.doge)
                 .into(iv);
-//
-//        iv.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View view) {
-//
-//                Glide.with(ArtistArtworkFragment.this)
-//                        .load(GogoConst.IPFS_GATEWAY_URL + imageIpfs)
-//                        .placeholder(R.drawable.progress_animation)
-//                        .error(R.drawable.doge)
-//                        .into(iv);
-//                return true;
-//            }
-//        });
+
+        iv.setOnLongClickListener(view -> {
+            mListener.showContextMenu(iv, hash, this::loadImage);
+            return true;
+        });
     }
 
-    protected Bitmap makeQRcode(String link) throws OutOfMemoryError {
-        return QRCode.from(link).withSize(1024, 1024).bitmap();
-    }
 
     protected String makeLink(String mainUrl) {
-        String tattooTitleLinkified = mArtwork.getTitle().toLowerCase().replace(" ", "_");
-        return mainUrl + mArtistName.toLowerCase() + "/" + mArtwork.getShortName().toLowerCase() + "/" + tattooTitleLinkified;
+        return mainUrl + mArtistName.toLowerCase() + "/" + mArtwork.getShortName().toLowerCase() + "/" + mArtwork.getLink();
     }
 }

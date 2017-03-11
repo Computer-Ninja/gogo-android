@@ -10,39 +10,41 @@ buildscript {
     dependencies {
         classpath 'io.fabric.tools:gradle:1.+'
         classpath "gradle.plugin.org.golang.mobile.bind:gobindPlugin:0.2.8"
+        classpath 'me.tatarka:gradle-retrolambda:3.6.0'
     }
 }
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
-apply plugin: "org.golang.mobile.bind"
+apply plugin: 'me.tatarka.retrolambda'
+//apply plugin: "org.golang.mobile.bind"
 
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
 }
-
-gobind {
-    pkg = "golang.org/x/mobile/example/bind/hello"
-    //pkg = "github.com/gogotattoo/gogo-upload/watermark"
-    //pkg = "github.com/skip2/go-qrcode"
-
-    GOPATH = "/home/delirium/go"
-
-    // Optional path to the go executable.
-     GO = "/home/delirium/go/bin/go"
-
-    // Optionally, set the absolute path to the gomobile binary.
-    GOMOBILE = "/home/delirium/go/bin/gomobile"
-
-    // Pass extra parameters to command line. Optional.
-    // GOMOBILEFLAGS="-javapkg my.java.package"
-
-    // Absolute path to the gobind binary. Optional.
-    GOBIND="/home/delirium/go/bin/gobind"
-
-    // Optional list of architectures. Defaults to all supported architectures.
-    // GOARCH="arm amd64"
-}
+//
+//gobind {
+//    //pkg = "golang.org/x/mobile/example/bind/hello"
+//    //pkg = "github.com/gogotattoo/gogo-upload/watermark"
+//    //pkg = "github.com/skip2/go-qrcode"
+//
+//    GOPATH = "/Users/delirium/go"
+//
+//    // Optional path to the go executable.
+//     GO = "/Users/delirium/go/bin/go"
+//
+//    // Optionally, set the absolute path to the gomobile binary.
+//    GOMOBILE = "/Users/delirium/go/bin/gomobile"
+//
+//    // Pass extra parameters to command line. Optional.
+//    // GOMOBILEFLAGS="-javapkg my.java.package"
+//
+//    // Absolute path to the gobind binary. Optional.
+//    GOBIND="/Users/delirium/go/bin/gobind"
+//
+//    // Optional list of architectures. Defaults to all supported architectures.
+//    // GOARCH="arm amd64"
+//}
 
 android {
     compileSdkVersion 25
@@ -60,6 +62,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
@@ -93,7 +99,7 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics-ndk:1.1.6@aar') {
         transitive = true;
     }
-
+    compile 'me.dm7.barcodescanner:zxing:1.9'
 //    compile(name:'watermark', ext:'aar')
 
 }
