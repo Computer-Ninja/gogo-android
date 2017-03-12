@@ -39,6 +39,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.analytics.Tracker;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -52,6 +53,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
+import tattoo.gogo.app.gogo_android.utils.AnalyticsUtil;
+
+import static android.R.attr.name;
 
 public class MainActivity extends AppCompatActivity implements
         ArtistArtworkListFragment.OnArtistArtworkFragmentInteractionListener,
@@ -83,6 +87,7 @@ ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
     @BindView(R.id.fl_loading) FrameLayout flLoading;
     private AlphaAnimation fadeOut;
     private AlphaAnimation fadeIn;
+    private Tracker mTracker;
 
     public static View getToolbarLogoIcon(Toolbar toolbar){
         //check if contentDescription previously was set
@@ -167,8 +172,9 @@ ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
         View logoView = getToolbarLogoIcon(mToolbar);
         logoView.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, TattooQrScannerActivity.class)));
 
+        mTracker = ((GogoAndroid) getApplication()).getTracker();
 
-
+        AnalyticsUtil.sendScreenName(mTracker, getString(R.string.app_name));
 
         hideLoading();
     }
@@ -320,22 +326,26 @@ ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
                 getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                 getSupportActionBar().setDisplayUseLogoEnabled(true);
                 getSupportActionBar().setIcon(R.drawable.actionbar_space_between_icon_and_title);
+                AnalyticsUtil.sendScreenName(mTracker, getString(R.string.app_name_short));
             } else {
                 FragmentManager.BackStackEntry bse =
                         manager.getBackStackEntryAt(manager.getBackStackEntryCount() - 1);
                 String title = getString(R.string.app_name_short) + "/" + bse.getName();
-                if (title.length() > 24) {
-                    title = "/" + bse.getName();
+                if (title.length() > 24 /* || And portrait? */) {
+                    setActionBarTitle("/" + bse.getName());
+                } else {
+                    setActionBarTitle(title);
                 }
-
-                setActionBarTitle(title);
 
                 getSupportActionBar().setDisplayUseLogoEnabled(false);
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
                 getSupportActionBar().setIcon(0);
+                Log.i(TAG, "Setting screen name: " + name);
+                AnalyticsUtil.sendScreenName(mTracker, title);
             }
         }
+
     }
 
 
@@ -404,13 +414,17 @@ ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
                             showLoading();
                             if (position == 0) {
                                 savePhoto(hash);
+                                AnalyticsUtil.sendEvent(mTracker, "context_menu", "save_photo", hash);
                             } else if (position == 1) {
                                 sharePhoto(iv);
+                                AnalyticsUtil.sendEvent(mTracker, "context_menu", "share_photo", hash);
                             } else if (position == 2) {
                                 shareOriginalPhoto(hash);
+                                AnalyticsUtil.sendEvent(mTracker, "context_menu", "share_original_photo", hash);
                             } else {
                                 refresh.onImageRefresh(hash, iv);
                                 hideLoading();
+                                AnalyticsUtil.sendEvent(mTracker, "context_menu", "refresh_photo", hash);
                             }
                         })
                 .show();

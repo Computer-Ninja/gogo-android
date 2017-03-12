@@ -207,7 +207,11 @@ public class ArtistArtworkListFragment extends ArtFragment {
                         count++;
                     }
                 }
-                setupRecyclerView();
+                if (mWorks.isEmpty()) {
+                    tvNothingHere.setVisibility(View.VISIBLE);
+                } else {
+                    setupRecyclerView();
+                }
             }
 
             @Override

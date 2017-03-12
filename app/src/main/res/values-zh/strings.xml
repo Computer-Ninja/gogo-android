@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_settings">设置</string>
+    <string name="welcome_message">gogo.tattoo 安卓客户端欢迎您</string>
+    <string name="description">使纹身艺术家获得认同感，展示身份，提高身价。
+\n\n
+面对未知的下一个纹身来源，客户可以付出更多信任。\n
+有直观的照片可以用来审核，纹身的真实性可以保证。</string>
+    <string name="hint_tattoo_title">纹身名字</string>
+    <string name="hint_made_at">哪里做的? 楚上风?</string>
+    <string name="hint_made_by">谁做的? 曦子?</string>
+    <string name="hint_made_date">什么时候做的? 今天?</string>
+    <string name="share_to">分享给朋友…</string>
+    <string name="hint_time_elapsed">进行时间?</string>
+    <string name="male">男</string>
+    <string name="female">女</string>
+    <string name="hint_made_city">城市?</string>
+    <string name="hint_made_country">国家?</string>
+    <string name="tags">Tags</string>
+    <string name="body_parts">身体部分</string>
+    <string name="test_link_wait">请稍等</string>
+    <string name="test_link_available">[可用]</string>
+    <string name="test_link_taken">[已被用]</string>
+    <string name="new_tattoo">新纹身</string>
+    <string name="tattoo">纹身</string>
+    <string name="design">设计</string>
+    <string name="henna">海娜</string>
+    <string name="piercing">穿孔</string>
+    <string name="dreaklocks">脏辫</string>
+    <string name="hint_piercing_title">作品名称叫什么呢?</string>
+    <string name="submit_success">新作品提交成功</string>
+    <string name="submit_fail">好像有错误。。。</string>
+    <string name="hint_title">作品名称</string>
+    <string name="nothing_here_yet">很多人想看曦子做纹身。。。</string>
+    <string name="slogan">我们的使命是\n创建更好的纹身世界</string>
+    <string name="tv_made_date">创作日期: %s</string>
+    <string name="tv_publish_date">发布日期: %s</string>
+    <string name="photo_download_succeess">照片下载成功</string>
+    <string name="photo_download_fail">照片下载失败</string>
+    <string name="photo_download_started">照片下载中</string>
+    <string name="save_to_phone">保存到手机</string>
+    <string name="refresh_image">刷新</string>
+    <string name="share_all">分享所有过程照片</string>
+    <string name="share_original_to">分享照片源文件</string>
+    <string name="photo_download_for_sharing">获得源文件中</string>
+    <string name="something_went_wrong">运行失败 请通知以帮助我们改进</string>
+</resources>
