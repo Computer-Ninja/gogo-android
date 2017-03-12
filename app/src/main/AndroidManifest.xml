@@ -37,6 +37,7 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="49f02412d8578d9bc6b6b688fb4adaa71855db40" />

@@ -4,13 +4,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -103,7 +99,6 @@ public class MainActivityFragment extends ArtFragment {
 
         //tvDescription.setText(Hello.greetings("This is a greeting from golang, WOW!"));
 
-
     }
 
     private void loadArtist(final ImageView iv, String link, final String artistName) {
@@ -114,30 +109,24 @@ public class MainActivityFragment extends ArtFragment {
                 // do something with the bitmap
                 // for demonstration purposes, let's just set it to an ImageView
                 iv.setImageBitmap(bitmap.getBitmap());
-                iv.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        String tag = artistName+"/"+ArtistArtworkListFragment.ARTWORK_TYPE_TATTOO;
-                        getFragmentManager().beginTransaction()
-                                .hide(MainActivityFragment.this)
-                                .add(R.id.fragment_container, ArtistArtworkListFragment.newInstance(1,
-                                        artistName, ArtistArtworkListFragment.ARTWORK_TYPE_TATTOO), tag)
-                                .addToBackStack(tag)
-                                .commit();
-                    }
+                iv.setOnClickListener(v -> {
+                    String tag = artistName+"/"+ArtistArtworkListFragment.ARTWORK_TYPE_TATTOO;
+                    getFragmentManager().beginTransaction()
+                            .hide(MainActivityFragment.this)
+                            .add(R.id.fragment_container, ArtistArtworkListFragment.newInstance(1,
+                                    artistName, ArtistArtworkListFragment.ARTWORK_TYPE_TATTOO), tag)
+                            .addToBackStack(tag)
+                            .commit();
                 });
-                iv.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View view) {
-                        String tag = artistName+"/"+ArtistArtworkListFragment.ARTWORK_TYPE_DESIGN;
-                        getFragmentManager().beginTransaction()
-                                .hide(MainActivityFragment.this)
-                                .add(R.id.fragment_container, ArtistArtworkListFragment.newInstance(1,
-                                        artistName, ArtistArtworkListFragment.ARTWORK_TYPE_DESIGN), tag)
-                                .addToBackStack(tag)
-                                .commit();
-                        return true;
-                    }
+                iv.setOnLongClickListener(view -> {
+                    String tag = artistName+"/"+ArtistArtworkListFragment.ARTWORK_TYPE_DESIGN;
+                    getFragmentManager().beginTransaction()
+                            .hide(MainActivityFragment.this)
+                            .add(R.id.fragment_container, ArtistArtworkListFragment.newInstance(1,
+                                    artistName, ArtistArtworkListFragment.ARTWORK_TYPE_DESIGN), tag)
+                            .addToBackStack(tag)
+                            .commit();
+                    return true;
                 });
             }
         };

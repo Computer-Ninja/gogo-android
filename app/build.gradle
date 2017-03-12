@@ -103,6 +103,14 @@ dependencies {
     compile 'me.dm7.barcodescanner:zxing:1.9'
 //    compile(name:'watermark', ext:'aar')
 
+//    compile(name:'watermark', ext:'aar')
+
+}
+
+crashlytics {
+    enableNdk true
+    androidNdkOut 'src/main/obj'
+    androidNdkLibsOut 'src/main/libs'
 }
 
 crashlytics {

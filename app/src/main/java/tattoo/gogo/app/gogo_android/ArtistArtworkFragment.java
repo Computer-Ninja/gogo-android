@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -282,7 +283,6 @@ public class ArtistArtworkFragment extends ArtFragment {
                 .placeholder(R.drawable.progress_animation)
                 .error(R.drawable.doge)
                 .into(iv);
-
         iv.setOnLongClickListener(view -> {
             mListener.showContextMenu(iv, hash, this::loadImage);
             return true;

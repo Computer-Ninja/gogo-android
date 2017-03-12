@@ -18,6 +18,7 @@ import android.provider.MediaStore;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
@@ -343,6 +344,7 @@ ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
                 getSupportActionBar().setIcon(0);
                 Log.i(TAG, "Setting screen name: " + name);
                 AnalyticsUtil.sendScreenName(mTracker, title);
+
             }
         }
 
@@ -375,28 +377,6 @@ ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
                             (hash, iv) -> loadThumbnail(fr, holder));
             return true;
         });
-
-//
-//        Glide.with(fr.get())
-//                .load(url)
-//                .asBitmap()
-//                .dontAnimate()
-//                //.placeholder(R.drawable.progress_animation)
-//                //.error(R.drawable.doge)
-//                .diskCacheStrategy(DiskCacheStrategy.RESULT)
-//                //.override(outMetrics.widthPixels, outMetrics.heightPixels)
-//                .into(new SimpleTarget<Bitmap>() {
-//                    @Override
-//                    public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
-//
-//                        if (bitmap != null) {
-//
-//                            holder.ivThumbnail.setImageBitmap(bitmap);
-//
-//                        }
-//                    }
-//                });
-//
 
     }
 
@@ -524,7 +504,7 @@ ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
 
         private String saveImageToFile(String imageIpfs) throws Exception {
             if (!haveStoragePermission()) {
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MainActivity.PERMISSION_REQUEST_STORAGE);
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MainActivity.PERMISSION_REQUEST_STORAGE);
                 throw new Exception("No permission");
             }
 
