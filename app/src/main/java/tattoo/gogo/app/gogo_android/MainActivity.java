@@ -4,11 +4,14 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -38,6 +41,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.analytics.Tracker;
@@ -45,14 +49,24 @@ import com.google.android.gms.analytics.Tracker;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import tattoo.gogo.app.gogo_android.api.GogoApi;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
 import tattoo.gogo.app.gogo_android.utils.AnalyticsUtil;
 
@@ -64,6 +78,8 @@ ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
         FragmentManager.OnBackStackChangedListener {
     private static final String TAG = "MainActivity";
     protected static final int PERMISSION_REQUEST_STORAGE = 2;
+    public static final int GALLERY_PICTURE = 3;
+    public static final int CAMERA_REQUEST = 4;
     private boolean isFabOpen;
     private Animation fab_open;
     private Animation fab_close;
@@ -630,6 +646,246 @@ ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
         }
 
 
+    }
+
+
+    private Intent pictureActionIntent = null;
+    Bitmap bitmap;
+
+    String selectedImagePath;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+
+        bitmap = null;
+        selectedImagePath = null;
+
+        if (resultCode == RESULT_OK && requestCode == CAMERA_REQUEST) {
+
+            File f = new File(Environment.getExternalStorageDirectory()
+                    .toString());
+            for (File temp : f.listFiles()) {
+                if (temp.getName().equals("temp.jpg")) {
+                    f = temp;
+                    break;
+                }
+            }
+
+            if (!f.exists()) {
+
+                Toast.makeText(getBaseContext(),
+
+                        "Error while capturing image", Toast.LENGTH_LONG)
+
+                        .show();
+
+                return;
+
+            }
+
+            try {
+
+                bitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
+
+                bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, true);
+
+                int rotate = 0;
+                try {
+                    ExifInterface exif = new ExifInterface(f.getAbsolutePath());
+                    int orientation = exif.getAttributeInt(
+                            ExifInterface.TAG_ORIENTATION,
+                            ExifInterface.ORIENTATION_NORMAL);
+
+                    switch (orientation) {
+                        case ExifInterface.ORIENTATION_ROTATE_270:
+                            rotate = 270;
+                            break;
+                        case ExifInterface.ORIENTATION_ROTATE_180:
+                            rotate = 180;
+                            break;
+                        case ExifInterface.ORIENTATION_ROTATE_90:
+                            rotate = 90;
+                            break;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                Matrix matrix = new Matrix();
+                matrix.postRotate(rotate);
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
+                        bitmap.getHeight(), matrix, true);
+
+
+                //img_logo.setImageBitmap(bitmap);
+                storeImageTosdCard(bitmap);
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        } else if (resultCode == RESULT_OK && requestCode == GALLERY_PICTURE) {
+            if (data != null) {
+
+                Uri selectedImage = data.getData();
+                String[] filePath = {MediaStore.Images.Media.DATA};
+                Cursor c = getContentResolver().query(selectedImage, filePath,
+                        null, null, null);
+                c.moveToFirst();
+                int columnIndex = c.getColumnIndex(filePath[0]);
+                selectedImagePath = c.getString(columnIndex);
+                c.close();
+
+                if (selectedImagePath != null) {
+                    //txt_image_path.setText(selectedImagePath);
+                }
+
+                bitmap = BitmapFactory.decodeFile(selectedImagePath); // load
+                // preview image
+                bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, false);
+
+
+                //img_logo.setImageBitmap(bitmap);
+
+            } else {
+                Toast.makeText(getApplicationContext(), "Cancelled",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+        private void storeImageTosdCard(Bitmap processedBitmap) {
+            try {
+                // TODO Auto-generated method stub
+
+                OutputStream output;
+                // Find the SD Card path
+                File filepath = Environment.getExternalStorageDirectory();
+                // Create a new folder in SD Card
+                File dir = new File(filepath.getAbsolutePath() + "/gogo.tattoo/");
+                dir.mkdirs();
+
+                String imge_name = "gogo.tattoo_" + System.currentTimeMillis()
+                        + ".jpg";
+                // Create a name for the saved image
+                File file = new File(dir, imge_name);
+                if (file.exists()) {
+                    file.delete();
+                    file.createNewFile();
+                } else {
+                    file.createNewFile();
+
+                }
+
+                try {
+
+                    output = new FileOutputStream(file);
+
+                    // Compress into png format image from 0% - 100%
+                    processedBitmap
+                            .compress(Bitmap.CompressFormat.PNG, 100, output);
+                    output.flush();
+                    output.close();
+
+                    int file_size = Integer
+                            .parseInt(String.valueOf(file.length() / 1024));
+                    System.out.println("size ===>>> " + file_size);
+                    System.out.println("file.length() ===>>> " + file.length());
+
+                    selectedImagePath = file.getAbsolutePath();
+
+                    //new PhotoUploader(selectedImagePath).execute();
+
+                    File file2 = new File(selectedImagePath);
+
+                    RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), selectedImagePath);
+
+                    MultipartBody.Part multipartBody = MultipartBody.Part.createFormData("file",file2.getName(),requestFile);
+                    GogoApi.getApi().upload("gogo", "chushangfeng", GogoConst.watermarkDateFormat.format(new Date()), multipartBody).enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            Log.d("Success", "Code: "+response.code());
+                            Log.d("Success", "Message: "+response.message());
+                            Snackbar.make(mToolbar, "Success: " +response.body(),Snackbar.LENGTH_LONG).show();
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                            Log.d("failure", "message = " + t.getMessage());
+                            Log.d("failure", "cause = " + t.getCause());
+                            Snackbar.make(mToolbar, "Failure: " + t,Snackbar.LENGTH_LONG).show();
+                        }
+                    });
+
+                }
+
+                catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        }
+
+
+    private class PhotoUploader extends AsyncTask<Void, Void, Void> {
+
+        private final String mPath;
+        public Bitmap bitmap;
+
+        public PhotoUploader(String path) {
+            mPath = path;
+        }
+        @Override
+        protected Void doInBackground(Void... v) {
+            try {
+
+            } catch (Exception x) {
+                x.printStackTrace();
+                return null;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showLoading();
+             }
+
+        @Override
+        protected void onPostExecute(Void v) {
+            super.onPostExecute(v);
+            hideLoading();
+        }
+
+
+        private String saveImageToFile(String imageIpfs) throws Exception {
+            if (!haveStoragePermission()) {
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MainActivity.PERMISSION_REQUEST_STORAGE);
+                throw new Exception("No permission");
+            }
+
+            URL imageurl = new URL(GogoConst.IPFS_GATEWAY_URL + imageIpfs);
+            bitmap = BitmapFactory.decodeStream(imageurl.openConnection().getInputStream());
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+            String filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                    + File.separator + imageIpfs +".jpg";
+            File f = new File(filePath);
+            f.createNewFile();
+            //write the bytes in file
+            FileOutputStream fo = new FileOutputStream(f);
+            fo.write(bytes.toByteArray());
+
+            // remember close de FileOutput
+            fo.close();
+            return filePath;
+        }
     }
 }
 

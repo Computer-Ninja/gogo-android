@@ -42,4 +42,7 @@
     <string name="share_original_to">Share original file</string>
     <string name="photo_download_for_sharing">Fetching image to share…</string>
     <string name="something_went_wrong">Something went wrong, please report an issue ; )</string>
+    <string name="upload_photo">Upload photo</string>
+    <string name="from_gallery">From Gallery</string>
+    <string name="from_camera">From Camera</string>
 </resources>

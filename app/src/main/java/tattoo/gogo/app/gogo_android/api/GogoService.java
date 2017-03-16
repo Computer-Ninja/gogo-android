@@ -2,11 +2,16 @@ package tattoo.gogo.app.gogo_android.api;
 
 import java.util.List;
 
+import okhttp3.MultipartBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 import tattoo.gogo.app.gogo_android.model.Design;
 import tattoo.gogo.app.gogo_android.model.Henna;
 import tattoo.gogo.app.gogo_android.model.Piercing;
@@ -39,6 +44,15 @@ public interface GogoService {
 
     @POST("piercing/{id}")
     Call<Piercing> piercing(@Path("id") int id, @Body Piercing piercing);
+
+    @Multipart
+    @POST("upload")
+    Call<ResponseBody> upload(
+            @Query("artist_name") String artistName,
+            @Query("made_at") String madeAt,
+            @Query("made_date") String madeDate,
+            @Part MultipartBody.Part file
+    );
 }
 
 

@@ -8,13 +8,17 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -80,6 +84,7 @@ public abstract class NewWorkFragment extends ArtFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        setHasOptionsMenu(true);
 
         mArtWork = newArtWork();
         populateWithDelay(etAuthor, mTattooArtist, 600);
@@ -100,8 +105,6 @@ public abstract class NewWorkFragment extends ArtFragment {
         etTitle.requestFocus();
 
         client = new OkHttpClient();
-
-
     }
 
     protected abstract ArtWork newArtWork();
@@ -121,22 +124,16 @@ public abstract class NewWorkFragment extends ArtFragment {
 
     protected void setListeners() {
 
-        btnFemale.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                btnFemale.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
-                btnMale.setTextColor(Color.GRAY);
-                mArtWork.setGender("female");
-            }
+        btnFemale.setOnClickListener(v -> {
+            btnFemale.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+            btnMale.setTextColor(Color.GRAY);
+            mArtWork.setGender("female");
         });
 
-        btnMale.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                btnMale.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
-                btnFemale.setTextColor(Color.GRAY);
-                mArtWork.setGender("male");
-            }
+        btnMale.setOnClickListener(v -> {
+            btnMale.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+            btnFemale.setTextColor(Color.GRAY);
+            mArtWork.setGender("male");
         });
 
         etAuthor.addTextChangedListener(new TextWatcher() {
@@ -173,35 +170,75 @@ public abstract class NewWorkFragment extends ArtFragment {
 
 
                 handler.removeCallbacks(workRunnable);
-                workRunnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mArtWork.getTitle().length() < 4 || mTattooArtist.isEmpty()) {
-                            ivQRgogo.setVisibility(GONE);
-                            ivQRgithub.setVisibility(GONE);
-                            tvGogoLink.setVisibility(GONE);
-                            tvGithubLink.setVisibility(GONE);
-                            return;
-                        }
-                        updateQRcodes();
-                        testLink();
+                workRunnable = () -> {
+                    if (mArtWork.getTitle().length() < 4 || mTattooArtist.isEmpty()) {
+                        ivQRgogo.setVisibility(GONE);
+                        ivQRgithub.setVisibility(GONE);
+                        tvGogoLink.setVisibility(GONE);
+                        tvGithubLink.setVisibility(GONE);
+                        return;
                     }
+                    updateQRcodes();
+                    testLink();
                 };
                 handler.postDelayed(workRunnable, 1500 /*delay*/);
 
             }
         });
-        fab.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                updateArtwork();
-                sendForApprovalToPublish();
-                return false;
-            }
+        fab.setOnLongClickListener(view -> {
+            updateArtwork();
+            sendForApprovalToPublish();
+            return false;
         });
 
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        menu.clear();
+
+        menu.add(R.string.upload_photo).setOnMenuItemClickListener(item -> {
+            startDialog();
+            return true;
+        });
+    }
+
+    private void startDialog() {
+        AlertDialog.Builder myAlertDialog = new AlertDialog.Builder(
+                getActivity());
+        myAlertDialog.setTitle(R.string.upload_photo);
+
+        myAlertDialog.setPositiveButton(R.string.from_gallery,
+                (arg0, arg1) -> {
+                    Intent pictureActionIntent = null;
+
+                    pictureActionIntent = new Intent(
+                            Intent.ACTION_PICK,
+                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(
+                            pictureActionIntent,
+                            MainActivity.GALLERY_PICTURE);
+
+                });
+
+        myAlertDialog.setNegativeButton(R.string.from_camera,
+                (arg0, arg1) -> {
+
+                    Intent intent = new Intent(
+                            MediaStore.ACTION_IMAGE_CAPTURE);
+                    File f = new File(android.os.Environment
+                            .getExternalStorageDirectory(), "temp.jpg");
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                            Uri.fromFile(f));
+
+                    startActivityForResult(intent,
+                            MainActivity.CAMERA_REQUEST);
+
+                });
+        myAlertDialog.show();
+    }
     private void sendForApprovalToPublish() {
         if (!isAdded()) {
             return;
@@ -232,20 +269,17 @@ public abstract class NewWorkFragment extends ArtFragment {
             @Override
             public void onResponse(Call call, final Response response) throws IOException {
 
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        int strRes = R.string.test_link_available;
-                        int colorRes = R.color.colorAccent;
-                        if (response.isSuccessful()) {
-                            strRes = R.string.test_link_taken;
-                            colorRes =  R.color.colorPrimaryDark;
-                        } else {
-                            }
-                        tvTitleAvailability.setText(strRes);
-                        tvTitleAvailability.setTextColor(ContextCompat.getColor(getContext(), colorRes));
+                handler.post(() -> {
+                    int strRes = R.string.test_link_available;
+                    int colorRes = R.color.colorAccent;
+                    if (response.isSuccessful()) {
+                        strRes = R.string.test_link_taken;
+                        colorRes =  R.color.colorPrimaryDark;
+                    } else {
+                        }
+                    tvTitleAvailability.setText(strRes);
+                    tvTitleAvailability.setTextColor(ContextCompat.getColor(getContext(), colorRes));
 
-                    }
                 });
             }
         });
@@ -305,17 +339,14 @@ public abstract class NewWorkFragment extends ArtFragment {
             }
         }.execute();
 
-        ivQRgithub.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent shareIntent = new Intent();
-                shareIntent.setAction(Intent.ACTION_SEND);
-                shareIntent.setType("images/png");
+        ivQRgithub.setOnClickListener(v -> {
+            Intent shareIntent = new Intent();
+            shareIntent.setAction(Intent.ACTION_SEND);
+            shareIntent.setType("images/png");
 
-                Uri uri = FileProvider.getUriForFile(getContext(), "tattoo.gogo.app.gogo_android", makeQRcodeFile(gogoGithubLink));
-                shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-                startActivity(Intent.createChooser(shareIntent, getResources().getText(R.string.share_to)));
-            }
+            Uri uri = FileProvider.getUriForFile(getContext(), "tattoo.gogo.app.gogo_android", makeQRcodeFile(gogoGithubLink));
+            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+            startActivity(Intent.createChooser(shareIntent, getResources().getText(R.string.share_to)));
         });
 
     }
