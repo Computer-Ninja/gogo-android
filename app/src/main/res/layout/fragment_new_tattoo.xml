@@ -204,6 +204,32 @@
             TagsEditText:tagsTextSize="@dimen/defaultTagsTextSize"
             TagsEditText:tagsCloseImagePadding="@dimen/defaultTagsCloseImagePadding"/>
 
+        <HorizontalScrollView
+            android:id="@+id/hsv_process_images"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/ll_process_images"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <LinearLayout
+            android:id="@+id/ll_final_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+
+        </LinearLayout>
+
         <include layout="@layout/qr_codes"/>
     </LinearLayout>
 

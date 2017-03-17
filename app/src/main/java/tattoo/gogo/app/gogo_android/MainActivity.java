@@ -74,6 +74,7 @@ import tattoo.gogo.app.gogo_android.utils.AnalyticsUtil;
 import tattoo.gogo.app.gogo_android.utils.IntentUtils;
 
 import static android.R.attr.name;
+import static tattoo.gogo.app.gogo_android.NewWorkFragment.IS_FINAL;
 
 public class MainActivity extends AppCompatActivity implements
         ArtistArtworkListFragment.OnArtistArtworkFragmentInteractionListener,
@@ -363,19 +364,15 @@ public class MainActivity extends AppCompatActivity implements
                 } else {
                     setActionBarTitle(title);
                 }
-
                 getSupportActionBar().setDisplayUseLogoEnabled(false);
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
                 getSupportActionBar().setIcon(0);
                 Log.i(TAG, "Setting screen name: " + name);
                 AnalyticsUtil.sendScreenName(mTracker, title);
-
             }
         }
 
     }
-
 
     @Override
     public void loadThumbnail(final WeakReference<Fragment> fr, final ArtworkRecyclerViewAdapter.ViewHolder holder) {
@@ -403,7 +400,6 @@ public class MainActivity extends AppCompatActivity implements
                     (hash, iv) -> loadThumbnail(fr, holder));
             return true;
         });
-
     }
 
     @Override
@@ -440,7 +436,6 @@ public class MainActivity extends AppCompatActivity implements
         getSupportActionBar().setTitle(title);
     }
 
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         // This is because the dialog was cancelled when we recreated the activity.
@@ -460,7 +455,6 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-
     protected boolean haveStoragePermission() {
         return Build.VERSION.SDK_INT < 23 || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
@@ -479,7 +473,7 @@ public class MainActivity extends AppCompatActivity implements
             String filePath;
             try {
                 filePath = saveImageToFile(imageIpfs[0]);
-                if (filePath != null) broadcastImageUpdate(filePath);
+                if (filePath != null) IntentUtils.broadcastImageUpdate(MainActivity.this, filePath);
             } catch (Exception x) {
                 x.printStackTrace();
                 return null;
@@ -588,12 +582,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    private void broadcastImageUpdate(String path) {
-        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        mediaScanIntent.setData(Uri.fromFile(new File(path)));
-        sendBroadcast(mediaScanIntent);
-    }
-
     public Uri getImageUri(Context inContext, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
@@ -668,75 +656,83 @@ public class MainActivity extends AppCompatActivity implements
         selectedImagePath = null;
 
         if (resultCode == RESULT_OK && requestCode == CAMERA_REQUEST) {
-
-            File f = new File(Environment.getExternalStorageDirectory().toString());
-            for (File temp : f.listFiles()) {
-                if (temp.getName().equals("temp.jpg")) {
-                    f = temp;
-                    break;
-                }
-            }
-
-            if (!f.exists()) {
-                Snackbar.make(mToolbar, R.string.error_camera_capture, Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            try {
-                bitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
-                bitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth()/4,
-                                                   bitmap.getHeight()/4, true);
-
-                int rotate = 0;
-                ExifInterface exif = new ExifInterface(f.getAbsolutePath());
-                int orientation = exif.getAttributeInt(
-                        ExifInterface.TAG_ORIENTATION,
-                        ExifInterface.ORIENTATION_NORMAL);
-
-                switch (orientation) {
-                    case ExifInterface.ORIENTATION_ROTATE_270:
-                        rotate = 270;
-                        break;
-                    case ExifInterface.ORIENTATION_ROTATE_180:
-                        rotate = 180;
-                        break;
-                    case ExifInterface.ORIENTATION_ROTATE_90:
-                        rotate = 90;
-                        break;
-                }
-                Matrix matrix = new Matrix();
-                matrix.postRotate(rotate);
-                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
-                        bitmap.getHeight(), matrix, true);
-
-                //img_logo.setImageBitmap(bitmap);
-                storeImageToSDCard(bitmap);
-                uploadFile();
-            } catch (Exception e) {
-                showError(e);
-            }
+            onCameraPhotoResult(data);
 
         } else if (resultCode == RESULT_OK && requestCode == GALLERY_PICTURE) {
-            if (data != null) {
+            onGalleryPhotoResult(data);
+        }
+    }
 
-                Uri selectedImage = data.getData();
-                String[] filePath = {MediaStore.Images.Media.DATA};
-                Cursor c = getContentResolver().query(selectedImage, filePath,
-                        null, null, null);
-                c.moveToFirst();
-                int columnIndex = c.getColumnIndex(filePath[0]);
-                selectedImagePath = c.getString(columnIndex);
-                c.close();
+    private void onGalleryPhotoResult(Intent data) {
+        if (data != null) {
 
-                bitmap = BitmapFactory.decodeFile(selectedImagePath); // load
-                // preview image
-                bitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth()/2, bitmap.getHeight()/2, false);
+            Uri selectedImage = data.getData();
+            String[] filePath = {MediaStore.Images.Media.DATA};
+            Cursor c = getContentResolver().query(selectedImage, filePath,
+                    null, null, null);
+            c.moveToFirst();
+            int columnIndex = c.getColumnIndex(filePath[0]);
+            selectedImagePath = c.getString(columnIndex);
+            c.close();
 
-                uploadFile();
+            bitmap = BitmapFactory.decodeFile(selectedImagePath); // load
+            // preview image
+            bitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth()/2, bitmap.getHeight()/2, false);
 
-            } else {
-                Snackbar.make(mToolbar, R.string.gallery_cancelled, Toast.LENGTH_SHORT).show();
+            uploadFile(data, bitmap);
+
+        } else {
+            Snackbar.make(mToolbar, R.string.gallery_cancelled, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void onCameraPhotoResult(Intent data) {
+
+        File f = new File(Environment.getExternalStorageDirectory().toString());
+        for (File temp : f.listFiles()) {
+            if (temp.getName().equals("temp.jpg")) {
+                f = temp;
+                break;
             }
+        }
+
+        if (!f.exists()) {
+            Snackbar.make(mToolbar, R.string.error_camera_capture, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        try {
+            bitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
+            bitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth()/4,
+                    bitmap.getHeight()/4, true);
+
+            int rotate = 0;
+            ExifInterface exif = new ExifInterface(f.getAbsolutePath());
+            int orientation = exif.getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL);
+
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotate = 270;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotate = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotate = 90;
+                    break;
+            }
+            Matrix matrix = new Matrix();
+            matrix.postRotate(rotate);
+            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
+                    bitmap.getHeight(), matrix, true);
+
+            //img_logo.setImageBitmap(bitmap);
+            storeImageToSDCard(bitmap);
+            uploadFile(data, bitmap);
+        } catch (Exception e) {
+            showError(e);
         }
     }
 
@@ -747,7 +743,7 @@ public class MainActivity extends AppCompatActivity implements
         Snackbar.make(mToolbar, e.getMessage(), Snackbar.LENGTH_LONG).show();
     }
 
-    private void uploadFile() {
+    private void uploadFile(Intent data, Bitmap bitmap) {
 
         File file = new File(selectedImagePath);
 
@@ -759,15 +755,7 @@ public class MainActivity extends AppCompatActivity implements
         GogoApi.getApi().upload("gogo", "chushangfeng", GogoConst.watermarkDateFormat.format(new Date()), multipartBody).enqueue(new Callback<UploadResponse>() {
             @Override
             public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
-                Log.d("Success", "Code: " + response.code());
-                Log.d("Success", "Message: " + response.message());
-                hideLoading();
-                setRequestedOrientation(mSavedOrientation);
-                String hash = response.body().getHash();
-                Log.d("Success", "Hash: " + hash);
-                Snackbar.make(mToolbar, "Success: " + hash, Snackbar.LENGTH_LONG).show();
-                IntentUtils.opentUrl(MainActivity.this, GogoConst.IPFS_GATEWAY_URL + hash);
-
+                onFileUploadSuccess(data, response, bitmap);
             }
 
             @Override
@@ -779,6 +767,22 @@ public class MainActivity extends AppCompatActivity implements
                 setRequestedOrientation(mSavedOrientation);
             }
         });
+    }
+
+    private void onFileUploadSuccess(Intent data, Response<UploadResponse> response, Bitmap bitmap) {
+        Log.d("Success", "Code: " + response.code());
+        Log.d("Success", "Message: " + response.message());
+        hideLoading();
+        setRequestedOrientation(mSavedOrientation);
+        String hash = response.body().getHash();
+        Log.d("Success", "Hash: " + hash);
+        Snackbar.make(mToolbar, "Success: " + hash, Snackbar.LENGTH_LONG).show();
+        //IntentUtils.opentUrl(MainActivity.this, GogoConst.IPFS_GATEWAY_URL + hash);
+
+        NewWorkFragment fr = (NewWorkFragment) getSupportFragmentManager().findFragmentByTag("gogo/tattoo/new");
+        if (fr != null) {
+            fr.addImage(hash, bitmap, data.getBooleanExtra(IS_FINAL, false));
+        }
     }
 
     private void storeImageToSDCard(Bitmap processedBitmap) throws IOException {

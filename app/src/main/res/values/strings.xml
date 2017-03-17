@@ -47,4 +47,6 @@
     <string name="from_camera">From Camera</string>
     <string name="error_camera_capture">Error while capturing image.</string>
     <string name="gallery_cancelled">Cancelled</string>
+    <string name="upload_process_photo">Upload process photo</string>
+    <string name="upload_final_photo">Upload final photo</string>
 </resources>

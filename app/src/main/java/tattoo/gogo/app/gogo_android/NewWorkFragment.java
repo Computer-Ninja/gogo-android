@@ -1,5 +1,6 @@
 package tattoo.gogo.app.gogo_android;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -45,6 +46,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
+import tattoo.gogo.app.gogo_android.utils.IntentUtils;
 
 import static android.view.View.GONE;
 
@@ -52,9 +54,15 @@ import static android.view.View.GONE;
  * Created by delirium on 2/26/17.
  */
 public abstract class NewWorkFragment extends ArtFragment {
+    protected static final String IS_FINAL = "is_final";
     protected OkHttpClient client;
     protected String mTattooArtist = "gogo";
+    private boolean isFinalPhotoUloaded = false;
 
+    interface NewWorkImageUploadedListener {
+        void onImageUploaded(String hash, Bitmap bitmap);
+        void onFinalImageUploaded(String hash, Bitmap bitmap);
+    }
 
     @BindView(R.id.input_title) EditText etTitle;
     @BindView(R.id.input_made_by) EditText etAuthor;
@@ -74,7 +82,8 @@ public abstract class NewWorkFragment extends ArtFragment {
     @BindView(R.id.btn_female) Button btnFemale;
     @BindView(R.id.btn_male) Button btnMale;
     @BindView(R.id.ll_gender_selection) LinearLayout llGenderSelection;
-
+    @BindView(R.id.ll_process_images) LinearLayout llProcessImages;
+    @BindView(R.id.ll_final_image) LinearLayout llFinalImage;
 
     Handler handler = new Handler(Looper.getMainLooper() /*UI thread*/);
     protected Runnable workRunnable;
@@ -168,7 +177,6 @@ public abstract class NewWorkFragment extends ArtFragment {
                 mArtWork.setTitle(tattooTitle.toString().trim());
                 updateLink();
 
-
                 handler.removeCallbacks(workRunnable);
                 workRunnable = () -> {
                     if (mArtWork.getTitle().length() < 4 || mTattooArtist.isEmpty()) {
@@ -199,13 +207,19 @@ public abstract class NewWorkFragment extends ArtFragment {
 
         menu.clear();
 
-        menu.add(R.string.upload_photo).setOnMenuItemClickListener(item -> {
-            startDialog();
+        menu.add(R.string.upload_process_photo).setOnMenuItemClickListener(item -> {
+            startDialog(false);
             return true;
         });
+        if (!isFinalPhotoUloaded) {
+            menu.add(R.string.upload_final_photo).setOnMenuItemClickListener(item -> {
+                startDialog(true);
+                return true;
+            });
+        }
     }
 
-    private void startDialog() {
+    private void startDialog(boolean isFinal) {
         AlertDialog.Builder myAlertDialog = new AlertDialog.Builder(
                 getActivity());
         myAlertDialog.setTitle(R.string.upload_photo);
@@ -217,6 +231,7 @@ public abstract class NewWorkFragment extends ArtFragment {
                     pictureActionIntent = new Intent(
                             Intent.ACTION_PICK,
                             MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    pictureActionIntent.putExtra(IS_FINAL, isFinal);
                     getActivity().startActivityForResult(
                             pictureActionIntent,
                             MainActivity.GALLERY_PICTURE);
@@ -232,9 +247,9 @@ public abstract class NewWorkFragment extends ArtFragment {
                             .getExternalStorageDirectory(), "temp.jpg");
                     intent.putExtra(MediaStore.EXTRA_OUTPUT,
                             Uri.fromFile(f));
+                    intent.putExtra(IS_FINAL, isFinal);
 
-                    getActivity().startActivityForResult(intent,
-                            MainActivity.CAMERA_REQUEST);
+                    getActivity().startActivityForResult(intent, MainActivity.CAMERA_REQUEST);
 
                 });
         myAlertDialog.show();
@@ -321,8 +336,8 @@ public abstract class NewWorkFragment extends ArtFragment {
         tvGithubLink.setText(gogoGithubLink);
 
         new AsyncTask<Void, Void, Void>() {
-            public Bitmap qrGithubBitmap;
-            public Bitmap qrGogoBitmap;
+             Bitmap qrGithubBitmap;
+             Bitmap qrGogoBitmap;
 
             @Override
             protected Void doInBackground(Void... params) {
@@ -366,17 +381,34 @@ public abstract class NewWorkFragment extends ArtFragment {
     }
 
     protected void populateWithDelay(final EditText view, final String value, int delay) {
-        view.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                view.setText(value);
-            }
-        }, delay);
+        view.postDelayed(() -> view.setText(value), delay);
     }
 
 
     protected String makeLink(String mainUrl) {
         String tattooTitleLinkified = mArtWork.getTitle().toLowerCase().replace(" ", "_");
         return mainUrl + mTattooArtist.toLowerCase() + "/" + mArtWork.getShortName().toLowerCase() +"/" + tattooTitleLinkified;
+    }
+
+
+    public void addImage(String hash, Bitmap bitmap, boolean isFinal) {
+        if (getContext() == null) {
+            return;
+        }
+        final ImageView iv = new ImageView(getContext());
+        iv.setAdjustViewBounds(true);
+        iv.setImageBitmap(bitmap);
+        iv.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        iv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        iv.setPadding(8, 8, 8, 8);
+        iv.setOnClickListener(v -> IntentUtils.opentUrl(getContext(), GogoConst.IPFS_GATEWAY_URL + hash));
+        if (isFinal) {
+            mArtWork.setImageIpfs(hash);
+            llFinalImage.removeAllViews();
+            llFinalImage.addView(iv);
+        } else {
+            mArtWork.getImagesIpfs().add(hash);
+            llProcessImages.addView(iv);
+        }
     }
 }
