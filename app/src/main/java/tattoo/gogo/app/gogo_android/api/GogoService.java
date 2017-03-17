@@ -3,7 +3,6 @@ package tattoo.gogo.app.gogo_android.api;
 import java.util.List;
 
 import okhttp3.MultipartBody;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -47,7 +46,7 @@ public interface GogoService {
 
     @Multipart
     @POST("upload")
-    Call<ResponseBody> upload(
+    Call<UploadResponse> upload(
             @Query("artist_name") String artistName,
             @Query("made_at") String madeAt,
             @Query("made_date") String madeDate,

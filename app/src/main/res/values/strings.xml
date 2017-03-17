@@ -45,4 +45,6 @@
     <string name="upload_photo">Upload photo</string>
     <string name="from_gallery">From Gallery</string>
     <string name="from_camera">From Camera</string>
+    <string name="error_camera_capture">Error while capturing image.</string>
+    <string name="gallery_cancelled">Cancelled</string>
 </resources>

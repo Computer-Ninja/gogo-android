@@ -217,7 +217,7 @@ public abstract class NewWorkFragment extends ArtFragment {
                     pictureActionIntent = new Intent(
                             Intent.ACTION_PICK,
                             MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(
+                    getActivity().startActivityForResult(
                             pictureActionIntent,
                             MainActivity.GALLERY_PICTURE);
 
@@ -233,7 +233,7 @@ public abstract class NewWorkFragment extends ArtFragment {
                     intent.putExtra(MediaStore.EXTRA_OUTPUT,
                             Uri.fromFile(f));
 
-                    startActivityForResult(intent,
+                    getActivity().startActivityForResult(intent,
                             MainActivity.CAMERA_REQUEST);
 
                 });

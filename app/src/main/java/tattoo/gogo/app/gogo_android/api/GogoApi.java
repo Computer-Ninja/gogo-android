@@ -6,7 +6,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import tattoo.gogo.app.gogo_android.BuildConfig;
 
 /**
  * Created by delirium on 17-3-2.
@@ -24,8 +23,9 @@ public class GogoApi {
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
             OkHttpClient client = new OkHttpClient.Builder()
                     .addInterceptor(interceptor)
-                    .connectTimeout(1, TimeUnit.MINUTES)
+                    .connectTimeout(2, TimeUnit.MINUTES)
                     .readTimeout(3, TimeUnit.MINUTES)
+                    .writeTimeout(5, TimeUnit.MINUTES)
                     .build();
             Retrofit retrofit = new Retrofit.Builder()
                     .client(client)

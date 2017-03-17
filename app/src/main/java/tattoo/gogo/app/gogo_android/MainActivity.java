@@ -3,6 +3,7 @@ package tattoo.gogo.app.gogo_android;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -49,6 +50,7 @@ import com.google.android.gms.analytics.Tracker;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.URL;
@@ -62,19 +64,20 @@ import butterknife.ButterKnife;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import tattoo.gogo.app.gogo_android.api.GogoApi;
+import tattoo.gogo.app.gogo_android.api.UploadResponse;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
 import tattoo.gogo.app.gogo_android.utils.AnalyticsUtil;
+import tattoo.gogo.app.gogo_android.utils.IntentUtils;
 
 import static android.R.attr.name;
 
 public class MainActivity extends AppCompatActivity implements
         ArtistArtworkListFragment.OnArtistArtworkFragmentInteractionListener,
-ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
+        ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
         FragmentManager.OnBackStackChangedListener {
     private static final String TAG = "MainActivity";
     protected static final int PERMISSION_REQUEST_STORAGE = 2;
@@ -105,22 +108,23 @@ ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
     private AlphaAnimation fadeOut;
     private AlphaAnimation fadeIn;
     private Tracker mTracker;
+    private int mSavedOrientation;
 
-    public static View getToolbarLogoIcon(Toolbar toolbar){
+    public static View getToolbarLogoIcon(Toolbar toolbar) {
         //check if contentDescription previously was set
         boolean hadContentDescription = android.text.TextUtils.isEmpty(toolbar.getLogoDescription());
         String contentDescription = String.valueOf(!hadContentDescription ? toolbar.getLogoDescription() : "logoContentDescription");
         toolbar.setLogoDescription(contentDescription);
         ArrayList<View> potentialViews = new ArrayList<View>();
         //find the view based on it's content description, set programatically or with android:contentDescription
-        toolbar.findViewsWithText(potentialViews,contentDescription, View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION);
+        toolbar.findViewsWithText(potentialViews, contentDescription, View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION);
         //Nav icon is always instantiated at this point because calling setLogoDescription ensures its existence
         View logoIcon = null;
-        if(potentialViews.size() > 0){
+        if (potentialViews.size() > 0) {
             logoIcon = potentialViews.get(0);
         }
         //Clear content description if not previously present
-        if(hadContentDescription)
+        if (hadContentDescription)
             toolbar.setLogoDescription(null);
         return logoIcon;
     }
@@ -200,23 +204,28 @@ ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
         fadeOut = new AlphaAnimation(1, 0);
         fadeOut.setInterpolator(new AccelerateInterpolator());
         fadeOut.setDuration(400);
-        fadeOut.setAnimationListener(new Animation.AnimationListener()
-        {
-            public void onAnimationEnd(Animation animation)
-            {
+        fadeOut.setAnimationListener(new Animation.AnimationListener() {
+            public void onAnimationEnd(Animation animation) {
                 flLoading.setVisibility(View.GONE);
             }
-            public void onAnimationRepeat(Animation animation) {}
-            public void onAnimationStart(Animation animation) {}
+
+            public void onAnimationRepeat(Animation animation) {
+            }
+
+            public void onAnimationStart(Animation animation) {
+            }
         });
 
         fadeIn = new AlphaAnimation(0, 1);
         fadeIn.setInterpolator(new AccelerateInterpolator());
         fadeIn.setDuration(1000);
-        fadeIn.setAnimationListener(new Animation.AnimationListener()
-        {
-            public void onAnimationEnd(Animation animation) {}
-            public void onAnimationRepeat(Animation animation) {}
+        fadeIn.setAnimationListener(new Animation.AnimationListener() {
+            public void onAnimationEnd(Animation animation) {
+            }
+
+            public void onAnimationRepeat(Animation animation) {
+            }
+
             public void onAnimationStart(Animation animation) {
                 flLoading.setVisibility(View.VISIBLE);
             }
@@ -230,6 +239,7 @@ ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
         }
         flLoading.post(() -> flLoading.startAnimation(fadeOut));
     }
+
     @Override
     public void showLoading() {
         if (fadeIn == null) {
@@ -323,10 +333,10 @@ ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
             Log.d(TAG, "loadThumbnail: Fragment is null");
             return;
         }
-        String tag = artistName + "/" + artWork.getType() + "/"+ artWork.getLink();
+        String tag = artistName + "/" + artWork.getType() + "/" + artWork.getLink();
         getSupportFragmentManager().beginTransaction()
                 .hide(fr.get())
-                .add(R.id.fragment_container,  ArtistArtworkFragment.newInstance(artistName, artWork), tag)
+                .add(R.id.fragment_container, ArtistArtworkFragment.newInstance(artistName, artWork), tag)
                 .addToBackStack(tag)
                 .commit();
     }
@@ -390,7 +400,7 @@ ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
 
         holder.mView.setOnLongClickListener(view -> {
             showContextMenu(holder.ivThumbnail, holder.mItem.getImageIpfs(),
-                            (hash, iv) -> loadThumbnail(fr, holder));
+                    (hash, iv) -> loadThumbnail(fr, holder));
             return true;
         });
 
@@ -431,25 +441,18 @@ ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
     }
 
 
-
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
-    {
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         // This is because the dialog was cancelled when we recreated the activity.
         if (permissions.length == 0 || grantResults.length == 0)
             return;
 
-        switch (requestCode)
-        {
-            case PERMISSION_REQUEST_STORAGE:
-            {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_STORAGE: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
                     Snackbar.make(mToolbar, "STORAGE PERMISSION GRANTED", Snackbar.LENGTH_LONG).show();
-                }
-                else
-                {
+                } else {
                     Snackbar.make(mToolbar, "No permission to store files", Snackbar.LENGTH_LONG).show();
                 }
             }
@@ -470,6 +473,7 @@ ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
         public PhotoSave(boolean share) {
             mShare = share;
         }
+
         @Override
         protected String doInBackground(String... imageIpfs) {
             String filePath;
@@ -529,7 +533,7 @@ ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
             String filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-                    + File.separator + imageIpfs +".jpg";
+                    + File.separator + imageIpfs + ".jpg";
             File f = new File(filePath);
             f.createNewFile();
             //write the bytes in file
@@ -562,7 +566,7 @@ ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
 
     @Override
     public void sharePhotos(List<View> views) {
-        new AsyncTask<Void, Void, Void>(){
+        new AsyncTask<Void, Void, Void>() {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
@@ -600,7 +604,7 @@ ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
 
     public static Bitmap getBitmapFromView(View view) {
         //Define a bitmap with the same size as the view
-        Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(),      view.getHeight(), Bitmap.Config.ARGB_8888);
+        Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
         //Bind a canvas to it
         Canvas canvas = new Canvas(returnedBitmap);
         //Get the view's background
@@ -628,7 +632,7 @@ ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
 
         ArrayList<Uri> files = new ArrayList<>();
 
-        for(View view : views) {
+        for (View view : views) {
             files.add(getImageUri(this, getBitmapFromView(view)));
         }
 
@@ -648,24 +652,24 @@ ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
 
     }
 
-
-    private Intent pictureActionIntent = null;
     Bitmap bitmap;
 
     String selectedImagePath;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         super.onActivityResult(requestCode, resultCode, data);
+        mSavedOrientation = getRequestedOrientation();
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+
+        showLoading();
 
         bitmap = null;
         selectedImagePath = null;
 
         if (resultCode == RESULT_OK && requestCode == CAMERA_REQUEST) {
 
-            File f = new File(Environment.getExternalStorageDirectory()
-                    .toString());
+            File f = new File(Environment.getExternalStorageDirectory().toString());
             for (File temp : f.listFiles()) {
                 if (temp.getName().equals("temp.jpg")) {
                     f = temp;
@@ -674,55 +678,42 @@ ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
             }
 
             if (!f.exists()) {
-
-                Toast.makeText(getBaseContext(),
-
-                        "Error while capturing image", Toast.LENGTH_LONG)
-
-                        .show();
-
+                Snackbar.make(mToolbar, R.string.error_camera_capture, Toast.LENGTH_LONG).show();
                 return;
-
             }
 
             try {
-
                 bitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
-
-                bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, true);
+                bitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth()/4,
+                                                   bitmap.getHeight()/4, true);
 
                 int rotate = 0;
-                try {
-                    ExifInterface exif = new ExifInterface(f.getAbsolutePath());
-                    int orientation = exif.getAttributeInt(
-                            ExifInterface.TAG_ORIENTATION,
-                            ExifInterface.ORIENTATION_NORMAL);
+                ExifInterface exif = new ExifInterface(f.getAbsolutePath());
+                int orientation = exif.getAttributeInt(
+                        ExifInterface.TAG_ORIENTATION,
+                        ExifInterface.ORIENTATION_NORMAL);
 
-                    switch (orientation) {
-                        case ExifInterface.ORIENTATION_ROTATE_270:
-                            rotate = 270;
-                            break;
-                        case ExifInterface.ORIENTATION_ROTATE_180:
-                            rotate = 180;
-                            break;
-                        case ExifInterface.ORIENTATION_ROTATE_90:
-                            rotate = 90;
-                            break;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                switch (orientation) {
+                    case ExifInterface.ORIENTATION_ROTATE_270:
+                        rotate = 270;
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_180:
+                        rotate = 180;
+                        break;
+                    case ExifInterface.ORIENTATION_ROTATE_90:
+                        rotate = 90;
+                        break;
                 }
                 Matrix matrix = new Matrix();
                 matrix.postRotate(rotate);
                 bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
                         bitmap.getHeight(), matrix, true);
 
-
                 //img_logo.setImageBitmap(bitmap);
-                storeImageTosdCard(bitmap);
+                storeImageToSDCard(bitmap);
+                uploadFile();
             } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                showError(e);
             }
 
         } else if (resultCode == RESULT_OK && requestCode == GALLERY_PICTURE) {
@@ -737,155 +728,90 @@ ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
                 selectedImagePath = c.getString(columnIndex);
                 c.close();
 
-                if (selectedImagePath != null) {
-                    //txt_image_path.setText(selectedImagePath);
-                }
-
                 bitmap = BitmapFactory.decodeFile(selectedImagePath); // load
                 // preview image
-                bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, false);
+                bitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth()/2, bitmap.getHeight()/2, false);
 
-
-                //img_logo.setImageBitmap(bitmap);
+                uploadFile();
 
             } else {
-                Toast.makeText(getApplicationContext(), "Cancelled",
-                        Toast.LENGTH_SHORT).show();
+                Snackbar.make(mToolbar, R.string.gallery_cancelled, Toast.LENGTH_SHORT).show();
             }
         }
     }
-        private void storeImageTosdCard(Bitmap processedBitmap) {
-            try {
-                // TODO Auto-generated method stub
 
-                OutputStream output;
-                // Find the SD Card path
-                File filepath = Environment.getExternalStorageDirectory();
-                // Create a new folder in SD Card
-                File dir = new File(filepath.getAbsolutePath() + "/gogo.tattoo/");
-                dir.mkdirs();
+    private void showError(Exception e) {
+        e.printStackTrace();
+        hideLoading();
+        setRequestedOrientation(mSavedOrientation);
+        Snackbar.make(mToolbar, e.getMessage(), Snackbar.LENGTH_LONG).show();
+    }
 
-                String imge_name = "gogo.tattoo_" + System.currentTimeMillis()
-                        + ".jpg";
-                // Create a name for the saved image
-                File file = new File(dir, imge_name);
-                if (file.exists()) {
-                    file.delete();
-                    file.createNewFile();
-                } else {
-                    file.createNewFile();
+    private void uploadFile() {
 
-                }
+        File file = new File(selectedImagePath);
 
-                try {
+        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
 
-                    output = new FileOutputStream(file);
+        MultipartBody.Part multipartBody = MultipartBody.Part.createFormData("uploadfile", file.getName(), requestFile);
 
-                    // Compress into png format image from 0% - 100%
-                    processedBitmap
-                            .compress(Bitmap.CompressFormat.PNG, 100, output);
-                    output.flush();
-                    output.close();
+        //MultipartBody.Part multipartBody = MultipartBody.Part.createFormData("file",file2.getName(),requestFile);
+        GogoApi.getApi().upload("gogo", "chushangfeng", GogoConst.watermarkDateFormat.format(new Date()), multipartBody).enqueue(new Callback<UploadResponse>() {
+            @Override
+            public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
+                Log.d("Success", "Code: " + response.code());
+                Log.d("Success", "Message: " + response.message());
+                hideLoading();
+                setRequestedOrientation(mSavedOrientation);
+                String hash = response.body().getHash();
+                Log.d("Success", "Hash: " + hash);
+                Snackbar.make(mToolbar, "Success: " + hash, Snackbar.LENGTH_LONG).show();
+                IntentUtils.opentUrl(MainActivity.this, GogoConst.IPFS_GATEWAY_URL + hash);
 
-                    int file_size = Integer
-                            .parseInt(String.valueOf(file.length() / 1024));
-                    System.out.println("size ===>>> " + file_size);
-                    System.out.println("file.length() ===>>> " + file.length());
-
-                    selectedImagePath = file.getAbsolutePath();
-
-                    //new PhotoUploader(selectedImagePath).execute();
-
-                    File file2 = new File(selectedImagePath);
-
-                    RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), selectedImagePath);
-
-                    MultipartBody.Part multipartBody = MultipartBody.Part.createFormData("file",file2.getName(),requestFile);
-                    GogoApi.getApi().upload("gogo", "chushangfeng", GogoConst.watermarkDateFormat.format(new Date()), multipartBody).enqueue(new Callback<ResponseBody>() {
-                        @Override
-                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                            Log.d("Success", "Code: "+response.code());
-                            Log.d("Success", "Message: "+response.message());
-                            Snackbar.make(mToolbar, "Success: " +response.body(),Snackbar.LENGTH_LONG).show();
-
-                        }
-
-                        @Override
-                        public void onFailure(Call<ResponseBody> call, Throwable t) {
-                            Log.d("failure", "message = " + t.getMessage());
-                            Log.d("failure", "cause = " + t.getCause());
-                            Snackbar.make(mToolbar, "Failure: " + t,Snackbar.LENGTH_LONG).show();
-                        }
-                    });
-
-                }
-
-                catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
             }
 
-        }
-
-
-    private class PhotoUploader extends AsyncTask<Void, Void, Void> {
-
-        private final String mPath;
-        public Bitmap bitmap;
-
-        public PhotoUploader(String path) {
-            mPath = path;
-        }
-        @Override
-        protected Void doInBackground(Void... v) {
-            try {
-
-            } catch (Exception x) {
-                x.printStackTrace();
-                return null;
+            @Override
+            public void onFailure(Call<UploadResponse> call, Throwable t) {
+                Log.d("failure", "message = " + t.getMessage());
+                Log.d("failure", "cause = " + t.getCause());
+                Snackbar.make(mToolbar, "Failure: " + t, Snackbar.LENGTH_LONG).show();
+                hideLoading();
+                setRequestedOrientation(mSavedOrientation);
             }
-            return null;
+        });
+    }
+
+    private void storeImageToSDCard(Bitmap processedBitmap) throws IOException {
+        OutputStream output;
+        // Find the SD Card path
+        File filepath = Environment.getExternalStorageDirectory();
+        // Create a new folder in SD Card
+        File dir = new File(filepath.getAbsolutePath() + "/gogo.tattoo/");
+        dir.mkdirs();
+
+        String imageName = "gogo.tattoo_" + System.currentTimeMillis() + ".jpg";
+        // Create a name for the saved image
+        File file = new File(dir, imageName);
+        if (file.exists()) {
+            file.delete();
+            file.createNewFile();
+        } else {
+            file.createNewFile();
+
         }
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            showLoading();
-             }
+        output = new FileOutputStream(file);
 
-        @Override
-        protected void onPostExecute(Void v) {
-            super.onPostExecute(v);
-            hideLoading();
-        }
+        // Compress into png format image from 0% - 100%
+        processedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, output);
+        output.flush();
+        output.close();
 
+        int size = Integer.parseInt(String.valueOf(file.length() / 1024));
+        System.out.println("size ===>>> " + size);
+        System.out.println("file.length() ===>>> " + file.length());
 
-        private String saveImageToFile(String imageIpfs) throws Exception {
-            if (!haveStoragePermission()) {
-                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MainActivity.PERMISSION_REQUEST_STORAGE);
-                throw new Exception("No permission");
-            }
-
-            URL imageurl = new URL(GogoConst.IPFS_GATEWAY_URL + imageIpfs);
-            bitmap = BitmapFactory.decodeStream(imageurl.openConnection().getInputStream());
-            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-            String filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-                    + File.separator + imageIpfs +".jpg";
-            File f = new File(filePath);
-            f.createNewFile();
-            //write the bytes in file
-            FileOutputStream fo = new FileOutputStream(f);
-            fo.write(bytes.toByteArray());
-
-            // remember close de FileOutput
-            fo.close();
-            return filePath;
-        }
+        selectedImagePath = file.getAbsolutePath();
     }
 }
 
