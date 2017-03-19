@@ -1,6 +1,5 @@
 package tattoo.gogo.app.gogo_android;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -17,7 +16,6 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -39,7 +37,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -48,7 +45,10 @@ import okhttp3.Response;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
 import tattoo.gogo.app.gogo_android.utils.IntentUtils;
 
+import static android.os.Environment.getExternalStorageDirectory;
+import static android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 import static android.view.View.GONE;
+import static tattoo.gogo.app.gogo_android.MainActivity.GALLERY_PICTURE;
 
 /**
  * Created by delirium on 2/26/17.
@@ -56,11 +56,11 @@ import static android.view.View.GONE;
 public abstract class NewWorkFragment extends ArtFragment {
     protected static final String IS_FINAL = "is_final";
     protected OkHttpClient client;
-    protected String mTattooArtist = "gogo";
     private boolean isFinalPhotoUloaded = false;
 
     interface NewWorkImageUploadedListener {
         void onImageUploaded(String hash, Bitmap bitmap);
+
         void onFinalImageUploaded(String hash, Bitmap bitmap);
     }
 
@@ -79,9 +79,9 @@ public abstract class NewWorkFragment extends ArtFragment {
     @BindView(R.id.tv_github_link) TextView tvGithubLink;
     @BindView(R.id.tet_body_parts) ImprovedTagsEditText tetBodyParts;
     @BindView(R.id.tet_tags) ImprovedTagsEditText tetTags;
-    @BindView(R.id.btn_female) Button btnFemale;
-    @BindView(R.id.btn_male) Button btnMale;
-    @BindView(R.id.ll_gender_selection) LinearLayout llGenderSelection;
+    @Nullable @BindView(R.id.btn_female) Button btnFemale;
+    @Nullable @BindView(R.id.btn_male) Button btnMale;
+    @Nullable @BindView(R.id.ll_gender_selection) LinearLayout llGenderSelection;
     @BindView(R.id.ll_process_images) LinearLayout llProcessImages;
     @BindView(R.id.ll_final_image) LinearLayout llFinalImage;
 
@@ -96,7 +96,7 @@ public abstract class NewWorkFragment extends ArtFragment {
         setHasOptionsMenu(true);
 
         mArtWork = newArtWork();
-        populateWithDelay(etAuthor, mTattooArtist, 600);
+        populateWithDelay(etAuthor, getArtist(), 600);
         populateWithDelay(etMadeAt, mArtWork.getMadeAtShop(), 1000);
         String dateToday = GogoConst.watermarkDateFormat.format(new Date());
         populateWithDelay(etMadeDate, dateToday, 1400);
@@ -110,7 +110,8 @@ public abstract class NewWorkFragment extends ArtFragment {
         fab = ((MainActivity) getActivity()).getFloatingActionButton();
         setListeners();
 
-        btnFemale.performClick();
+        if (btnFemale != null)
+            btnFemale.performClick();
         etTitle.requestFocus();
 
         client = new OkHttpClient();
@@ -118,32 +119,21 @@ public abstract class NewWorkFragment extends ArtFragment {
 
     protected abstract ArtWork newArtWork();
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(getLayout(), container, false);
-
-        ButterKnife.bind(this, view);
-
-        return view;
-    }
-
-    protected abstract int getLayout();
-
 
     protected void setListeners() {
+        if (btnFemale != null)
+            btnFemale.setOnClickListener(v -> {
+                btnFemale.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+                btnMale.setTextColor(Color.GRAY);
+                mArtWork.setGender("female");
+            });
 
-        btnFemale.setOnClickListener(v -> {
-            btnFemale.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
-            btnMale.setTextColor(Color.GRAY);
-            mArtWork.setGender("female");
-        });
-
-        btnMale.setOnClickListener(v -> {
-            btnMale.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
-            btnFemale.setTextColor(Color.GRAY);
-            mArtWork.setGender("male");
-        });
+        if (btnMale != null)
+            btnMale.setOnClickListener(v -> {
+                btnMale.setTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+                btnFemale.setTextColor(Color.GRAY);
+                mArtWork.setGender("male");
+            });
 
         etAuthor.addTextChangedListener(new TextWatcher() {
             @Override
@@ -158,7 +148,7 @@ public abstract class NewWorkFragment extends ArtFragment {
 
             @Override
             public void afterTextChanged(Editable authorName) {
-                mTattooArtist = authorName.toString().trim();
+                setArtist(authorName.toString().trim());
                 updateLink();
             }
         });
@@ -167,6 +157,7 @@ public abstract class NewWorkFragment extends ArtFragment {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
             }
+
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
@@ -179,7 +170,7 @@ public abstract class NewWorkFragment extends ArtFragment {
 
                 handler.removeCallbacks(workRunnable);
                 workRunnable = () -> {
-                    if (mArtWork.getTitle().length() < 4 || mTattooArtist.isEmpty()) {
+                    if (mArtWork.getTitle().length() < 4 || getArtist().isEmpty()) {
                         ivQRgogo.setVisibility(GONE);
                         ivQRgithub.setVisibility(GONE);
                         tvGogoLink.setVisibility(GONE);
@@ -226,34 +217,31 @@ public abstract class NewWorkFragment extends ArtFragment {
 
         myAlertDialog.setPositiveButton(R.string.from_gallery,
                 (arg0, arg1) -> {
+                    hideFab();
                     Intent pictureActionIntent = null;
-
-                    pictureActionIntent = new Intent(
-                            Intent.ACTION_PICK,
-                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    pictureActionIntent.putExtra(IS_FINAL, isFinal);
-                    getActivity().startActivityForResult(
-                            pictureActionIntent,
-                            MainActivity.GALLERY_PICTURE);
-
+                    pictureActionIntent = new Intent(Intent.ACTION_PICK, EXTERNAL_CONTENT_URI);
+                    getActivity().startActivityForResult(pictureActionIntent, GALLERY_PICTURE
+                                    + (isFinal ? 1000 : 0));
                 });
 
         myAlertDialog.setNegativeButton(R.string.from_camera,
                 (arg0, arg1) -> {
-
-                    Intent intent = new Intent(
-                            MediaStore.ACTION_IMAGE_CAPTURE);
-                    File f = new File(android.os.Environment
-                            .getExternalStorageDirectory(), "temp.jpg");
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT,
-                            Uri.fromFile(f));
-                    intent.putExtra(IS_FINAL, isFinal);
-
-                    getActivity().startActivityForResult(intent, MainActivity.CAMERA_REQUEST);
+                    hideFab();
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    File f = new File(getExternalStorageDirectory(), "temp.jpg");
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
+                    getActivity().startActivityForResult(intent, MainActivity.CAMERA_REQUEST
+                            + (isFinal ? 1000 : 0));
 
                 });
+        myAlertDialog.setOnCancelListener(dialog -> {
+            showViews();
+            ((MainActivity) getActivity()).hideLoading();
+        });
         myAlertDialog.show();
     }
+
+
     private void sendForApprovalToPublish() {
         if (!isAdded()) {
             return;
@@ -289,9 +277,9 @@ public abstract class NewWorkFragment extends ArtFragment {
                     int colorRes = R.color.colorAccent;
                     if (response.isSuccessful()) {
                         strRes = R.string.test_link_taken;
-                        colorRes =  R.color.colorPrimaryDark;
+                        colorRes = R.color.colorPrimaryDark;
                     } else {
-                        }
+                    }
                     tvTitleAvailability.setText(strRes);
                     tvTitleAvailability.setTextColor(ContextCompat.getColor(getContext(), colorRes));
 
@@ -336,8 +324,8 @@ public abstract class NewWorkFragment extends ArtFragment {
         tvGithubLink.setText(gogoGithubLink);
 
         new AsyncTask<Void, Void, Void>() {
-             Bitmap qrGithubBitmap;
-             Bitmap qrGogoBitmap;
+            Bitmap qrGithubBitmap;
+            Bitmap qrGogoBitmap;
 
             @Override
             protected Void doInBackground(Void... params) {
@@ -357,7 +345,7 @@ public abstract class NewWorkFragment extends ArtFragment {
         ivQRgithub.setOnClickListener(v -> {
             Intent shareIntent = new Intent();
             shareIntent.setAction(Intent.ACTION_SEND);
-            shareIntent.setType("images/png");
+            shareIntent.setType("partial_images/png");
 
             Uri uri = FileProvider.getUriForFile(getContext(), "tattoo.gogo.app.gogo_android", makeQRcodeFile(gogoGithubLink));
             shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
@@ -387,14 +375,15 @@ public abstract class NewWorkFragment extends ArtFragment {
 
     protected String makeLink(String mainUrl) {
         String tattooTitleLinkified = mArtWork.getTitle().toLowerCase().replace(" ", "_");
-        return mainUrl + mTattooArtist.toLowerCase() + "/" + mArtWork.getShortName().toLowerCase() +"/" + tattooTitleLinkified;
+        return mainUrl + getArtist() + "/" + mArtWork.getType() + "/" + tattooTitleLinkified;
     }
 
 
     public void addImage(String hash, Bitmap bitmap, boolean isFinal) {
-        if (getContext() == null) {
+        if (!isAdded()) {
             return;
         }
+        showViews();
         final ImageView iv = new ImageView(getContext());
         iv.setAdjustViewBounds(true);
         iv.setImageBitmap(bitmap);
@@ -406,9 +395,11 @@ public abstract class NewWorkFragment extends ArtFragment {
             mArtWork.setImageIpfs(hash);
             llFinalImage.removeAllViews();
             llFinalImage.addView(iv);
+            llFinalImage.setVisibility(View.VISIBLE);
         } else {
             mArtWork.getImagesIpfs().add(hash);
             llProcessImages.addView(iv);
+            llProcessImages.setVisibility(View.VISIBLE);
         }
     }
 }

@@ -13,8 +13,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class GogoApi {
 
-    private static final String HOST_URL = "http://api.gogo.tattoo:12345/";
-    // private static final String HOST_URL = "http://192.168.1.145:12345/";
+    private static final String HOST_URL = "http://api.gogo.tattoo/";
+    // private static final String HOST_URL = "http://192.168.1.153:12345/";
     private static GogoService mApi;
 
     public static GogoService getApi() {

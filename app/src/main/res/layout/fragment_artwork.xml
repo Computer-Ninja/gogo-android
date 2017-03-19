@@ -53,6 +53,6 @@
                 />
         </LinearLayout>
 
-        <include layout="@layout/qr_codes"/>
+        <include layout="@layout/partial_qr_codes"/>
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

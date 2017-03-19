@@ -2,9 +2,7 @@ package tattoo.gogo.app.gogo_android;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -17,8 +15,9 @@ import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
+import java.util.Arrays;
+
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import tattoo.gogo.app.gogo_android.utils.CircleTransform;
 
 
@@ -34,22 +33,13 @@ public class MainActivityFragment extends ArtFragment {
     @BindView(R.id.iv_artist_xizi) ImageView ivArtistXizi;
     @BindView(R.id.tv_description) TextView tvDescription;
 
-    private View flNewTattoo;
-    private FloatingActionButton fab;
     private Animation myFadeInAnimation;
     private Animation myFadeOutAnimation;
 
 
-    public MainActivityFragment() {
-    }
-
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_main, container, false);
-        ButterKnife.bind(this, v);
-        return v;
+    protected int getLayout() {
+        return R.layout.fragment_main;
     }
 
     @Override
@@ -93,9 +83,9 @@ public class MainActivityFragment extends ArtFragment {
 
         ivDoge.startAnimation(myFadeOutAnimation);
 
-        loadArtist(ivArtistGogo, "http://gogo.tattoo/gogo/images/strawberry.jpg", "gogo");
-        loadArtist(ivArtistAid, "http://gogo.tattoo/aid/images/aid.png", "aid");
-        loadArtist(ivArtistXizi, "http://gogo.tattoo/xizi/images/xizi.jpg", "xizi");
+        loadArtist(ivArtistGogo, GogoConst.MAIN_URL + "gogo/images/gogo.jpg", "gogo");
+        loadArtist(ivArtistAid, GogoConst.MAIN_URL + "aid/images/aid.png", "aid");
+        loadArtist(ivArtistXizi, GogoConst.MAIN_URL + "xizi/images/xizi.jpg", "xizi");
 
         //tvDescription.setText(Hello.greetings("This is a greeting from golang, WOW!"));
 
@@ -119,13 +109,7 @@ public class MainActivityFragment extends ArtFragment {
                             .commit();
                 });
                 iv.setOnLongClickListener(view -> {
-                    String tag = artistName+"/"+ArtistArtworkListFragment.ARTWORK_TYPE_DESIGN;
-                    getFragmentManager().beginTransaction()
-                            .hide(MainActivityFragment.this)
-                            .add(R.id.fragment_container, ArtistArtworkListFragment.newInstance(1,
-                                    artistName, ArtistArtworkListFragment.ARTWORK_TYPE_DESIGN), tag)
-                            .addToBackStack(tag)
-                            .commit();
+                    setArtistView(artistName);
                     return true;
                 });
             }
@@ -134,6 +118,23 @@ public class MainActivityFragment extends ArtFragment {
                 .load(link)
                 .bitmapTransform(new CircleTransform(getContext()))
                 .into(target);
+    }
+
+    private void setArtistView(String artistName) {
+        ((GogoAndroid) getActivity().getApplication()).setArtist(artistName);
+        for (View v : Arrays.asList(ivArtistAid, ivArtistGogo, ivArtistXizi)) {
+            int s = getResources().getDimensionPixelSize(R.dimen.iv_artist_unselected);
+            int padding = getResources().getDimensionPixelSize(R.dimen.iv_artist_padding_unselected);
+            if (artistName.equals(v.getTag())) {
+                s = getResources().getDimensionPixelSize(R.dimen.iv_artist_selected);
+                padding = getResources().getDimensionPixelSize(R.dimen.iv_artist_padding_selected);
+            }
+            ViewGroup.LayoutParams lp = v.getLayoutParams();
+            lp.width = s;
+            lp.height = s;
+            v.setLayoutParams(lp);
+            v.setPadding(padding,padding,padding,padding);
+        }
     }
 
     @Override
@@ -157,12 +158,7 @@ public class MainActivityFragment extends ArtFragment {
 
         }
         ivDoge.startAnimation(myFadeInAnimation);
-        ivDoge.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                ivDoge.startAnimation(myFadeOutAnimation);
-            }
-        }, 5000);
+        ivDoge.postDelayed(() -> ivDoge.startAnimation(myFadeOutAnimation), 5000);
 
         String msg = "i explain let me";
         String action = "no more";
@@ -177,12 +173,6 @@ public class MainActivityFragment extends ArtFragment {
             action = "i envy";
         }
         Snackbar.make(view, msg, Snackbar.LENGTH_LONG)
-                .setAction(action,
-                        new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                fabClicked(view);
-                            }
-                        }).show();
+                .setAction(action, v -> fabClicked(view)).show();
     }
 }

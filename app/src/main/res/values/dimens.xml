@@ -6,4 +6,8 @@
     <dimen name="text_margin">16dp</dimen>
     <dimen name="slogan_text_size">30sp</dimen>
     <dimen name="slogan_padding">30dp</dimen>
+    <dimen name="iv_artist_unselected">100dp</dimen>
+    <dimen name="iv_artist_selected">120dp</dimen>
+    <dimen name="iv_artist_padding_unselected">10dp</dimen>
+    <dimen name="iv_artist_padding_selected">0dp</dimen>
 </resources>

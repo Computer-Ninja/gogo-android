@@ -54,7 +54,7 @@ public class ImprovedTagsEditText extends AutoCompleteTextView {
     public static final String NEW_LINE = "\n";
 
     private static final String LAST_STRING = "lastString";
-    private static final String TAGS = "tags";
+    private static final String TAGS = "partial_tags";
     private static final String SUPER_STATE = "superState";
     private static final String UNDER_CONSTRUCTION_TAG = "underConstructionTag";
     private static final String ALLOW_SPACES_IN_TAGS = "allowSpacesInTags";
@@ -147,7 +147,7 @@ public class ImprovedTagsEditText extends AutoCompleteTextView {
     }
 
     /**
-     * do not use this method to set tags
+     * do not use this method to set partial_tags
      */
     @Override
     public void setText(CharSequence text, BufferType type) {
@@ -184,7 +184,7 @@ public class ImprovedTagsEditText extends AutoCompleteTextView {
     }
 
     /**
-     * use this method to set tags
+     * use this method to set partial_tags
      */
     public void setTags(CharSequence... tags) {
         mTagSpans.clear();
@@ -207,7 +207,7 @@ public class ImprovedTagsEditText extends AutoCompleteTextView {
     }
 
     /**
-     * use this method to set tags
+     * use this method to set partial_tags
      */
 
     public void setTags(String[] tags) {

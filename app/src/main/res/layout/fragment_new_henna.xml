@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:TagsEditText="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -18,225 +17,21 @@
         android:orientation="vertical"
         android:paddingTop="?attr/actionBarSize">
 
+        <include layout="@layout/partial_artist_title"/>
 
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/input_layout_made_by"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp">
+        <include layout="@layout/partial_future_link"/>
 
-            <EditText
-                android:id="@+id/input_made_by"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/hint_made_by"
-                android:maxLines="1"/>
-        </android.support.design.widget.TextInputLayout>
+        <include layout="@layout/partial_where_when"/>
 
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/input_layout_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp">
+        <include layout="@layout/partial_gender"/>
 
-            <EditText
-                android:id="@+id/input_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/hint_title"
-                android:inputType="textCapSentences"
-                android:maxLines="1"/>
-        </android.support.design.widget.TextInputLayout>
+        <include layout="@layout/partial_tags"/>
 
-        <TextView
-            android:id="@+id/tv_future_link"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:gravity="center"
-            android:textColor="@color/gray"/>
+        <include layout="@layout/partial_body_parts"/>
 
-        <TextView
-            android:id="@+id/tv_future_link_availability"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:textColor="@color/colorPrimary"/>
+        <include layout="@layout/partial_images"/>
 
+        <include layout="@layout/partial_qr_codes"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/input_layout_made_city"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="48dp"
-                android:layout_weight="1">
-
-                <EditText
-                    android:id="@+id/input_made_city"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/hint_made_city"
-                    android:maxLines="1"/>
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:id="@+id/input_layout_made_country"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="48dp"
-                android:layout_weight="1">
-
-                <EditText
-                    android:id="@+id/input_made_country"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/hint_made_country"
-                    android:maxLines="1"/>
-            </android.support.design.widget.TextInputLayout>
-        </LinearLayout>
-
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/input_layout_made_at"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="48dp">
-
-            <EditText
-                android:id="@+id/input_made_at"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/hint_made_at"
-                android:maxLines="1"/>
-        </android.support.design.widget.TextInputLayout>
-
-
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/input_layout_made_date"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp">
-
-            <EditText
-                android:id="@+id/input_made_date"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/hint_made_date"
-                android:maxLines="1"/>
-        </android.support.design.widget.TextInputLayout>
-
-
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/input_layout_time_elapsed"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp">
-
-            <EditText
-                android:id="@+id/input_time_elapsed"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/hint_time_elapsed"
-                android:inputType="numberDecimal"
-                android:maxLines="1"/>
-        </android.support.design.widget.TextInputLayout>
-
-        <LinearLayout
-            android:id="@+id/ll_gender_selection"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <Button
-                android:id="@+id/btn_female"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/female"
-                android:textAllCaps="true"/>
-
-            <Button
-                android:id="@+id/btn_male"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-
-                android:text="@string/male"
-                android:textAllCaps="true"/>
-
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginTop="12dp"
-            android:gravity="center"
-            android:text="@string/tags"/>
-
-        <tattoo.gogo.app.gogo_android.ImprovedTagsEditText
-            android:id="@+id/tet_tags"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="18dp"
-            TagsEditText:allowSpaceInTag="true"
-            TagsEditText:tagsBackground="@drawable/tag"
-            TagsEditText:tagsCloseImagePadding="@dimen/defaultTagsCloseImagePadding"
-            TagsEditText:tagsCloseImageRight="@drawable/tag_close"
-            TagsEditText:tagsTextSize="@dimen/defaultTagsTextSize"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginTop="12dp"
-            android:gravity="center"
-            android:text="@string/body_parts"/>
-
-        <tattoo.gogo.app.gogo_android.ImprovedTagsEditText
-            android:id="@+id/tet_body_parts"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="18dp"
-            TagsEditText:allowSpaceInTag="true"
-            TagsEditText:tagsBackground="@drawable/tag"
-            TagsEditText:tagsCloseImagePadding="@dimen/defaultTagsCloseImagePadding"
-            TagsEditText:tagsCloseImageRight="@drawable/tag_close"
-            TagsEditText:tagsTextSize="@dimen/defaultTagsTextSize"/>
-
-        <TextView
-            android:id="@+id/tv_gogo_link"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:gravity="center"
-            android:textColor="@color/gray"/>
-
-        <ImageView
-            android:id="@+id/iv_qr_gogotattoo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            />
-
-        <TextView
-            android:id="@+id/tv_github_link"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="512dp"
-            android:gravity="center"
-            android:textColor="@color/gray"/>
-
-        <ImageView
-            android:id="@+id/iv_qr_gogogithub"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="256dp"
-            />
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

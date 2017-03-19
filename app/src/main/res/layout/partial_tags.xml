@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:TagsEditText="http://schemas.android.com/apk/res-auto"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="12dp"
+        android:gravity="center"
+        android:text="@string/tags"/>
+
+    <tattoo.gogo.app.gogo_android.ImprovedTagsEditText
+        android:id="@+id/tet_tags"
+        TagsEditText:allowSpaceInTag="true"
+        TagsEditText:tagsBackground="@drawable/tag"
+        TagsEditText:tagsCloseImagePadding="@dimen/defaultTagsCloseImagePadding"
+        TagsEditText:tagsCloseImageRight="@drawable/tag_close"
+        TagsEditText:tagsTextSize="@dimen/defaultTagsTextSize"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="18dp"/>
+</merge>

@@ -12,6 +12,7 @@ import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import tattoo.gogo.app.gogo_android.model.Design;
+import tattoo.gogo.app.gogo_android.model.Dreadlocks;
 import tattoo.gogo.app.gogo_android.model.Henna;
 import tattoo.gogo.app.gogo_android.model.Piercing;
 import tattoo.gogo.app.gogo_android.model.Tattoo;
@@ -43,6 +44,15 @@ public interface GogoService {
 
     @POST("piercing/{id}")
     Call<Piercing> piercing(@Path("id") int id, @Body Piercing piercing);
+
+    @GET("dreadlocks/{id}")
+    Call<Dreadlocks> dreadlocks(@Path("id") long id);
+
+    @GET("dreadlocks/{name}")
+    Call<List<Dreadlocks>> dreadlocks(@Path("name") String name);
+
+    @POST("dreadlocks/{id}")
+    Call<Dreadlocks> dreadlocks(@Path("id") int id, @Body Dreadlocks tat);
 
     @Multipart
     @POST("upload")

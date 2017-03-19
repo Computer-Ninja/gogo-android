@@ -88,7 +88,7 @@ public final class GlideImageGetter implements Drawable.Callback {
 
         @Override
         public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
-             // Resize images - Scale image proportionally to fit TextView width
+             // Resize partial_images - Scale image proportionally to fit TextView width
              float width;
              float height;
              if (resource.getIntrinsicWidth() >= getView().getWidth()) {

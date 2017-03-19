@@ -10,6 +10,7 @@ import com.google.android.gms.analytics.Tracker;
 import io.fabric.sdk.android.Fabric;
 public class GogoAndroid extends Application {
     private Tracker mTracker;
+    private String mArtist = "gogo";
 
     @Override
     public void onCreate() {
@@ -29,4 +30,13 @@ public class GogoAndroid extends Application {
         }
         return mTracker;
     }
+
+    public void setArtist(String artist) {
+        this.mArtist = artist;
+    }
+
+    public String getArtist() {
+        return mArtist;
+    }
+
 }

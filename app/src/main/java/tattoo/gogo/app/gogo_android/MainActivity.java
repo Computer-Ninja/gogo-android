@@ -74,7 +74,6 @@ import tattoo.gogo.app.gogo_android.utils.AnalyticsUtil;
 import tattoo.gogo.app.gogo_android.utils.IntentUtils;
 
 import static android.R.attr.name;
-import static tattoo.gogo.app.gogo_android.NewWorkFragment.IS_FINAL;
 
 public class MainActivity extends AppCompatActivity implements
         ArtistArtworkListFragment.OnArtistArtworkFragmentInteractionListener,
@@ -151,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements
         });
         newTattoo.setOnClickListener(v -> {
             animateFAB();
-            String tag = "gogo/tattoo/new";
+            String tag = ((GogoAndroid) getApplication()).getArtist() + "/tattoo/new";
             getSupportFragmentManager().beginTransaction()
                     .hide(getSupportFragmentManager().findFragmentByTag("welcome"))
                     .add(R.id.fragment_container, new NewTattooFragment(), tag)
@@ -161,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements
 
         newPiercing.setOnClickListener(v -> {
             animateFAB();
-            String tag = "gogo/piercing/new";
+            String tag = ((GogoAndroid) getApplication()).getArtist() + "/piercing/new";
             getSupportFragmentManager().beginTransaction()
                     .hide(getSupportFragmentManager().findFragmentByTag("welcome"))
                     .add(R.id.fragment_container, new NewPiercingFragment(), tag)
@@ -171,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements
 
         newDesign.setOnClickListener(v -> {
             animateFAB();
-            String tag = "gogo/design/new";
+            String tag = ((GogoAndroid) getApplication()).getArtist() + "/design/new";
             getSupportFragmentManager().beginTransaction()
                     .hide(getSupportFragmentManager().findFragmentByTag("welcome"))
                     .add(R.id.fragment_container, new NewDesignFragment(), tag)
@@ -181,10 +180,20 @@ public class MainActivity extends AppCompatActivity implements
 
         newHenna.setOnClickListener(v -> {
             animateFAB();
-            String tag = "gogo/henna/new";
+            String tag = ((GogoAndroid) getApplication()).getArtist() +"/henna/new";
             getSupportFragmentManager().beginTransaction()
                     .hide(getSupportFragmentManager().findFragmentByTag("welcome"))
                     .add(R.id.fragment_container, new NewHennaFragment(), tag)
+                    .addToBackStack(tag)
+                    .commit();
+        });
+
+        newDreadlocks.setOnClickListener(v -> {
+            animateFAB();
+            String tag = ((GogoAndroid) getApplication()).getArtist() +"/dreadlocks/new";
+            getSupportFragmentManager().beginTransaction()
+                    .hide(getSupportFragmentManager().findFragmentByTag("welcome"))
+                    .add(R.id.fragment_container, new NewDreadlockFragment(), tag)
                     .addToBackStack(tag)
                     .commit();
         });
@@ -349,6 +358,7 @@ public class MainActivity extends AppCompatActivity implements
         mToolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
         if (manager != null) {
             if (manager.getBackStackEntryCount() == 0) {
+                hideLoading();
                 setActionBarTitle(getString(R.string.app_name_short));
                 fab.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
                 getSupportActionBar().setDisplayHomeAsUpEnabled(false);
@@ -653,17 +663,22 @@ public class MainActivity extends AppCompatActivity implements
         showLoading();
 
         bitmap = null;
+        boolean isFinal = false;
         selectedImagePath = null;
+        if (requestCode > 1000) {
+            requestCode -= 1000;
+            isFinal = true;
+        }
 
         if (resultCode == RESULT_OK && requestCode == CAMERA_REQUEST) {
-            onCameraPhotoResult(data);
+            onCameraPhotoResult(data, isFinal);
 
         } else if (resultCode == RESULT_OK && requestCode == GALLERY_PICTURE) {
-            onGalleryPhotoResult(data);
+            onGalleryPhotoResult(data, isFinal);
         }
     }
 
-    private void onGalleryPhotoResult(Intent data) {
+    private void onGalleryPhotoResult(Intent data, boolean isFinal) {
         if (data != null) {
 
             Uri selectedImage = data.getData();
@@ -677,16 +692,16 @@ public class MainActivity extends AppCompatActivity implements
 
             bitmap = BitmapFactory.decodeFile(selectedImagePath); // load
             // preview image
-            bitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth()/2, bitmap.getHeight()/2, false);
+            bitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth()/4, bitmap.getHeight()/4, false);
 
-            uploadFile(data, bitmap);
+            uploadFile(bitmap, isFinal);
 
         } else {
             Snackbar.make(mToolbar, R.string.gallery_cancelled, Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void onCameraPhotoResult(Intent data) {
+    private void onCameraPhotoResult(Intent data, boolean isFinal) {
 
         File f = new File(Environment.getExternalStorageDirectory().toString());
         for (File temp : f.listFiles()) {
@@ -730,7 +745,7 @@ public class MainActivity extends AppCompatActivity implements
 
             //img_logo.setImageBitmap(bitmap);
             storeImageToSDCard(bitmap);
-            uploadFile(data, bitmap);
+            uploadFile(bitmap, isFinal);
         } catch (Exception e) {
             showError(e);
         }
@@ -743,7 +758,7 @@ public class MainActivity extends AppCompatActivity implements
         Snackbar.make(mToolbar, e.getMessage(), Snackbar.LENGTH_LONG).show();
     }
 
-    private void uploadFile(Intent data, Bitmap bitmap) {
+    private void uploadFile(Bitmap bitmap, boolean isFinal) {
 
         File file = new File(selectedImagePath);
 
@@ -755,7 +770,7 @@ public class MainActivity extends AppCompatActivity implements
         GogoApi.getApi().upload("gogo", "chushangfeng", GogoConst.watermarkDateFormat.format(new Date()), multipartBody).enqueue(new Callback<UploadResponse>() {
             @Override
             public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
-                onFileUploadSuccess(data, response, bitmap);
+                onFileUploadSuccess(response, bitmap, isFinal);
             }
 
             @Override
@@ -769,7 +784,7 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 
-    private void onFileUploadSuccess(Intent data, Response<UploadResponse> response, Bitmap bitmap) {
+    private void onFileUploadSuccess(Response<UploadResponse> response, Bitmap bitmap, boolean isFinal) {
         Log.d("Success", "Code: " + response.code());
         Log.d("Success", "Message: " + response.message());
         hideLoading();
@@ -781,7 +796,19 @@ public class MainActivity extends AppCompatActivity implements
 
         NewWorkFragment fr = (NewWorkFragment) getSupportFragmentManager().findFragmentByTag("gogo/tattoo/new");
         if (fr != null) {
-            fr.addImage(hash, bitmap, data.getBooleanExtra(IS_FINAL, false));
+            fr.addImage(hash, bitmap, isFinal);
+        }
+         fr = (NewWorkFragment) getSupportFragmentManager().findFragmentByTag("gogo/design/new");
+        if (fr != null) {
+            fr.addImage(hash, bitmap, isFinal);
+        }
+         fr = (NewWorkFragment) getSupportFragmentManager().findFragmentByTag("gogo/henna/new");
+        if (fr != null) {
+            fr.addImage(hash, bitmap, isFinal);
+        }
+         fr = (NewWorkFragment) getSupportFragmentManager().findFragmentByTag("gogo/piercing/new");
+        if (fr != null) {
+            fr.addImage(hash, bitmap, isFinal);
         }
     }
 
@@ -817,5 +844,6 @@ public class MainActivity extends AppCompatActivity implements
 
         selectedImagePath = file.getAbsolutePath();
     }
+
 }
 

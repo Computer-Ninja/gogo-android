@@ -51,12 +51,9 @@ public class NewPiercingFragment extends NewWorkFragment {
 
     protected void setListeners() {
         super.setListeners();
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                updateArtwork();
-                sendToApi();
-            }
+        fab.setOnClickListener(view -> {
+            updateArtwork();
+            sendToApi();
         });
     }
 

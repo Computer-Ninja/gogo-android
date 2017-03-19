@@ -2,18 +2,17 @@ package tattoo.gogo.app.gogo_android;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,6 +20,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -45,19 +45,21 @@ public class ArtistArtworkListFragment extends ArtFragment {
     public static final String ARTWORK_TYPE_DESIGN = "design";
     public static final String ARTWORK_TYPE_HENNA = "henna";
     public static final String ARTWORK_TYPE_PIERCING = "piercing";
+    public static final String ARTWORK_TYPE_DREADLOCKS= "dreadlocks";
     private static final String PARAM_WORKS = "works";
     private static final String PARAM_BUNDLE = "bundle";
 
     private int mColumnCount = 1;
     private OnArtistArtworkFragmentInteractionListener mListener;
     private ArrayList<ArtWork> mWorks = new ArrayList<>();
-    private RecyclerView mRecyclerView;
     private String mArtistName;
-    private ImageView ivLoading;
-    private TextView tvNothingHere;
     private String mArtworkType;
     private List<ArtWork> mAllWorks = new ArrayList<>();
     private Bundle savedState = null;
+
+    @BindView(R.id.list) RecyclerView mRecyclerView;
+    @BindView(R.id.iv_loading) ImageView ivLoading;
+    @BindView(R.id.tv_nothing_here_yet) TextView tvNothingHere;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -92,19 +94,18 @@ public class ArtistArtworkListFragment extends ArtFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_tattoo_list, container, false);
+    protected int getLayout() {
+        return R.layout.fragment_tattoo_list;
+    }
 
-        // Set the adapter
-        Context context = view.getContext();
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.list);
-        ivLoading = (ImageView) view.findViewById(R.id.iv_loading);
-        tvNothingHere = (TextView) view.findViewById(R.id.tv_nothing_here_yet);
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
         if (mColumnCount <= 1) {
-            mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         } else {
-            mRecyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+            mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), mColumnCount));
         }
         if (savedInstanceState != null && savedState == null) {
             savedState = savedInstanceState.getBundle(PARAM_BUNDLE);
@@ -114,8 +115,6 @@ public class ArtistArtworkListFragment extends ArtFragment {
             setupRecyclerView();
         }
         savedState = null;
-
-        return view;
     }
 
     @Override
@@ -263,6 +262,9 @@ public class ArtistArtworkListFragment extends ArtFragment {
             case ARTWORK_TYPE_DESIGN:
                 GogoApi.getApi().design(mArtistName).enqueue(callback);
                 break;
+            case ARTWORK_TYPE_DREADLOCKS:
+                GogoApi.getApi().dreadlocks(mArtistName).enqueue(callback);
+                break;
         }
     }
 
@@ -309,6 +311,8 @@ public class ArtistArtworkListFragment extends ArtFragment {
             addMenuItem(menu, R.string.henna, ArtistArtworkListFragment.ARTWORK_TYPE_HENNA);
         if (!mArtworkType.equals(ARTWORK_TYPE_PIERCING))
             addMenuItem(menu, R.string.piercing, ArtistArtworkListFragment.ARTWORK_TYPE_PIERCING);
+        if (!mArtworkType.equals(ARTWORK_TYPE_DREADLOCKS))
+            addMenuItem(menu, R.string.dreaklocks, ArtistArtworkListFragment.ARTWORK_TYPE_DREADLOCKS);
 
     }
 

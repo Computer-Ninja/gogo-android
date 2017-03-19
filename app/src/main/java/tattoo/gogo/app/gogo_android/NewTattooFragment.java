@@ -2,7 +2,6 @@ package tattoo.gogo.app.gogo_android;
 
 import android.support.design.widget.Snackbar;
 import android.util.Log;
-import android.view.View;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -34,13 +33,10 @@ public class NewTattooFragment extends NewWorkFragment {
     @Override
     protected void setListeners() {
         super.setListeners();
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                updateArtwork();
-                //sendForApprovalToPublish();
-                sendToApi();
-            }
+        fab.setOnClickListener(view -> {
+            updateArtwork();
+            //sendForApprovalToPublish();
+            sendToApi();
         });
     }
 
