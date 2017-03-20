@@ -1,0 +1,19 @@
+[0.0.4-alpha]
+ + dreadlocks (posting and browsing)
+ + switching tattoo artists (for posting new artworks)
+
+[0.0.3-alpha]
+ * the first apk was shown to community, includes basic functions:
+ + artist lists of artwonks, such as
+  + tattoos (of course)
+  + design
+  + henna
+  + piercing
+ * each artwork includes:
+  + ability to save every photo to the phone
+  + sharing imageview bitmap to friends
+  + sharing original file (downloaded from IPFS) to friends
+
+ * includes features for artists:
+  + posting new work to gogo-api
+  + obtaining QR codes for new works

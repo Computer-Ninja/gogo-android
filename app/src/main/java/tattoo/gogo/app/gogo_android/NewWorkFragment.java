@@ -3,6 +3,7 @@ package tattoo.gogo.app.gogo_android;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.moandjiezana.toml.TomlWriter;
 
 import net.glxn.qrgen.android.QRCode;
@@ -401,5 +403,9 @@ public abstract class NewWorkFragment extends ArtFragment {
             llProcessImages.addView(iv);
             llProcessImages.setVisibility(View.VISIBLE);
         }
+        Glide.with(getContext())
+                .load(GogoConst.IPFS_GATEWAY_URL + hash)
+                .placeholder(new BitmapDrawable(getResources(), bitmap))
+                .into(iv);
     }
 }

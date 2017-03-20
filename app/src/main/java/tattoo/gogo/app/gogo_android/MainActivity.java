@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements
 
         newHenna.setOnClickListener(v -> {
             animateFAB();
-            String tag = ((GogoAndroid) getApplication()).getArtist() +"/henna/new";
+            String tag = ((GogoAndroid) getApplication()).getArtist() + "/henna/new";
             getSupportFragmentManager().beginTransaction()
                     .hide(getSupportFragmentManager().findFragmentByTag("welcome"))
                     .add(R.id.fragment_container, new NewHennaFragment(), tag)
@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements
 
         newDreadlocks.setOnClickListener(v -> {
             animateFAB();
-            String tag = ((GogoAndroid) getApplication()).getArtist() +"/dreadlocks/new";
+            String tag = ((GogoAndroid) getApplication()).getArtist() + "/dreadlocks/new";
             getSupportFragmentManager().beginTransaction()
                     .hide(getSupportFragmentManager().findFragmentByTag("welcome"))
                     .add(R.id.fragment_container, new NewDreadlockFragment(), tag)
@@ -692,7 +692,7 @@ public class MainActivity extends AppCompatActivity implements
 
             bitmap = BitmapFactory.decodeFile(selectedImagePath); // load
             // preview image
-            bitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth()/4, bitmap.getHeight()/4, false);
+            bitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth() / 4, bitmap.getHeight() / 4, false);
 
             uploadFile(bitmap, isFinal);
 
@@ -718,8 +718,8 @@ public class MainActivity extends AppCompatActivity implements
 
         try {
             bitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
-            bitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth()/4,
-                    bitmap.getHeight()/4, true);
+            bitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth() / 4,
+                    bitmap.getHeight() / 4, true);
 
             int rotate = 0;
             ExifInterface exif = new ExifInterface(f.getAbsolutePath());
@@ -740,10 +740,11 @@ public class MainActivity extends AppCompatActivity implements
             }
             Matrix matrix = new Matrix();
             matrix.postRotate(rotate);
-            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
-                    bitmap.getHeight(), matrix, true);
+            bitmap = Bitmap.createBitmap(bitmap, 0, 0,
+                    bitmap.getWidth(),
+                    bitmap.getHeight(),
+                    matrix, true);
 
-            //img_logo.setImageBitmap(bitmap);
             storeImageToSDCard(bitmap);
             uploadFile(bitmap, isFinal);
         } catch (Exception e) {
@@ -767,7 +768,7 @@ public class MainActivity extends AppCompatActivity implements
         MultipartBody.Part multipartBody = MultipartBody.Part.createFormData("uploadfile", file.getName(), requestFile);
 
         //MultipartBody.Part multipartBody = MultipartBody.Part.createFormData("file",file2.getName(),requestFile);
-        GogoApi.getApi().upload("gogo", "chushangfeng", GogoConst.watermarkDateFormat.format(new Date()), multipartBody).enqueue(new Callback<UploadResponse>() {
+        GogoApi.getApi().upload(((GogoAndroid) getApplication()).getArtist(), "chushangfeng", GogoConst.watermarkDateFormat.format(new Date()), multipartBody).enqueue(new Callback<UploadResponse>() {
             @Override
             public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
                 onFileUploadSuccess(response, bitmap, isFinal);
@@ -794,19 +795,28 @@ public class MainActivity extends AppCompatActivity implements
         Snackbar.make(mToolbar, "Success: " + hash, Snackbar.LENGTH_LONG).show();
         //IntentUtils.opentUrl(MainActivity.this, GogoConst.IPFS_GATEWAY_URL + hash);
 
-        NewWorkFragment fr = (NewWorkFragment) getSupportFragmentManager().findFragmentByTag("gogo/tattoo/new");
+        NewWorkFragment fr = (NewWorkFragment) getSupportFragmentManager()
+                .findFragmentByTag(((GogoAndroid) getApplication()).getArtist() + "/tattoo/new");
         if (fr != null) {
             fr.addImage(hash, bitmap, isFinal);
         }
-         fr = (NewWorkFragment) getSupportFragmentManager().findFragmentByTag("gogo/design/new");
+        fr = (NewWorkFragment) getSupportFragmentManager()
+                .findFragmentByTag(((GogoAndroid) getApplication()).getArtist() + "/design/new");
         if (fr != null) {
             fr.addImage(hash, bitmap, isFinal);
         }
-         fr = (NewWorkFragment) getSupportFragmentManager().findFragmentByTag("gogo/henna/new");
+        fr = (NewWorkFragment) getSupportFragmentManager()
+                .findFragmentByTag(((GogoAndroid) getApplication()).getArtist() + "/henna/new");
         if (fr != null) {
             fr.addImage(hash, bitmap, isFinal);
         }
-         fr = (NewWorkFragment) getSupportFragmentManager().findFragmentByTag("gogo/piercing/new");
+        fr = (NewWorkFragment) getSupportFragmentManager()
+                .findFragmentByTag(((GogoAndroid) getApplication()).getArtist() + "/piercing/new");
+        if (fr != null) {
+            fr.addImage(hash, bitmap, isFinal);
+        }
+        fr = (NewWorkFragment) getSupportFragmentManager()
+                .findFragmentByTag(((GogoAndroid) getApplication()).getArtist() + "/dreadlocks/new");
         if (fr != null) {
             fr.addImage(hash, bitmap, isFinal);
         }

@@ -223,8 +223,10 @@ public class ArtistArtworkListFragment extends ArtFragment {
                         int totalItemCount = lm.getItemCount();
                         int pastVisibleItems = lm.findFirstVisibleItemPosition();
                         if (pastVisibleItems + visibleItemCount >= totalItemCount) {
-                            mWorks.add(mAllWorks.remove(0));
-                            mRecyclerView.invalidate();
+                            if (mAllWorks.size() > 1) {
+                                mWorks.add(mAllWorks.remove(0));
+                                mRecyclerView.invalidate();
+                            }
                         }
                     }
                 });

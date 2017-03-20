@@ -8,7 +8,7 @@
 有直观的照片可以用来审核，纹身的真实性可以保证。</string>
     <string name="hint_tattoo_title">纹身名字</string>
     <string name="hint_made_at">哪里做的? 楚上风?</string>
-    <string name="hint_made_by">谁做的? 曦子?</string>
+    <string name="hint_made_by">谁做的?</string>
     <string name="hint_made_date">什么时候做的? 今天?</string>
     <string name="share_to">分享给朋友…</string>
     <string name="hint_time_elapsed">进行时间?</string>
@@ -31,7 +31,7 @@
     <string name="submit_success">新作品提交成功</string>
     <string name="submit_fail">好像有错误。。。</string>
     <string name="hint_title">作品名称</string>
-    <string name="nothing_here_yet">很多人想看曦子做纹身。。。</string>
+    <string name="nothing_here_yet">很酷的作品即将呈现</string>
     <string name="slogan">我们的使命是\n创建更好的纹身世界</string>
     <string name="tv_made_date">创作日期: %s</string>
     <string name="tv_publish_date">发布日期: %s</string>
