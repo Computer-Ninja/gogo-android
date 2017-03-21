@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
@@ -26,7 +28,7 @@ public class TattooQrScannerActivity extends AppCompatActivity implements ZXingS
         setContentView(mScannerView);                // Set the scanner view as the content view
         // Request permission. This does it asynchronously so we have to wait for onRequestPermissionResult before trying to open the camera.
         if (!haveCameraPermission())
-            requestPermissions(new String[]{Manifest.permission.CAMERA}, PERMISSION_REQUEST_CAMERA);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSION_REQUEST_CAMERA);
     }
 
     private boolean haveCameraPermission()

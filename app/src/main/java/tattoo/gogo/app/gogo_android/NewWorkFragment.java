@@ -50,6 +50,8 @@ import tattoo.gogo.app.gogo_android.utils.IntentUtils;
 import static android.os.Environment.getExternalStorageDirectory;
 import static android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 import static android.view.View.GONE;
+import static tattoo.gogo.app.gogo_android.GogoActivity.PERMISSION_REQUEST_CAMERA;
+import static tattoo.gogo.app.gogo_android.GogoActivity.PERMISSION_REQUEST_STORAGE;
 import static tattoo.gogo.app.gogo_android.MainActivity.GALLERY_PICTURE;
 
 /**
@@ -60,11 +62,6 @@ public abstract class NewWorkFragment extends ArtFragment {
     protected OkHttpClient client;
     private boolean isFinalPhotoUloaded = false;
 
-    interface NewWorkImageUploadedListener {
-        void onImageUploaded(String hash, Bitmap bitmap);
-
-        void onFinalImageUploaded(String hash, Bitmap bitmap);
-    }
 
     @BindView(R.id.input_title) EditText etTitle;
     @BindView(R.id.input_made_by) EditText etAuthor;
@@ -216,23 +213,34 @@ public abstract class NewWorkFragment extends ArtFragment {
         AlertDialog.Builder myAlertDialog = new AlertDialog.Builder(
                 getActivity());
         myAlertDialog.setTitle(R.string.upload_photo);
-
+        final GogoActivity ga = ((GogoActivity) getActivity());
         myAlertDialog.setPositiveButton(R.string.from_gallery,
                 (arg0, arg1) -> {
+                    if (!ga.haveStoragePermission()) {
+                        ga.requestPermission(PERMISSION_REQUEST_STORAGE);
+                        return;
+                    }
                     hideFab();
-                    Intent pictureActionIntent = null;
-                    pictureActionIntent = new Intent(Intent.ACTION_PICK, EXTERNAL_CONTENT_URI);
-                    getActivity().startActivityForResult(pictureActionIntent, GALLERY_PICTURE
+                    Intent pictureActionIntent = new Intent(Intent.ACTION_PICK, EXTERNAL_CONTENT_URI);
+                    ga.startActivityForResult(pictureActionIntent, GALLERY_PICTURE
                                     + (isFinal ? 1000 : 0));
                 });
 
         myAlertDialog.setNegativeButton(R.string.from_camera,
                 (arg0, arg1) -> {
+                    if (!ga.haveStoragePermission()) {
+                        ga.requestPermission(PERMISSION_REQUEST_STORAGE);
+                        return;
+                    }
+                    if (!ga.haveCameraPermission()) {
+                        ga.requestPermission(PERMISSION_REQUEST_CAMERA);
+                        return;
+                    }
                     hideFab();
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     File f = new File(getExternalStorageDirectory(), "temp.jpg");
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
-                    getActivity().startActivityForResult(intent, MainActivity.CAMERA_REQUEST
+                    ga.startActivityForResult(intent, MainActivity.CAMERA_REQUEST
                             + (isFinal ? 1000 : 0));
 
                 });

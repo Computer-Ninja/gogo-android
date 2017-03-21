@@ -80,6 +80,7 @@ abstract class GogoActivity extends AppCompatActivity implements
         FragmentManager.OnBackStackChangedListener {
     private static final String TAG = "GogoActivity";
     protected static final int PERMISSION_REQUEST_STORAGE = 2;
+    protected static final int PERMISSION_REQUEST_CAMERA = 1;
     public static final int GALLERY_PICTURE = 3;
     public static final int CAMERA_REQUEST = 4;
     boolean isFabOpen;
@@ -88,10 +89,14 @@ abstract class GogoActivity extends AppCompatActivity implements
     Animation rotate_forward;
     Animation rotate_backward;
 
-    @BindView(R.id.fab) FloatingActionButton fab;
-    @BindView(R.id.toolbar) Toolbar mToolbar;
-    @BindView(R.id.appbar) AppBarLayout mAppbar;
-    @BindView(R.id.fl_loading) FrameLayout flLoading;
+    @BindView(R.id.fab)
+    FloatingActionButton fab;
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
+    @BindView(R.id.appbar)
+    AppBarLayout mAppbar;
+    @BindView(R.id.fl_loading)
+    FrameLayout flLoading;
 
     private AlphaAnimation fadeOut;
     private AlphaAnimation fadeIn;
@@ -259,6 +264,9 @@ abstract class GogoActivity extends AppCompatActivity implements
                                 AnalyticsUtil.sendEvent(mTracker, "context_menu", "refresh_photo", hash);
                             }
                         })
+                .setOnCancelListener(dialog -> {
+                    hideLoading();
+                })
                 .show();
     }
 
@@ -288,6 +296,10 @@ abstract class GogoActivity extends AppCompatActivity implements
 
     protected boolean haveStoragePermission() {
         return Build.VERSION.SDK_INT < 23 || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    protected boolean haveCameraPermission() {
+        return Build.VERSION.SDK_INT < 23 || checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
     }
 
     private class PhotoSave extends AsyncTask<String, Void, String> {
@@ -349,7 +361,7 @@ abstract class GogoActivity extends AppCompatActivity implements
 
         private String saveImageToFile(String imageIpfs) throws Exception {
             if (!haveStoragePermission()) {
-                ActivityCompat.requestPermissions(GogoActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MainActivity.PERMISSION_REQUEST_STORAGE);
+                requestPermission(PERMISSION_REQUEST_STORAGE);
                 throw new Exception("No permission");
             }
 
@@ -371,11 +383,27 @@ abstract class GogoActivity extends AppCompatActivity implements
         }
     }
 
+    protected void requestPermission(int perm) {
+        if (perm == PERMISSION_REQUEST_STORAGE) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, perm);
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, perm);
+        }
+    }
+
     public void savePhoto(final String imageIpfs) {
+        if (!haveStoragePermission()) {
+            requestPermission(PERMISSION_REQUEST_STORAGE);
+            return;
+        }
         new PhotoSave(false).execute(imageIpfs);
     }
 
     public void shareOriginalPhoto(String hash) {
+        if (!haveStoragePermission()) {
+            requestPermission(PERMISSION_REQUEST_STORAGE);
+            return;
+        }
         new PhotoSave(true).execute(hash);
     }
 

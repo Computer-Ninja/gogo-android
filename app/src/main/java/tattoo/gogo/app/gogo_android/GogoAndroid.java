@@ -1,6 +1,7 @@
 package tattoo.gogo.app.gogo_android;
 
 import android.app.Application;
+import android.os.StrictMode;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.ndk.CrashlyticsNdk;
@@ -16,6 +17,9 @@ public class GogoAndroid extends Application {
     public void onCreate() {
         super.onCreate();
         Fabric.with(this, new Crashlytics(), new CrashlyticsNdk());
+
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
     }
 
     /**
