@@ -1,5 +1,6 @@
 package tattoo.gogo.app.gogo_android;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -101,12 +102,14 @@ public class MainActivityFragment extends ArtFragment {
                 iv.setImageBitmap(bitmap.getBitmap());
                 iv.setOnClickListener(v -> {
                     String tag = artistName+"/"+ArtistArtworkListFragment.ARTWORK_TYPE_TATTOO;
-                    getFragmentManager().beginTransaction()
-                            .hide(MainActivityFragment.this)
-                            .add(R.id.fragment_container, ArtistArtworkListFragment.newInstance(1,
-                                    artistName, ArtistArtworkListFragment.ARTWORK_TYPE_TATTOO), tag)
-                            .addToBackStack(tag)
-                            .commit();
+//                    getFragmentManager().beginTransaction()
+//                            .hide(MainActivityFragment.this)
+//                            .add(R.id.fragment_container, ArtistArtworkListFragment.newInstance(1,
+//                                    artistName, ArtistArtworkListFragment.ARTWORK_TYPE_TATTOO), tag)
+//                            .addToBackStack(tag)
+//                            .commit();
+                    setArtist(artistName);
+                    startActivity(new Intent(getContext(), ArtworksActivity.class));
                 });
                 iv.setOnLongClickListener(view -> {
                     setArtistView(artistName);

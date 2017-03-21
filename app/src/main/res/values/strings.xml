@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">app.gogo.tattoo</string>
-    <string name="app_name_short"  translatable="false">gogo.tattoo</string>
+    <string name="app_name_short" translatable="false">gogo.tattoo</string>
     <string name="action_settings">Settings</string>
     <string name="welcome_message">Welcome to gogo.tattoo Android app.</string>
     <string name="description">Recognition for artists, trust for clients, authenticity for tattoos</string>
@@ -49,4 +49,6 @@
     <string name="gallery_cancelled">Cancelled</string>
     <string name="upload_process_photo">Upload process photo</string>
     <string name="upload_final_photo">Upload final photo</string>
+    <string name="title_activity_artworks">Artworks</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 </resources>

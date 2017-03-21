@@ -3,30 +3,30 @@
           xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <uses-feature
         android:name="android.hardware.camera.autofocus"
-        android:required="false" />
+        android:required="false"/>
     <uses-feature
         android:name="android.hardware.camera"
-        android:required="false" />
+        android:required="false"/>
 
     <application
         android:name=".GogoAndroid"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name_short"
+        android:largeHeap="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:largeHeap="true"
         tools:replace="android:label">
 
-        <!--<meta-data android:name=".config.GlideConfiguration"-->
-                   <!--android:value=".config.GlideModule"/>-->
+        <!-- <meta-data android:name=".config.GlideConfiguration" -->
+        <!-- android:value=".config.GlideModule"/> -->
 
         <activity
             android:name=".MainActivity"
@@ -38,7 +38,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
         <activity
             android:name=".TattooQrScannerActivity"
             android:label="@string/app_name"
@@ -47,7 +46,13 @@
 
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="49f02412d8578d9bc6b6b688fb4adaa71855db40" />
+            android:value="49f02412d8578d9bc6b6b688fb4adaa71855db40"/>
+
+        <activity
+            android:name=".ArtworksActivity"
+            android:label="@string/title_activity_artworks"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
     </application>
 
 </manifest>

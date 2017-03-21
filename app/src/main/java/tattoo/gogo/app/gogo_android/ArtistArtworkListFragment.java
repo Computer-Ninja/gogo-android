@@ -3,7 +3,6 @@ package tattoo.gogo.app.gogo_android;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,7 +10,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -305,34 +303,17 @@ public class ArtistArtworkListFragment extends ArtFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        if (!mArtworkType.equals(ARTWORK_TYPE_TATTOO))
-            addMenuItem(menu, R.string.tattoo, ArtistArtworkListFragment.ARTWORK_TYPE_TATTOO);
-        if (!mArtworkType.equals(ARTWORK_TYPE_DESIGN))
-            addMenuItem(menu, R.string.design, ArtistArtworkListFragment.ARTWORK_TYPE_DESIGN);
-        if (!mArtworkType.equals(ARTWORK_TYPE_HENNA))
-            addMenuItem(menu, R.string.henna, ArtistArtworkListFragment.ARTWORK_TYPE_HENNA);
-        if (!mArtworkType.equals(ARTWORK_TYPE_PIERCING))
-            addMenuItem(menu, R.string.piercing, ArtistArtworkListFragment.ARTWORK_TYPE_PIERCING);
-        if (!mArtworkType.equals(ARTWORK_TYPE_DREADLOCKS))
-            addMenuItem(menu, R.string.dreaklocks, ArtistArtworkListFragment.ARTWORK_TYPE_DREADLOCKS);
+//        if (!mArtworkType.equals(ARTWORK_TYPE_TATTOO))
+//            addMenuItem(menu, R.string.tattoo, ArtistArtworkListFragment.ARTWORK_TYPE_TATTOO);
+//        if (!mArtworkType.equals(ARTWORK_TYPE_DESIGN))
+//            addMenuItem(menu, R.string.design, ArtistArtworkListFragment.ARTWORK_TYPE_DESIGN);
+//        if (!mArtworkType.equals(ARTWORK_TYPE_HENNA))
+//            addMenuItem(menu, R.string.henna, ArtistArtworkListFragment.ARTWORK_TYPE_HENNA);
+//        if (!mArtworkType.equals(ARTWORK_TYPE_PIERCING))
+//            addMenuItem(menu, R.string.piercing, ArtistArtworkListFragment.ARTWORK_TYPE_PIERCING);
+//        if (!mArtworkType.equals(ARTWORK_TYPE_DREADLOCKS))
+//            addMenuItem(menu, R.string.dreaklocks, ArtistArtworkListFragment.ARTWORK_TYPE_DREADLOCKS);
 
-    }
-
-    private void addMenuItem(Menu menu, @StringRes int textResId, final String artworkTypeTattoo) {
-
-        menu.add(textResId).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                String tag = mArtistName + "/" + artworkTypeTattoo;
-                getFragmentManager().beginTransaction()
-                        .hide(ArtistArtworkListFragment.this)
-                        .add(R.id.fragment_container, ArtistArtworkListFragment.newInstance(1,
-                                mArtistName, artworkTypeTattoo), tag)
-                        .addToBackStack(tag)
-                        .commit();
-                return false;
-            }
-        });
     }
 
     @Override
