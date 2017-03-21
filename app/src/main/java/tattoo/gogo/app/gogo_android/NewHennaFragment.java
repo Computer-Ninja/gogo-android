@@ -29,19 +29,7 @@ public class NewHennaFragment extends NewWorkFragment {
         return mHenna;
     }
 
-    protected void setListeners() {
-        super.setListeners();
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                updateArtwork();
-                //sendForApprovalToPublish();
-                sendToApi();
-            }
-        });
-    }
-
-    private void sendToApi() {
+    protected void sendToApi() {
         GogoApi.getApi().henna(ThreadLocalRandom.current().nextInt(0, 10000), mHenna)
                 .enqueue(new Callback<Henna>() {
                     @Override

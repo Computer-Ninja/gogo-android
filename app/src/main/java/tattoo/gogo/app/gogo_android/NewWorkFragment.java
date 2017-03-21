@@ -12,6 +12,7 @@ import android.os.Looper;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
@@ -183,13 +184,28 @@ public abstract class NewWorkFragment extends ArtFragment {
 
             }
         });
+        fab.setOnClickListener(view -> {
+            if (etTitle.getText().toString().trim().isEmpty()) {
+                Snackbar.make(mToolbar, R.string.error_please_give_title, Snackbar.LENGTH_LONG).show();
+                return;
+            }
+            updateArtwork();
+            sendToApi();
+        });
+
         fab.setOnLongClickListener(view -> {
+            if (etTitle.getText().toString().trim().isEmpty()) {
+                Snackbar.make(mToolbar, R.string.error_please_give_title, Snackbar.LENGTH_LONG).show();
+                return true;
+            }
             updateArtwork();
             sendForApprovalToPublish();
-            return false;
+            return true;
         });
 
     }
+
+    protected abstract void sendToApi();
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {

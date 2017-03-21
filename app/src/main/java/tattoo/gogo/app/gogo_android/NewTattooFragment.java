@@ -30,17 +30,8 @@ public class NewTattooFragment extends NewWorkFragment {
         return R.layout.fragment_new_tattoo;
     }
 
-    @Override
-    protected void setListeners() {
-        super.setListeners();
-        fab.setOnClickListener(view -> {
-            updateArtwork();
-            //sendForApprovalToPublish();
-            sendToApi();
-        });
-    }
 
-    private void sendToApi() {
+    protected void sendToApi() {
         GogoApi.getApi().tattoo(ThreadLocalRandom.current().nextInt(0, 10000), mTattoo)
                 .enqueue(new Callback<Tattoo>() {
                     @Override

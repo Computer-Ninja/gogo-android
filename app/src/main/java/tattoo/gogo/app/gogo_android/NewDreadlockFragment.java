@@ -42,7 +42,7 @@ public class NewDreadlockFragment extends NewWorkFragment {
         });
     }
 
-    private void sendToApi() {
+    protected void sendToApi() {
         GogoApi.getApi().dreadlocks(ThreadLocalRandom.current().nextInt(0, 10000), mDreads)
                 .enqueue(new Callback<Dreadlocks>() {
                     @Override

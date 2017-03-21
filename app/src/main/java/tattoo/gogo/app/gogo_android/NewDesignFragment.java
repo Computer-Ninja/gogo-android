@@ -48,15 +48,8 @@ public class NewDesignFragment extends NewWorkFragment {
         return mDesign;
     }
 
-    protected void setListeners() {
-        super.setListeners();
-        fab.setOnClickListener(view -> {
-            updateArtwork();
-            sendToApi();
-        });
-    }
 
-    private void sendToApi() {
+    protected void sendToApi() {
         GogoApi.getApi().design(ThreadLocalRandom.current().nextInt(0, 10000), mDesign)
                 .enqueue(new Callback<Design>() {
                     @Override

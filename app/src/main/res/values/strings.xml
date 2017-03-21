@@ -51,4 +51,5 @@
     <string name="upload_final_photo">Upload final photo</string>
     <string name="title_activity_artworks">Artworks</string>
     <string name="section_format">Hello World from section: %1$d</string>
+    <string name="error_please_give_title">Please give a title to this work</string>
 </resources>

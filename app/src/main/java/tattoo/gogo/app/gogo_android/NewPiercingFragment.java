@@ -48,16 +48,7 @@ public class NewPiercingFragment extends NewWorkFragment {
         return R.layout.fragment_new_piercing;
     }
 
-
-    protected void setListeners() {
-        super.setListeners();
-        fab.setOnClickListener(view -> {
-            updateArtwork();
-            sendToApi();
-        });
-    }
-
-    private void sendToApi() {
+    protected void sendToApi() {
         GogoApi.getApi().piercing(ThreadLocalRandom.current().nextInt(0, 10000), mPiercing)
                 .enqueue(new Callback<Piercing>() {
                     @Override
