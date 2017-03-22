@@ -108,7 +108,7 @@ public class MainActivityFragment extends ArtFragment {
 //                                    artistName, ArtistArtworkListFragment.ARTWORK_TYPE_TATTOO), tag)
 //                            .addToBackStack(tag)
 //                            .commit();
-                    setArtist(artistName);
+                    setArtistView(artistName);
                     startActivity(new Intent(getContext(), ArtworksActivity.class));
                 });
                 iv.setOnLongClickListener(view -> {
@@ -124,7 +124,7 @@ public class MainActivityFragment extends ArtFragment {
     }
 
     private void setArtistView(String artistName) {
-        ((GogoAndroid) getActivity().getApplication()).setArtist(artistName);
+        setArtist(artistName);
         for (View v : Arrays.asList(ivArtistAid, ivArtistGogo, ivArtistXizi)) {
             int s = getResources().getDimensionPixelSize(R.dimen.iv_artist_unselected);
             int padding = getResources().getDimensionPixelSize(R.dimen.iv_artist_padding_unselected);

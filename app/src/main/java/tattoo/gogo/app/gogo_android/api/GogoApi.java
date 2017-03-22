@@ -14,7 +14,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class GogoApi {
 
     private static final String HOST_URL = "http://api.gogo.tattoo:12345/";
-    //private static final String HOST_URL = "http://192.168.0.123:12345/";
+    //private static final String HOST_URL = "http://192.168.0.113:12345/";
     private static GogoService mApi;
 
     public static GogoService getApi() {

@@ -1,3 +1,9 @@
+[0.0.6]
+
+[0.0.5]
+ + uploading (process and final) photos to the api + watermark + ipfs hash
+ + tabs (swipe left/right) in artists artworks list
+
 [0.0.4-alpha]
  + dreadlocks (posting and browsing)
  + switching tattoo artists (for posting new artworks)
