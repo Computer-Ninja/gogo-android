@@ -244,9 +244,9 @@ public class ArtistArtworkListFragment extends ArtFragment {
             @Override
             public void onFailure(Call<List<ArtWork>> call, Throwable t) {
                 Log.e(TAG, "onFailure: ", t);
-
-                getFragmentManager().popBackStack();
-
+                if (getFragmentManager() != null) {
+                    getFragmentManager().popBackStack();
+                }
             }
         };
         switch (mArtworkType) {
