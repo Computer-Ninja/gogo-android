@@ -306,9 +306,10 @@ public abstract class NewWorkFragment extends ArtFragment {
                         colorRes = R.color.colorPrimaryDark;
                     } else {
                     }
-                    tvTitleAvailability.setText(strRes);
-                    tvTitleAvailability.setTextColor(ContextCompat.getColor(getContext(), colorRes));
-
+                    if (isAdded()) {
+                        tvTitleAvailability.setText(strRes);
+                        tvTitleAvailability.setTextColor(ContextCompat.getColor(getContext(), colorRes));
+                    }
                 });
             }
         });

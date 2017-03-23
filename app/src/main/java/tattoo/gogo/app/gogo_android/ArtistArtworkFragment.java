@@ -228,7 +228,9 @@ public class ArtistArtworkFragment extends ArtFragment {
             private void loadQRviews() {
                 if (qrGogoBitmap != null) {
                     ivQRgogo.setImageBitmap(qrGogoBitmap);
-                    ivQRgogo.setOnClickListener(v -> mListener.sharePhoto(ivQRgogo));
+                    ivQRgogo.setOnClickListener(v -> {
+                        mListener.sharePhoto(ivQRgogo);
+                    });
                 } else {
                     ivQRgogo.setVisibility(GONE);
                 }
@@ -240,17 +242,19 @@ public class ArtistArtworkFragment extends ArtFragment {
                 }
             }
         }.execute();
-
-
-
     }
-
 
     private void loadImages() {
         for (String hash : mArtwork.getImagesIpfs()) {
-            mViews.add(addImage(hash));
+            ImageView iv = addImage(hash);
+            if (iv != null) {
+                mViews.add(iv);
+            }
         }
-        mViews.add(addImage(mArtwork.getImageIpfs()));
+        ImageView iv = addImage(mArtwork.getImageIpfs());
+        if (iv != null) {
+            mViews.add(iv);
+        }
         mListener.hideLoading();
     }
 

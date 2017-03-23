@@ -61,7 +61,7 @@ public class ArtworksActivity extends GogoActivity
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
-        setGogoTitle(getArtist() + "/" + getCurrentArtType(0).toString().toLowerCase());
+        setGogoTitle(getArtist() + "/" + getCurrentArtType(0, true).toString().toLowerCase());
 
     }
 
@@ -137,7 +137,7 @@ public class ArtworksActivity extends GogoActivity
 
     @Override
     public void onPageSelected(int position) {
-        setGogoTitle(getArtist() + "/" + getCurrentArtType(position).toString().toLowerCase());
+        setGogoTitle(getArtist() + "/" + getCurrentArtType(position, true).toString().toLowerCase());
     }
 
     @Override
@@ -170,6 +170,9 @@ public class ArtworksActivity extends GogoActivity
                 case 3:
                     type = ArtistArtworkListFragment.ARTWORK_TYPE_PIERCING;
                     break;
+                case 4:
+                    type = ArtistArtworkListFragment.ARTWORK_TYPE_DREADLOCKS;
+                    break;
 
             }
             return ArtistArtworkListFragment.newInstance(1, getArtist(), type);
@@ -177,17 +180,20 @@ public class ArtworksActivity extends GogoActivity
 
         @Override
         public int getCount() {
-            return 4;
+            return 5;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return getCurrentArtType(position);
+            return getCurrentArtType(position, false);
         }
     }
 
-    private CharSequence getCurrentArtType(int position) {
-        Resources res = getLocalizedResources(this, Locale.US);
+    private CharSequence getCurrentArtType(int position, boolean english) {
+        Resources res = getResources();
+        if (english) {
+            res = getLocalizedResources(this, Locale.US);
+        }
         switch (position) {
             case 0:
                 return res.getString(R.string.tattoo);
@@ -197,6 +203,8 @@ public class ArtworksActivity extends GogoActivity
                 return res.getString(R.string.henna);
             case 3:
                 return res.getString(R.string.piercing);
+            case 4:
+                return res.getString(R.string.dreaklocks);
         }
         return "";
     }

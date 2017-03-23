@@ -208,37 +208,6 @@ public class ArtistArtworkListFragment extends ArtFragment {
                 } else {
                     setupRecyclerView();
                 }
-                //mRecyclerView.setHasFixedSize(true);
-                mRecyclerView.setItemViewCacheSize(20);
-                mRecyclerView.setDrawingCacheEnabled(true);
-                //mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-                mRecyclerView.setAdapter(new ArtworkRecyclerViewAdapter(ArtistArtworkListFragment.this, mWorks, mListener, mArtistName));
-                final LinearLayoutManager lm = (LinearLayoutManager) mRecyclerView.getLayoutManager();
-                mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                    @Override
-                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                        int visibleItemCount = lm.getChildCount();
-                        int totalItemCount = lm.getItemCount();
-                        int pastVisibleItems = lm.findFirstVisibleItemPosition();
-                        if (pastVisibleItems + visibleItemCount >= totalItemCount) {
-                            if (mAllWorks.size() > 1) {
-                                mWorks.add(mAllWorks.remove(0));
-                                mRecyclerView.invalidate();
-                            }
-                        }
-                    }
-                });
-                mRecyclerView.addOnScrollListener(new HidingScrollListener() {
-                    @Override
-                    public void onHide() {
-                        hideViews();
-                    }
-
-                    @Override
-                    public void onShow() {
-                        showViews();
-                    }
-                });
             }
 
             @Override
@@ -283,7 +252,7 @@ public class ArtistArtworkListFragment extends ArtFragment {
                 int pastVisibleItems = lm.findFirstVisibleItemPosition();
                 if (pastVisibleItems + visibleItemCount >= totalItemCount) {
                     // mWorks.add(mAllWorks.remove(0));
-                    mRecyclerView.invalidate();
+                    //mRecyclerView.invalidate();
                 }
             }
         });

@@ -94,4 +94,16 @@
         android:layout_centerInParent="true"
         android:tag="gogo"
         android:elevation="6dp"/>
+    <TextView
+        android:id="@+id/tv_debug_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/tv_version"
+        android:padding="18dp"/>
+    <TextView
+        android:id="@id/tv_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:padding="18dp"/>
 </RelativeLayout>

@@ -408,6 +408,10 @@ abstract class GogoActivity extends AppCompatActivity implements
     }
 
     public void sharePhoto(View view) {
+        if (!haveStoragePermission()) {
+            requestPermission(PERMISSION_REQUEST_STORAGE);
+            return;
+        }
         showLoading();
         broadcastBitmapToApps(Collections.singletonList(view));
         hideLoading();
@@ -419,12 +423,18 @@ abstract class GogoActivity extends AppCompatActivity implements
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                showLoading();
+                if (haveStoragePermission()) {
+                    showLoading();
+                } else {
+                    requestPermission(PERMISSION_REQUEST_STORAGE);
+                }
             }
 
             @Override
             protected Void doInBackground(Void... voids) {
-                broadcastBitmapToApps(views);
+                if (haveStoragePermission()) {
+                    broadcastBitmapToApps(views);
+                }
                 return null;
             }
 
@@ -442,7 +452,10 @@ abstract class GogoActivity extends AppCompatActivity implements
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
 
         String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
-        return Uri.parse(path);
+        if (path != null)
+            return Uri.parse(path);
+        else
+            return null;
     }
 
     public static Bitmap getBitmapFromView(View view) {
@@ -476,7 +489,10 @@ abstract class GogoActivity extends AppCompatActivity implements
         ArrayList<Uri> files = new ArrayList<>();
 
         for (View view : views) {
-            files.add(getImageUri(this, getBitmapFromView(view)));
+            Uri uri = getImageUri(this, getBitmapFromView(view));
+            if (uri != null) {
+                files.add(uri);
+            }
         }
 
         if (multipleFiles) {

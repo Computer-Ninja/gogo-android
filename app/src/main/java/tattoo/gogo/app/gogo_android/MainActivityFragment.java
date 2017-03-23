@@ -1,6 +1,8 @@
 package tattoo.gogo.app.gogo_android;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -19,6 +21,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import java.util.Arrays;
 
 import butterknife.BindView;
+import tattoo.gogo.app.gogo_android.api.GogoApi;
 import tattoo.gogo.app.gogo_android.utils.CircleTransform;
 
 
@@ -33,6 +36,8 @@ public class MainActivityFragment extends ArtFragment {
     @BindView(R.id.iv_artist_aid) ImageView ivArtistAid;
     @BindView(R.id.iv_artist_xizi) ImageView ivArtistXizi;
     @BindView(R.id.tv_description) TextView tvDescription;
+    @BindView(R.id.tv_version) TextView tvVersion;
+    @BindView(R.id.tv_debug_info) TextView tvDebugInfo;
 
     private Animation myFadeInAnimation;
     private Animation myFadeOutAnimation;
@@ -89,7 +94,16 @@ public class MainActivityFragment extends ArtFragment {
         loadArtist(ivArtistXizi, GogoConst.MAIN_URL + "xizi/images/xizi.jpg", "xizi");
 
         //tvDescription.setText(Hello.greetings("This is a greeting from golang, WOW!"));
-
+        PackageInfo pInfo = null;
+        try {
+            pInfo = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0);
+            tvVersion.setText(pInfo.versionName);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        if (!GogoApi.HOST_URL.contains("gogo.tattoo")) {
+            tvDebugInfo.setText(GogoApi.HOST_URL);
+        }
     }
 
     private void loadArtist(final ImageView iv, String link, final String artistName) {
