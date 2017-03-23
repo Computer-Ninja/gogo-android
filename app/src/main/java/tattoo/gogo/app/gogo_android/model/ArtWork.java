@@ -23,9 +23,8 @@ public class ArtWork implements Parcelable {
     @SerializedName("made_date")
     String made_date = "2017-02-25T20:01:06+03:00";
     String date = "2017-02-25T20:01:06+03:00";
-    String[] tags = {"coloring", "watercolor", "cover", "scarcover", "color", "freehand", "black and gray", "bird", "animal", "dragon", "flower", "koi", "lotus", "stars", "butterfly", "skull", "cat",
-            "colorful", "simplicity", "crazy", "couple"};
-    String[] bodypart = {"feet", "shoulder", "back", "hand", "arm", "chest", "leg"};
+    String[] tags = {"cover",  "color",  "black and gray", "bird", "animal", "dragon", "flower", "koi"};
+    String[] bodypart = {"shoulder", "arm", "chest", "leg"};
     @SerializedName("image_ipfs")
     String image_ipfs = "";
     @SerializedName("images_ipfs")

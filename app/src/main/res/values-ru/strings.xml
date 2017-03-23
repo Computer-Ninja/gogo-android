@@ -1,0 +1,54 @@
+<resources>
+    <string name="action_settings">Настройки</string>
+    <string name="welcome_message">Добро пожаловать в gogo.tattoo Android app.</string>
+    <string name="description">Помогаем талантам выделиться.\n
+Повышаем доверие клиентов.\n
+Поднимаем значимость татуировок.</string>
+    <string name="slogan">МЫ ДЕЛАЕМ МИР ТАТУ ЛУЧШЕ</string>
+    <string name="hint_tattoo_title">Имя работы</string>
+    <string name="hint_made_at">Где работа была сделана?</string>
+    <string name="hint_made_by">Кто мастер? aid?</string>
+    <string name="hint_made_date">Когда работа была сделана? Сегодня?</string>
+    <string name="share_to">Поделиться…</string>
+    <string name="hint_time_elapsed">Сколько времени заняла эта работа?</string>
+    <string name="male">Муж</string>
+    <string name="female">Жен</string>
+    <string name="hint_made_city">Город?</string>
+    <string name="hint_made_country">Страна?</string>
+    <string name="tags">Тэги</string>
+    <string name="body_parts">Части тела</string>
+    <string name="test_link_wait">Подождите ка…</string>
+    <string name="test_link_available">[доступно]</string>
+    <string name="test_link_taken">[занято]</string>
+    <string name="new_tattoo">Новая тату</string>
+    <string name="tattoo">Тату</string>
+    <string name="design">Дизайн</string>
+    <string name="henna">Хна</string>
+    <string name="piercing">Пирсинг</string>
+    <string name="dreaklocks">Дреды</string>
+    <string name="hint_piercing_title">Название работы?</string>
+    <string name="submit_success">Новая работы была успешно отправлена на проверку</string>
+    <string name="submit_fail">Что-то пошло нитак</string>
+    <string name="hint_title">Название работы</string>
+    <string name="nothing_here_yet">Пока тут ничего нет.</string>
+    <string name="tv_made_date">Сделана: %s</string>
+    <string name="tv_publish_date">Опубликована: %s</string>
+    <string name="photo_download_succeess">Фото было скачено успешно</string>
+    <string name="photo_download_fail">Фото не скачалось</string>
+    <string name="photo_download_started">Скачиваем это фото на SD карту…</string>
+    <string name="save_to_phone">Сохранить в Телефон</string>
+    <string name="refresh_image">Обновить</string>
+    <string name="share_all">Поделиться всем</string>
+    <string name="share_original_to">Поделиться оригиналом файла</string>
+    <string name="photo_download_for_sharing">Скачиваем изображение…</string>
+    <string name="something_went_wrong">Что-то пошло нитак, пожалуйста сообщите или исправьте сами ; )</string>
+    <string name="upload_photo">Залить фото</string>
+    <string name="from_gallery">Из Галереи</string>
+    <string name="from_camera">С Камеры</string>
+    <string name="error_camera_capture">Ошибка получения изображения.</string>
+    <string name="gallery_cancelled">Отменено</string>
+    <string name="upload_process_photo">Залить фото процесса</string>
+    <string name="upload_final_photo">Залить финальную работу</string>
+    <string name="title_activity_artworks">Работы</string>
+    <string name="error_please_give_title">Пожулайста сначала назовите эту работу</string>
+</resources>
