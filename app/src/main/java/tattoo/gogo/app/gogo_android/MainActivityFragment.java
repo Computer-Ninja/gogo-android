@@ -192,4 +192,10 @@ public class MainActivityFragment extends ArtFragment {
         Snackbar.make(view, msg, Snackbar.LENGTH_LONG)
                 .setAction(action, v -> fabClicked(view)).show();
     }
+
+    @Override
+    public void handleShakeEvent(int count) {
+        ivDoge.startAnimation(myFadeInAnimation);
+        ivDoge.postDelayed(() -> {ivDoge.startAnimation(myFadeOutAnimation);}, 1000);
+    }
 }

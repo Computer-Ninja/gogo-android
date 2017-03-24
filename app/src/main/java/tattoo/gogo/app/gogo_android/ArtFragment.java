@@ -76,4 +76,8 @@ abstract public class ArtFragment extends Fragment {
     protected void setArtist(String name) {
         ((GogoAndroid) getActivity().getApplication()).setArtist(name);
     }
+
+    public void handleShakeEvent(int count) {
+
+    }
 }

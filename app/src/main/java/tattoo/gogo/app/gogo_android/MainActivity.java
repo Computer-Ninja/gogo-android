@@ -1,11 +1,17 @@
 package tattoo.gogo.app.gogo_android;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorListener;
+import android.hardware.SensorManager;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,6 +19,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.FloatMath;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,6 +41,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import tattoo.gogo.app.gogo_android.api.GogoApi;
 import tattoo.gogo.app.gogo_android.api.UploadResponse;
+import tattoo.gogo.app.gogo_android.utils.ShakeDetector;
 
 public class MainActivity extends GogoActivity {
     private static final String TAG = "MainActivity";
@@ -105,6 +113,21 @@ public class MainActivity extends GogoActivity {
                     .commit();
         });
 
+        // ShakeDetector initialization
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mAccelerometer = mSensorManager
+                .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mShakeDetector = new ShakeDetector();
+        /*
+         * The following method, "handleShakeEvent(count):" is a stub //
+         * method you would use to setup whatever you want done once the
+         * device has been shook.
+         */
+        mShakeDetector.setOnShakeListener(this::handleShakeEvent);
+    }
+
+    private void handleShakeEvent(int count) {
+        ((ArtFragment) getSupportFragmentManager().findFragmentByTag("welcome")).handleShakeEvent(count);
     }
 
     @Override
@@ -112,6 +135,19 @@ public class MainActivity extends GogoActivity {
         return R.layout.activity_main;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Add the following line to register the Session Manager Listener onResume
+        mSensorManager.registerListener(mShakeDetector, mAccelerometer,	SensorManager.SENSOR_DELAY_UI);
+    }
+
+    @Override
+    public void onPause() {
+        // Add the following line to unregister the Sensor Manager onPause
+        mSensorManager.unregisterListener(mShakeDetector);
+        super.onPause();
+    }
 
     @Override
     public void onBackPressed() {
@@ -389,5 +425,32 @@ public class MainActivity extends GogoActivity {
 
         selectedImagePath = file.getAbsolutePath();
     }
+
+    /*
+	 * The gForce that is necessary to register as shake.
+	 * Must be greater than 1G (one earth gravity unit).
+	 * You can install "G-Force", by Blake La Pierre
+	 * from the Google Play Store and run it to see how
+	 *  many G's it takes to register a shake
+	 */
+    private static final float SHAKE_THRESHOLD_GRAVITY = 2.7F;
+    private static final int SHAKE_SLOP_TIME_MS = 500;
+    private static final int SHAKE_COUNT_RESET_TIME_MS = 3000;
+
+    private OnShakeListener mListener;
+    private long mShakeTimestamp;
+    private int mShakeCount;
+    private SensorManager mSensorManager;
+    private Sensor mAccelerometer;
+    private ShakeDetector mShakeDetector;
+
+    public void setOnShakeListener(OnShakeListener listener) {
+        this.mListener = listener;
+    }
+
+    public interface OnShakeListener {
+        public void onShake(int count);
+    }
+
 }
 
