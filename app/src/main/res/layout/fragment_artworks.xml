@@ -6,7 +6,7 @@
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_vertical_margin"
-                tools:context="tattoo.gogo.app.gogo_android.ArtworksActivity$PlaceholderFragment">
+                tools:context="tattoo.gogo.app.gogo_android.ArtworkListActivity$PlaceholderFragment">
 
     <TextView
         android:id="@+id/section_label"

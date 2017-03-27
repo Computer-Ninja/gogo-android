@@ -7,7 +7,7 @@
                                                  android:layout_height="match_parent"
                                                  android:fitsSystemWindows="true"
                                                  android:background="@color/white"
-                                                 tools:context="tattoo.gogo.app.gogo_android.ArtworksActivity">
+                                                 tools:context="tattoo.gogo.app.gogo_android.ArtworkListActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"

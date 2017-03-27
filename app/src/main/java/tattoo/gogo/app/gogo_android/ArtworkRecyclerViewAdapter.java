@@ -11,8 +11,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import java.lang.ref.WeakReference;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import tattoo.gogo.app.gogo_android.model.ArtWork;
@@ -56,14 +54,11 @@ public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecy
         holder.tvHeaderMonth.setText(holder.mItem.getMonth());
         holder.mContentView.setText(holder.mItem.getTitle());
 
-        holder.mView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(new WeakReference<>(mFragment), mArtistName, holder.mItem);
-                }
+        holder.mView.setOnClickListener(v -> {
+            if (null != mListener) {
+                // Notify the active callbacks interface (the activity, if the
+                // fragment is attached to one) that an item has been selected.
+                mListener.onListFragmentInteraction(new WeakReference<>(mFragment), mArtistName, mValues, position);
             }
         });
         mListener.loadThumbnail(new WeakReference<>(mFragment), holder);

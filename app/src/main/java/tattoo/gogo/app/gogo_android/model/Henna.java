@@ -13,8 +13,8 @@ public class Henna extends ArtWork {
     }
 
     public Henna() {
-        link = "gogo/henna";
+        type = "henna";
+        link = "henna/";
     }
 
-    public String getType() { return "henna"; }
 }

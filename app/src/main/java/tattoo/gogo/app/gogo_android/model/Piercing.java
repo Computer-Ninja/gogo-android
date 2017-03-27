@@ -13,9 +13,9 @@ public class Piercing extends ArtWork {
     }
 
     public  Piercing() {
-        link = "gogo/piercing/";
+        type = "piercing";
+        link = "piercing/";
     }
 
-    public String getType() { return "piercing"; }
 
 }

@@ -123,7 +123,7 @@ public class MainActivityFragment extends ArtFragment {
 //                            .addToBackStack(tag)
 //                            .commit();
                     setArtistView(artistName);
-                    startActivity(new Intent(getContext(), ArtworksActivity.class));
+                    startActivity(new Intent(getContext(), ArtworkListActivity.class));
                 });
                 iv.setOnLongClickListener(view -> {
                     setArtistView(artistName);

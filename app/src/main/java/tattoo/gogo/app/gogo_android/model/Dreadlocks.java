@@ -13,9 +13,9 @@ public class Dreadlocks extends ArtWork {
     }
 
     public Dreadlocks() {
-        link = "/dreadlocks/";
+        type = "dreadlocks";
+        link = "dreadlocks/";
     }
 
-    public String getType() { return "dreadlocks"; }
 
 }

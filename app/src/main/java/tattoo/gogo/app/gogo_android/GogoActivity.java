@@ -102,6 +102,7 @@ abstract class GogoActivity extends AppCompatActivity implements
     private AlphaAnimation fadeIn;
     private Tracker mTracker;
     int mSavedOrientation;
+    protected String mArtworkType = "tattoo";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -230,13 +231,17 @@ abstract class GogoActivity extends AppCompatActivity implements
     protected void setGogoTitle(String title) {
         AnalyticsUtil.sendScreenName(mTracker, title);
         String t = getString(R.string.app_name_short) + "/" + title;
-        if (t.length() > 27 /* || And portrait? */) {
+        if (t.length() > 25 /* || And portrait? */) {
             setActionBarTitle("/" + title);
         } else {
             setActionBarTitle(t);
         }
     }
 
+    protected void setGogoTitle() {
+        String title = ((GogoAndroid) getApplication()).getArtist() + "/" + mArtworkType.toLowerCase();
+        setGogoTitle(title);
+    }
 
     public void showContextMenu(final ImageView iv, final String hash, final ArtistArtworkFragment.OnImageRefreshListener refresh) {
         ArrayList<String> items = new ArrayList<>();

@@ -40,6 +40,7 @@ public class ArtWork implements Parcelable {
     @SerializedName("partial_gender")
     String gender = "female";
     String extra = "";
+    String type = "";
 
     public ArtWork() {
     }
@@ -213,7 +214,7 @@ public class ArtWork implements Parcelable {
     }
 
     public String getType() {
-        return "art";
+        return type;
     }
 
     public String getMonth() {
@@ -224,4 +225,7 @@ public class ArtWork implements Parcelable {
         }
     }
 
+    public void setType(String type) {
+        this.type = type;
+    }
 }

@@ -35,26 +35,18 @@ public class ArtistArtworkFragment extends ArtFragment {
 
     private static final String ARG_ARTIST_NAME = "artist-name";
     private static final String ARG_ARTWORK_TYPE = "artwork-type";
-    private static final String ARG_ARTWORK = "artwork";
+    static final String ARG_ARTWORK = "artwork";
 
     private String mArtistName;
 
-    @BindView(R.id.tv_artwork_title)
-    TextView tvTitle;
-    @BindView(R.id.ll_artwork_images)
-    LinearLayout llImages;
-    @BindView(R.id.tv_artwork_made_date)
-    TextView tvMadeDate;
-    @BindView(R.id.tv_artwork_made_published)
-    TextView tvPublishedDate;
-    @BindView(R.id.iv_qr_gogotattoo)
-    ImageView ivQRgogo;
-    @BindView(R.id.iv_qr_gogogithub)
-    ImageView ivQRgithub;
-    @BindView(R.id.tv_gogo_link)
-    TextView tvGogoLink;
-    @BindView(R.id.tv_github_link)
-    TextView tvGithubLink;
+    @BindView(R.id.tv_artwork_title) TextView tvTitle;
+    @BindView(R.id.ll_artwork_images) LinearLayout llImages;
+    @BindView(R.id.tv_artwork_made_date) TextView tvMadeDate;
+    @BindView(R.id.tv_artwork_made_published) TextView tvPublishedDate;
+    @BindView(R.id.iv_qr_gogotattoo) ImageView ivQRgogo;
+    @BindView(R.id.iv_qr_gogogithub) ImageView ivQRgithub;
+    @BindView(R.id.tv_gogo_link) TextView tvGogoLink;
+    @BindView(R.id.tv_github_link) TextView tvGithubLink;
 
 
     private ArtWork mArtwork;
@@ -68,11 +60,12 @@ public class ArtistArtworkFragment extends ArtFragment {
     public ArtistArtworkFragment() {
     }
 
-    public static ArtistArtworkFragment newInstance(String artistName, ArtWork artWork) {
+    public static ArtistArtworkFragment newInstance(String artistName, ArtWork artWork, String artWorkType) {
         ArtistArtworkFragment fragment = new ArtistArtworkFragment();
         Bundle args = new Bundle();
         args.putString(ARG_ARTIST_NAME, artistName);
         args.putParcelable(ARG_ARTWORK, artWork);
+        args.putString(ARG_ARTWORK_TYPE, artWorkType);
         fragment.setArguments(args);
         return fragment;
     }
@@ -86,10 +79,12 @@ public class ArtistArtworkFragment extends ArtFragment {
             mArtistName = getArguments().getString(ARG_ARTIST_NAME, "gogo");
             mArtwork = getArguments().getParcelable(ARG_ARTWORK);
         }
-//
-//        String title = mArtwork.getLink().replace("http://gogo.tattoo", "");
-//        ((MainActivity) getActivity()).setActionBarTitle(title);
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -115,10 +110,12 @@ public class ArtistArtworkFragment extends ArtFragment {
             e.printStackTrace();
         }
 
-        hideViews();
+        //hideViews();
         updateQRcodes();
 
-
+        String title = mArtistName.toLowerCase() + "/"
+                + ((GogoActivity) getActivity()).mArtworkType.toLowerCase() + "/";
+        ((GogoActivity) getActivity()).setGogoTitle(title);
     }
 
 
@@ -140,11 +137,11 @@ public class ArtistArtworkFragment extends ArtFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        if (context instanceof ArtistArtworkListFragment.OnArtistArtworkFragmentInteractionListener) {
+        if (context instanceof ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener) {
             mListener = (OnArtistArtworkFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnArtistTattooFragmentInteractionListener");
+                    + " must implement OnArtistArtworkFragmentInteractionListener");
         }
     }
 
@@ -197,8 +194,8 @@ public class ArtistArtworkFragment extends ArtFragment {
         tvGithubLink.setOnClickListener(view -> IntentUtils.opentUrl(getActivity(), gogoGithubLink));
 
         new AsyncTask<Void, Void, Boolean>() {
-            public Bitmap qrGithubBitmap;
-            public Bitmap qrGogoBitmap;
+             Bitmap qrGithubBitmap;
+             Bitmap qrGogoBitmap;
 
             @Override
             protected Boolean doInBackground(Void... params) {
@@ -286,8 +283,8 @@ public class ArtistArtworkFragment extends ArtFragment {
         });
     }
 
-
     protected String makeLink(String mainUrl) {
-        return mainUrl + mArtistName.toLowerCase() + "/" + mArtwork.getShortName().toLowerCase() + "/" + mArtwork.getLink();
+        return mainUrl + mArtistName.toLowerCase() + "/" + ((GogoActivity) getActivity()).mArtworkType.toLowerCase() + "/" + mArtwork.getLink();
     }
+
 }

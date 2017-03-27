@@ -1,7 +1,9 @@
 package tattoo.gogo.app.gogo_android;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,14 +19,16 @@ import android.view.View;
 import com.bumptech.glide.Glide;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import tattoo.gogo.app.gogo_android.model.ArtWork;
 
-public class ArtworksActivity extends GogoActivity
+public class ArtworkListActivity extends GogoActivity
         implements ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
         ArtistArtworkListFragment.OnArtistArtworkFragmentInteractionListener, ViewPager.OnPageChangeListener {
-    private static final String TAG = "ArtworksActivity";
+    private static final String TAG = "ArtworkListActivity";
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -89,20 +93,6 @@ public class ArtworksActivity extends GogoActivity
     }
 
     @Override
-    public void onListFragmentInteraction(WeakReference<Fragment> fr, String artistName, ArtWork artWork) {
-        if (fr.get() == null) {
-            Log.d(TAG, "loadThumbnail: Fragment is null");
-            return;
-        }
-        String tag = artistName + "/" + artWork.getType() + "/" + artWork.getLink();
-        getSupportFragmentManager().beginTransaction()
-                .hide(fr.get())
-                .add(R.id.fragment_container, ArtistArtworkFragment.newInstance(artistName, artWork), tag)
-                .addToBackStack(tag)
-                .commit();
-    }
-
-    @Override
     public void loadThumbnail(WeakReference<Fragment> fr, ArtworkRecyclerViewAdapter.ViewHolder holder) {
         Log.d(TAG, "loadThumbnail: " + holder.mItem.getTitle());
         if (fr.get() == null) {
@@ -131,13 +121,23 @@ public class ArtworksActivity extends GogoActivity
     }
 
     @Override
+    public void onListFragmentInteraction(WeakReference<Fragment> tWeakReference, String mArtistName, List<ArtWork> mValues, int position) {
+        Intent intent = new Intent(this, ArtworkActivity.class);
+        intent.putParcelableArrayListExtra(ArtworkActivity.ARG_ARTWORKS, (ArrayList<? extends Parcelable>) mValues);
+        intent.putExtra(ArtworkActivity.ARG_POSITION, position);
+        intent.putExtra(ArtworkActivity.ARG_ARTWORK_TYPE, mArtworkType);
+        startActivity(intent);
+    }
+
+    @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
     }
 
     @Override
     public void onPageSelected(int position) {
-        setGogoTitle(getArtist() + "/" + getCurrentArtType(position, true).toString().toLowerCase());
+        mArtworkType = getCurrentArtType(position, true).toString().toLowerCase();
+        setGogoTitle(getArtist() + "/" + mArtworkType);
     }
 
     @Override
