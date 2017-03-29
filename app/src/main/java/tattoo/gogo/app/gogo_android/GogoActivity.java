@@ -100,7 +100,7 @@ abstract class GogoActivity extends AppCompatActivity implements
 
     private AlphaAnimation fadeOut;
     private AlphaAnimation fadeIn;
-    private Tracker mTracker;
+    Tracker mTracker;
     int mSavedOrientation;
     protected String mArtworkType = "tattoo";
 
@@ -306,6 +306,8 @@ abstract class GogoActivity extends AppCompatActivity implements
     protected boolean haveCameraPermission() {
         return Build.VERSION.SDK_INT < 23 || checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
     }
+
+
 
     private class PhotoSave extends AsyncTask<String, Void, String> {
 
@@ -531,5 +533,9 @@ abstract class GogoActivity extends AppCompatActivity implements
         conf.setLocale(desiredLocale);
         Context localizedContext = context.createConfigurationContext(conf);
         return localizedContext.getResources();
+    }
+
+    public FloatingActionButton getFloatingActionButton() {
+        return (FloatingActionButton) findViewById(R.id.fab);
     }
 }

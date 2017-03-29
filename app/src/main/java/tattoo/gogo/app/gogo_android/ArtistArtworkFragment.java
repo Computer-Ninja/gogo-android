@@ -141,7 +141,7 @@ public class ArtistArtworkFragment extends ArtFragment {
             mListener = (OnArtistArtworkFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnArtistArtworkFragmentInteractionListener");
+                    + " must implement OnNewWorkFragmentInteractionListener");
         }
     }
 

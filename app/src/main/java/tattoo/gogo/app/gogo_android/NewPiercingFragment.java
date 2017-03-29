@@ -37,9 +37,17 @@ public class NewPiercingFragment extends NewWorkFragment {
 
     private Piercing mPiercing;
 
+    public static NewPiercingFragment newInstance(ArtWork artWork) {
+        NewPiercingFragment fr = new NewPiercingFragment();
+        fr.mPiercing = (Piercing) artWork;
+        return fr;
+    }
+
     @Override
     protected ArtWork newArtWork() {
-        mPiercing = new Piercing();
+        if (mPiercing == null) {
+            mPiercing = new Piercing();
+        }
         return mPiercing;
     }
 

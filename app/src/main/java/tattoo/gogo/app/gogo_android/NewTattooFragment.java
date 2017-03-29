@@ -25,6 +25,12 @@ public class NewTattooFragment extends NewWorkFragment {
 
     private Tattoo mTattoo;
 
+    public static NewTattooFragment newInstance(ArtWork artWork) {
+        NewTattooFragment fr = new NewTattooFragment();
+        fr.mTattoo = (Tattoo) artWork;
+        return fr;
+    }
+
     @Override
     protected int getLayout() {
         return R.layout.fragment_new_tattoo;
@@ -56,7 +62,9 @@ public class NewTattooFragment extends NewWorkFragment {
 
     @Override
     protected ArtWork newArtWork() {
-        mTattoo = new Tattoo();
+        if (mTattoo == null) {
+            mTattoo = new Tattoo();
+        }
         return mTattoo;
     }
 

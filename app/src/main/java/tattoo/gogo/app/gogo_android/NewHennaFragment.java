@@ -2,7 +2,6 @@ package tattoo.gogo.app.gogo_android;
 
 import android.support.design.widget.Snackbar;
 import android.util.Log;
-import android.view.View;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -12,6 +11,7 @@ import retrofit2.Response;
 import tattoo.gogo.app.gogo_android.api.GogoApi;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
 import tattoo.gogo.app.gogo_android.model.Henna;
+import tattoo.gogo.app.gogo_android.model.Tattoo;
 
 import static android.content.ContentValues.TAG;
 
@@ -23,9 +23,17 @@ public class NewHennaFragment extends NewWorkFragment {
     private Henna mHenna;
 
 
+    public static NewWorkFragment newInstance(ArtWork artWork) {
+        NewHennaFragment fr = new NewHennaFragment();
+        fr.mHenna = (Henna) artWork;
+        return fr;
+    }
+
     @Override
     protected ArtWork newArtWork() {
-        mHenna = new Henna();
+        if (mHenna == null) {
+            mHenna = new Henna();
+        }
         return mHenna;
     }
 
@@ -54,4 +62,5 @@ public class NewHennaFragment extends NewWorkFragment {
     protected int getLayout() {
         return R.layout.fragment_new_henna;
     }
+
 }

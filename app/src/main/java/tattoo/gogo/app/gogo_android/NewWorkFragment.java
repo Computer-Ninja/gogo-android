@@ -36,7 +36,6 @@ import net.glxn.qrgen.core.image.ImageType;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.Date;
 
 import butterknife.BindView;
@@ -62,7 +61,6 @@ public abstract class NewWorkFragment extends ArtFragment {
     protected static final String IS_FINAL = "is_final";
     protected OkHttpClient client;
     private boolean isFinalPhotoUloaded = false;
-
 
     @BindView(R.id.input_title) EditText etTitle;
     @BindView(R.id.input_made_by) EditText etAuthor;
@@ -97,6 +95,7 @@ public abstract class NewWorkFragment extends ArtFragment {
 
         mArtWork = newArtWork();
         populateWithDelay(etAuthor, getArtist(), 600);
+        populateWithDelay(etTitle, mArtWork.getTitle(), 200);
         populateWithDelay(etMadeAt, mArtWork.getMadeAtShop(), 1000);
         String dateToday = GogoConst.watermarkDateFormat.format(new Date());
         populateWithDelay(etMadeDate, dateToday, 1400);
@@ -107,7 +106,33 @@ public abstract class NewWorkFragment extends ArtFragment {
         tetTags.setTags(mArtWork.getTags());
         tetBodyParts.setTags(mArtWork.getBodypart());
 
-        fab = ((MainActivity) getActivity()).getFloatingActionButton();
+        tetTags.post(() -> {
+            if (!isAdded()) {
+                return;
+            }
+            for (String hash : mArtWork.getImagesIpfs()) {
+                ImageView iv = createImageView(hash, false);
+                addImageView(iv, false);
+                Glide.with(getContext())
+                        .load(GogoConst.IPFS_GATEWAY_URL + hash)
+                        .placeholder(R.drawable.progress_animation)
+                        .into(iv);
+            }
+
+            if (!isAdded()) {
+                return;
+            }
+            if (!mArtWork.getImageIpfs().isEmpty()) {
+                ImageView iv = createImageView(mArtWork.getImageIpfs(), true);
+                addImageView(iv, true);
+                Glide.with(getContext())
+                        .load(GogoConst.IPFS_GATEWAY_URL + mArtWork.getImageIpfs())
+                        .placeholder(R.drawable.progress_animation)
+                        .into(iv);
+            }
+        });
+
+        fab = ((GogoActivity) getActivity()).getFloatingActionButton();
         setListeners();
 
         if (btnFemale != null)
@@ -115,6 +140,7 @@ public abstract class NewWorkFragment extends ArtFragment {
         etTitle.requestFocus();
 
         client = new OkHttpClient();
+        showViews();
     }
 
     protected abstract ArtWork newArtWork();
@@ -170,6 +196,9 @@ public abstract class NewWorkFragment extends ArtFragment {
 
                 handler.removeCallbacks(workRunnable);
                 workRunnable = () -> {
+                    if (!isAdded()) {
+                        return;
+                    }
                     if (mArtWork.getTitle().length() < 4 || getArtist().isEmpty()) {
                         ivQRgogo.setVisibility(GONE);
                         ivQRgithub.setVisibility(GONE);
@@ -237,9 +266,10 @@ public abstract class NewWorkFragment extends ArtFragment {
                         return;
                     }
                     hideFab();
+                    updateArtwork();
                     Intent pictureActionIntent = new Intent(Intent.ACTION_PICK, EXTERNAL_CONTENT_URI);
                     ga.startActivityForResult(pictureActionIntent, GALLERY_PICTURE
-                                    + (isFinal ? 1000 : 0));
+                            + (isFinal ? 1000 : 0));
                 });
 
         myAlertDialog.setNegativeButton(R.string.from_camera,
@@ -252,6 +282,7 @@ public abstract class NewWorkFragment extends ArtFragment {
                         ga.requestPermission(PERMISSION_REQUEST_CAMERA);
                         return;
                     }
+                    updateArtwork();
                     hideFab();
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     File f = new File(getExternalStorageDirectory(), "temp.jpg");
@@ -262,7 +293,7 @@ public abstract class NewWorkFragment extends ArtFragment {
                 });
         myAlertDialog.setOnCancelListener(dialog -> {
             showViews();
-            ((MainActivity) getActivity()).hideLoading();
+            ((GogoActivity) getActivity()).hideLoading();
         });
         myAlertDialog.show();
     }
@@ -318,8 +349,7 @@ public abstract class NewWorkFragment extends ArtFragment {
 
     protected void updateArtwork() {
         mArtWork.setMadeDate(GogoConst.sdf.format(new Date()));
-        long t = Calendar.getInstance().getTimeInMillis();
-        mArtWork.setDate(GogoConst.sdf.format(new Date(t + (mArtWork.getDurationMin() * GogoConst.ONE_MINUTE_IN_MILLIS))));
+        mArtWork.setDate(GogoConst.sdf.format(new Date(new Date().getTime() + (mArtWork.getDurationMin() * GogoConst.ONE_MINUTE_IN_MILLIS))));
         mArtWork.setBodypart(tetBodyParts.getTags().toArray(new String[0]));
         mArtWork.setTags(tetTags.getTags().toArray(new String[0]));
         mArtWork.setLink(makeLink(GogoConst.MAIN_URL));
@@ -337,10 +367,13 @@ public abstract class NewWorkFragment extends ArtFragment {
         } catch (Exception x) {
 
         }
+        Label label = new Label();
+        label.setMadeAt(mArtWork.getMadeAtShop());
+        label.setMadeDate(mArtWork.getDate());
+        ((NewArtworkActivity)getActivity()).setLatestLabel(label);
     }
 
     protected void updateQRcodes() {
-
         ivQRgogo.setVisibility(View.VISIBLE);
         ivQRgithub.setVisibility(View.VISIBLE);
         tvGogoLink.setVisibility(View.VISIBLE);
@@ -401,7 +434,9 @@ public abstract class NewWorkFragment extends ArtFragment {
 
 
     protected String makeLink(String mainUrl) {
-        String tattooTitleLinkified = mArtWork.getTitle().toLowerCase().replace(" ", "_");
+        String tattooTitleLinkified = mArtWork.getTitle().toLowerCase()
+                .replace(" ", "_")
+                .replace("'","");
         return mainUrl + getArtist() + "/" + mArtWork.getType() + "/" + tattooTitleLinkified;
     }
 
@@ -411,26 +446,50 @@ public abstract class NewWorkFragment extends ArtFragment {
             return;
         }
         showViews();
-        final ImageView iv = new ImageView(getContext());
-        iv.setAdjustViewBounds(true);
+        final ImageView iv = createImageView(hash, isFinal);
         iv.setImageBitmap(bitmap);
-        iv.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-        iv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        iv.setPadding(8, 8, 8, 8);
-        iv.setOnClickListener(v -> IntentUtils.opentUrl(getContext(), GogoConst.IPFS_GATEWAY_URL + hash));
         if (isFinal) {
             mArtWork.setImageIpfs(hash);
-            llFinalImage.removeAllViews();
-            llFinalImage.addView(iv);
-            llFinalImage.setVisibility(View.VISIBLE);
         } else {
             mArtWork.getImagesIpfs().add(hash);
-            llProcessImages.addView(iv);
-            llProcessImages.setVisibility(View.VISIBLE);
         }
+        addImageView(iv, isFinal);
+
         Glide.with(getContext())
                 .load(GogoConst.IPFS_GATEWAY_URL + hash)
                 .placeholder(new BitmapDrawable(getResources(), bitmap))
                 .into(iv);
+    }
+
+    private void addImageView(ImageView iv, boolean isFinal) {
+        if (isFinal) {
+            llFinalImage.removeAllViews();
+            llFinalImage.addView(iv);
+            llFinalImage.setVisibility(View.VISIBLE);
+        } else {
+            llProcessImages.addView(iv);
+            llProcessImages.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private ImageView createImageView(String hash, final boolean isFinal) {
+        ImageView iv = new ImageView(getContext());
+        iv.setAdjustViewBounds(true);
+        iv.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        iv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        iv.setPadding(8, 8, 8, 8);
+        iv.setOnClickListener(v -> IntentUtils.opentUrl(getContext(), GogoConst.IPFS_GATEWAY_URL + hash));
+        iv.setOnLongClickListener(v -> {
+            if (isFinal) {
+                llFinalImage.removeAllViews();
+                mArtWork.setImageIpfs(null);
+            } else {
+                llProcessImages.removeView(iv);
+                mArtWork.getImagesIpfs().remove(hash);
+            }
+            return true;
+        });
+
+        return iv;
     }
 }

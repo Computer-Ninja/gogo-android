@@ -22,9 +22,17 @@ public class NewDreadlockFragment extends NewWorkFragment {
 
     private Dreadlocks mDreads;
 
+    public static NewDreadlockFragment newInstance(ArtWork artWork) {
+        NewDreadlockFragment fr = new NewDreadlockFragment();
+        fr.mDreads = (Dreadlocks) artWork;
+        return fr;
+    }
+
     @Override
     protected ArtWork newArtWork() {
-        mDreads = new Dreadlocks();
+        if (mDreads == null) {
+            mDreads = new Dreadlocks();
+        }
         return mDreads;
     }
 

@@ -17,6 +17,9 @@ import tattoo.gogo.app.gogo_android.GogoConst;
 
 public class ArtWork implements Parcelable {
 
+
+    int  id;
+
     @SerializedName("link")
     String link = "gogo/tattoo/";
     String title = "";
@@ -227,5 +230,13 @@ public class ArtWork implements Parcelable {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

@@ -1,6 +1,10 @@
-[0.0.6]
+[0.0.9-alpha]
+ + list of posted artworks
+ + deleting posted (not published) tattoo (only)
+ + removing images from posted work
+ * small bugfixes, more stable
 
-[0.0.5]
+[0.0.5-alpha]
  + uploading (process and final) photos to the api + watermark + ipfs hash
  + tabs (swipe left/right) in artists artworks list
 

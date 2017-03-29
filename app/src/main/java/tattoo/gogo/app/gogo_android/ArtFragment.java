@@ -24,6 +24,17 @@ import butterknife.ButterKnife;
 
 abstract public class ArtFragment extends Fragment {
 
+    public static final String ARG_COLUMN_COUNT = "column-count";
+    public static final String ARG_ARTIST_NAME = "artist-name";
+    public static final String ARG_ARTWORK_TYPE = "artwork-type";
+
+    public static final String ARTWORK_TYPE_TATTOO = "tattoo";
+    public static final String ARTWORK_TYPE_DESIGN = "design";
+    public static final String ARTWORK_TYPE_HENNA = "henna";
+    public static final String ARTWORK_TYPE_PIERCING = "piercing";
+    public static final String ARTWORK_TYPE_DREADLOCKS= "dreadlocks";
+    public static final String PARAM_WORKS = "works";
+    public static final String PARAM_BUNDLE = "bundle";
     //    @BindView(R.id.appbar) AppBarLayout mAppbar;
     Toolbar mToolbar;
     FloatingActionButton mFabButton;

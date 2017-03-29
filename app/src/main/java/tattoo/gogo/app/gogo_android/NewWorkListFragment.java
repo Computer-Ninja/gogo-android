@@ -26,15 +26,15 @@ import tattoo.gogo.app.gogo_android.model.ArtWork;
 import static android.content.ContentValues.TAG;
 
 /**
- * A fragment representing a list of Artist's Artworks.
+ * A fragment representing a list of Artist's Artworks, posted to api, but not published yet.
  * <p/>
- * Activities containing this fragment MUST implement the {@link OnArtistArtworkFragmentInteractionListener}
+ * Activities containing this fragment MUST implement the {@link OnNewWorkFragmentInteractionListener}
  * interface.
  */
-public class ArtistArtworkListFragment extends ArtFragment {
+public class NewWorkListFragment extends ArtFragment {
 
     private int mColumnCount = 1;
-    private OnArtistArtworkFragmentInteractionListener mListener;
+    private OnNewWorkFragmentInteractionListener mListener;
     private ArrayList<ArtWork> mWorks = new ArrayList<>();
     private String mArtistName;
     private String mArtworkType;
@@ -49,12 +49,12 @@ public class ArtistArtworkListFragment extends ArtFragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ArtistArtworkListFragment() {
+    public NewWorkListFragment() {
     }
 
     @SuppressWarnings("unused")
-    public static ArtistArtworkListFragment newInstance(int columnCount, String artistName, String artType) {
-        ArtistArtworkListFragment fragment = new ArtistArtworkListFragment();
+    public static NewWorkListFragment newInstance(int columnCount, String artistName, String artType) {
+        NewWorkListFragment fragment = new NewWorkListFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         args.putString(ARG_ARTIST_NAME, artistName);
@@ -75,11 +75,15 @@ public class ArtistArtworkListFragment extends ArtFragment {
         }
 
         getActivity().setTitle(GogoConst.GOGO_TATTOO + "/" + mArtistName + "/" + mArtworkType);
+
+        ((GogoActivity) getActivity()).getFloatingActionButton().setOnClickListener(v -> {
+            ((NewArtworkActivity) getActivity()).startNewWork(mArtworkType, true);
+        });
     }
 
     @Override
     protected int getLayout() {
-        return R.layout.fragment_tattoo_list;
+        return R.layout.fragment_new_work_list;
     }
 
     @Override
@@ -111,6 +115,7 @@ public class ArtistArtworkListFragment extends ArtFragment {
             ivLoading.setVisibility(View.GONE);
         }
     }
+
 
     @Override
     public void onDestroyView() {
@@ -175,22 +180,19 @@ public class ArtistArtworkListFragment extends ArtFragment {
                 if (!response.isSuccessful() || response.body() == null) {
                     Log.e(TAG, "onResponse: " + response.errorBody());
                     tvNothingHere.setVisibility(View.VISIBLE);
+                    ((NewArtworkActivity) getActivity()).startNewWork(mArtworkType, false);
                     return;
                 }
                 mAllWorks.addAll(response.body());
                 int count = 0;
-                for (ArtWork tat : response.body()) {
-                    if (!tat.getImageIpfs().isEmpty()) {
-                        //if (count > 5) {
-                        //    break;
-                        //}
-                        tat.setType(mArtworkType);
-                        mWorks.add(tat);
-                        count++;
-                    }
+                for (ArtWork work : response.body()) {
+                    work.setType(mArtworkType);
+                    mWorks.add(work);
+                    count++;
                 }
                 if (mWorks.isEmpty()) {
                     tvNothingHere.setVisibility(View.VISIBLE);
+                    ((NewArtworkActivity) getActivity()).startNewWork(mArtworkType, false);
                 } else {
                     setupRecyclerView();
                 }
@@ -206,19 +208,19 @@ public class ArtistArtworkListFragment extends ArtFragment {
         };
         switch (mArtworkType) {
             case ARTWORK_TYPE_TATTOO:
-                GogoApi.getApi().tattoo(mArtistName).enqueue(callback);
-                break;
-            case ARTWORK_TYPE_HENNA:
-                GogoApi.getApi().henna(mArtistName).enqueue(callback);
-                break;
-            case ARTWORK_TYPE_PIERCING:
-                GogoApi.getApi().piercing(mArtistName).enqueue(callback);
+                GogoApi.getApi().newTattoo().enqueue(callback);
                 break;
             case ARTWORK_TYPE_DESIGN:
-                GogoApi.getApi().design(mArtistName).enqueue(callback);
+                GogoApi.getApi().newDesign().enqueue(callback);
+                break;
+            case ARTWORK_TYPE_HENNA:
+                GogoApi.getApi().newHenna().enqueue(callback);
+                break;
+            case ARTWORK_TYPE_PIERCING:
+                GogoApi.getApi().newPiercing().enqueue(callback);
                 break;
             case ARTWORK_TYPE_DREADLOCKS:
-                GogoApi.getApi().dreadlocks(mArtistName).enqueue(callback);
+                GogoApi.getApi().newDreadlocks().enqueue(callback);
                 break;
         }
     }
@@ -228,7 +230,7 @@ public class ArtistArtworkListFragment extends ArtFragment {
         mRecyclerView.setItemViewCacheSize(20);
         mRecyclerView.setDrawingCacheEnabled(true);
         //mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-        mRecyclerView.setAdapter(new ArtworkRecyclerViewAdapter(ArtistArtworkListFragment.this, mWorks, mListener, mArtistName));
+        mRecyclerView.setAdapter(new NewWorkRecyclerViewAdapter(NewWorkListFragment.this, mWorks, mListener, mArtistName));
         final LinearLayoutManager lm = (LinearLayoutManager) mRecyclerView.getLayoutManager();
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -258,8 +260,8 @@ public class ArtistArtworkListFragment extends ArtFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof ArtistArtworkListFragment.OnArtistArtworkFragmentInteractionListener) {
-            mListener = (ArtistArtworkListFragment.OnArtistArtworkFragmentInteractionListener) context;
+        if (context instanceof NewWorkListFragment.OnNewWorkFragmentInteractionListener) {
+            mListener = (NewWorkListFragment.OnNewWorkFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnArtistTattooFragmentInteractionListener");
@@ -282,11 +284,12 @@ public class ArtistArtworkListFragment extends ArtFragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnArtistArtworkFragmentInteractionListener {
+    public interface OnNewWorkFragmentInteractionListener {
 
-        void loadThumbnail(WeakReference<Fragment> fr, ArtworkRecyclerViewAdapter.ViewHolder holder);
+        void loadThumbnail(WeakReference<Fragment> fr, NewWorkRecyclerViewAdapter.ViewHolder holder);
 
-        void onListFragmentInteraction(WeakReference<Fragment> tWeakReference, String mArtistName, List<ArtWork> mValues, int position);
+        void onListFragmentInteraction(WeakReference<Fragment> tWeakReference, String mArtistName, ArtWork artwork);
+
     }
 
 }
