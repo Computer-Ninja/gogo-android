@@ -19,7 +19,6 @@ import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -93,9 +92,8 @@ public class NewArtworkActivity extends GogoActivity
         items.add(getString(R.string.share_to));
         items.add(getString(R.string.share_original_to));
         items.add(getString(R.string.refresh_image));
-        if (mArtworkType.equals(ArtFragment.ARTWORK_TYPE_TATTOO)) {
-            items.add(getString(R.string.delete));
-        }
+        items.add(getString(R.string.delete));
+
         new AlertDialog.Builder(this)
                 .setAdapter(new ArrayAdapter<>(this,
                                 R.layout.selectable_list_item, items),
@@ -135,14 +133,18 @@ public class NewArtworkActivity extends GogoActivity
         if ((hash == null || hash.isEmpty()) && !holder.mItem.getImagesIpfs().isEmpty()) {
             hash = holder.mItem.getImagesIpfs().get(0);
         }
+
+        holder.mView.setOnLongClickListener(view -> {
+            showContextMenu(holder.ivThumbnail, holder.mItem.getImageIpfs(),
+                    (h, iv) -> loadThumbnail(fr, holder), holder.mItem);
+            return true;
+        });
+
         if (hash == null || hash.isEmpty()) {
-            Glide.with(fr.get())
-                    .load(R.drawable.doge)
-                    .into(holder.ivThumbnail);
+            holder.ivThumbnail.setImageResource(R.drawable.doge);
             return;
         }
         final String url = GogoConst.IPFS_GATEWAY_URL + hash;
-        holder.ivThumbnail.setVisibility(View.VISIBLE);
         Display display = getWindowManager().getDefaultDisplay();
         final DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -152,12 +154,6 @@ public class NewArtworkActivity extends GogoActivity
                 .placeholder(R.drawable.progress_animation)
                 .error(R.drawable.doge)
                 .into(holder.ivThumbnail);
-
-        holder.mView.setOnLongClickListener(view -> {
-            showContextMenu(holder.ivThumbnail, holder.mItem.getImageIpfs(),
-                    (h, iv) -> loadThumbnail(fr, holder), holder.mItem);
-            return true;
-        });
     }
 
     @Override
@@ -183,9 +179,9 @@ public class NewArtworkActivity extends GogoActivity
 
     public void deleteArtwork(int artworkId) {
         showLoading();
-        GogoApi.getApi().deleteTattoo(artworkId).enqueue(new Callback<List<Tattoo>>() {
+        Callback<List<ArtWork>> callback = new Callback<List<ArtWork>>() {
             @Override
-            public void onResponse(Call<List<Tattoo>> call, Response<List<Tattoo>> response) {
+            public void onResponse(Call<List<ArtWork>> call, Response<List<ArtWork>> response) {
                 finish();
                 Intent i = new Intent(NewArtworkActivity.this, NewArtworkActivity.class);
                 i.putExtra(NewArtworkActivity.ARG_ARTIST, ((GogoAndroid) getApplication()).getArtist());
@@ -194,11 +190,22 @@ public class NewArtworkActivity extends GogoActivity
             }
 
             @Override
-            public void onFailure(Call<List<Tattoo>> call, Throwable t) {
+            public void onFailure(Call<List<ArtWork>> call, Throwable t) {
                 hideLoading();
                 Snackbar.make(mToolbar, R.string.something_went_wrong, Snackbar.LENGTH_LONG).show();
             }
-        });
+        };
+        if (mArtworkType.equals(ArtFragment.ARTWORK_TYPE_TATTOO)) {
+            GogoApi.getApi().deleteTattoo(artworkId).enqueue(callback);
+        } else if (mArtworkType.equals(ArtFragment.ARTWORK_TYPE_DESIGN)) {
+            GogoApi.getApi().deleteDesign(artworkId).enqueue(callback);
+        } else if (mArtworkType.equals(ArtFragment.ARTWORK_TYPE_HENNA)) {
+            GogoApi.getApi().deleteHenna(artworkId).enqueue(callback);
+        } else if (mArtworkType.equals(ArtFragment.ARTWORK_TYPE_PIERCING)) {
+            GogoApi.getApi().deletePiercing(artworkId).enqueue(callback);
+        } else if (mArtworkType.equals(ArtFragment.ARTWORK_TYPE_DREADLOCKS)) {
+            GogoApi.getApi().deleteDreadlocks(artworkId).enqueue(callback);
+        }
     }
 
     public void startNewWork(String mArtworkType, boolean addToBackStack) {

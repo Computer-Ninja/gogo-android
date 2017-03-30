@@ -12,6 +12,7 @@ import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import tattoo.gogo.app.gogo_android.model.ArtWork;
 import tattoo.gogo.app.gogo_android.model.Design;
 import tattoo.gogo.app.gogo_android.model.Dreadlocks;
 import tattoo.gogo.app.gogo_android.model.Henna;
@@ -32,7 +33,7 @@ public interface GogoService {
     Call<Tattoo> tattoo(@Path("id") int id, @Body Tattoo tat);
 
     @DELETE("tattoo/{id}")
-    Call<List<Tattoo>> deleteTattoo(@Path("id") int id);
+    Call<List<ArtWork>> deleteTattoo(@Path("id") int id);
 
     @GET("henna/{name}")
     Call<List<Henna>> henna(@Path("name") String name);
@@ -43,6 +44,9 @@ public interface GogoService {
     @POST("henna/{id}")
     Call<Henna> henna(@Path("id") int id, @Body Henna hen);
 
+    @DELETE("henna/{id}")
+    Call<List<ArtWork>> deleteHenna(@Path("id") int id);
+
     @GET("design/{name}")
     Call<List<Design>> design(@Path("name") String name);
 
@@ -52,6 +56,9 @@ public interface GogoService {
     @GET("design")
     Call<List<Design>> newDesign();
 
+    @DELETE("design/{id}")
+    Call<List<ArtWork>> deleteDesign(@Path("id") int id);
+
     @GET("piercing/{name}")
     Call<List<Piercing>> piercing(@Path("name") String name);
 
@@ -60,6 +67,9 @@ public interface GogoService {
 
     @POST("piercing/{id}")
     Call<Piercing> piercing(@Path("id") int id, @Body Piercing piercing);
+
+    @DELETE("piercing/{id}")
+    Call<List<ArtWork>> deletePiercing(@Path("id") int id);
 
     @GET("dreadlocks/{id}")
     Call<Dreadlocks> dreadlocks(@Path("id") long id);
@@ -72,6 +82,9 @@ public interface GogoService {
 
     @POST("dreadlocks/{id}")
     Call<Dreadlocks> dreadlocks(@Path("id") int id, @Body Dreadlocks tat);
+
+    @DELETE("dreadlocks/{id}")
+    Call<List<ArtWork>> deleteDreadlocks(@Path("id") int id);
 
     @Multipart
     @POST("upload")

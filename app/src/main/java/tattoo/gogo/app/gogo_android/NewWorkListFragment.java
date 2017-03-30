@@ -76,9 +76,6 @@ public class NewWorkListFragment extends ArtFragment {
 
         getActivity().setTitle(GogoConst.GOGO_TATTOO + "/" + mArtistName + "/" + mArtworkType);
 
-        ((GogoActivity) getActivity()).getFloatingActionButton().setOnClickListener(v -> {
-            ((NewArtworkActivity) getActivity()).startNewWork(mArtworkType, true);
-        });
     }
 
     @Override
@@ -103,6 +100,8 @@ public class NewWorkListFragment extends ArtFragment {
             setupRecyclerView();
         }
         savedState = null;
+
+
     }
 
     @Override
@@ -114,6 +113,10 @@ public class NewWorkListFragment extends ArtFragment {
         } else {
             ivLoading.setVisibility(View.GONE);
         }
+
+        ((GogoActivity) getActivity()).getFloatingActionButton().setOnClickListener(v -> {
+            ((NewArtworkActivity) getActivity()).startNewWork(mArtworkType, true);
+        });
     }
 
 

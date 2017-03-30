@@ -81,11 +81,16 @@ abstract public class ArtFragment extends Fragment {
     }
 
     protected String getArtist() {
-        return ((GogoAndroid) getActivity().getApplication()).getArtist();
+        if (isAdded()) {
+            return ((GogoAndroid) getActivity().getApplication()).getArtist();
+        }
+        return "";
     }
 
     protected void setArtist(String name) {
-        ((GogoAndroid) getActivity().getApplication()).setArtist(name);
+        if (isAdded()) {
+            ((GogoAndroid) getActivity().getApplication()).setArtist(name);
+        }
     }
 
     public void handleShakeEvent(int count) {

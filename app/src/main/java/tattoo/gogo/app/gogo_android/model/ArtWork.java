@@ -40,7 +40,7 @@ public class ArtWork implements Parcelable {
     String made_at_shop = "chushangfeng";
     @SerializedName("duration_min")
     int duration_min = 120;
-    @SerializedName("partial_gender")
+    @SerializedName("gender")
     String gender = "female";
     String extra = "";
     String type = "";

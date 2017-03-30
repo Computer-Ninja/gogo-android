@@ -135,8 +135,14 @@ public abstract class NewWorkFragment extends ArtFragment {
         fab = ((GogoActivity) getActivity()).getFloatingActionButton();
         setListeners();
 
-        if (btnFemale != null)
-            btnFemale.performClick();
+        if (btnFemale != null) {
+
+            if (mArtWork.getGender().equals("male")) {
+                btnMale.performClick();
+            } else {
+                btnFemale.performClick();
+            }
+        }
         etTitle.requestFocus();
 
         client = new OkHttpClient();
