@@ -20,71 +20,70 @@ import tattoo.gogo.app.gogo_android.model.Piercing;
 import tattoo.gogo.app.gogo_android.model.Tattoo;
 
 public interface GogoService {
-    @GET("tattoo/{id}")
-    Call<Tattoo> tattoo(@Path("id") long id);
 
-    @GET("tattoo/{name}")
-    Call<List<Tattoo>> tattoo(@Path("name") String name);
+    @GET("{artist}/tattoo")
+    Call<List<Tattoo>> tattoo(@Path("artist") String name);
 
-    @GET("tattoo")
-    Call<List<Tattoo>> newTattoo();
+    @GET("{artist}/tattoo")
+    Call<List<Tattoo>> tattoo(@Path("artist") String name, @Query("status") String status);
 
-    @POST("tattoo/{id}")
-    Call<Tattoo> tattoo(@Path("id") int id, @Body Tattoo tat);
+    @POST("{artist}/tattoo/{work_name}")
+    Call<Tattoo> tattoo(@Path("artist") String name,  @Path("work_name") String workName, @Body Tattoo tat);
 
-    @DELETE("tattoo/{id}")
-    Call<List<ArtWork>> deleteTattoo(@Path("id") int id);
+    @DELETE("{artist}/tattoo/{work_name}")
+    Call<List<ArtWork>> deleteTattoo(@Path("artist") String name, @Path("work_name") String workName);
 
-    @GET("henna/{name}")
-    Call<List<Henna>> henna(@Path("name") String name);
+    @GET("{artist}/henna")
+    Call<List<Henna>> henna(@Path("artist") String name);
 
-    @GET("henna")
-    Call<List<Henna>> newHenna();
+    @GET("{artist}/henna")
+    Call<List<Henna>> henna(@Path("artist") String name, @Query("status") String status);
 
-    @POST("henna/{id}")
-    Call<Henna> henna(@Path("id") int id, @Body Henna hen);
+    @POST("{artist}/henna/{work_name}")
+    Call<Henna> henna(@Path("artist") String name,  @Path("work_name") String workName, @Body Henna tat);
 
-    @DELETE("henna/{id}")
-    Call<List<ArtWork>> deleteHenna(@Path("id") int id);
+    @DELETE("{artist}/henna/{work_name}")
+    Call<List<ArtWork>> deleteHenna(@Path("artist") String name, @Path("work_name") String workName);
 
-    @GET("design/{name}")
-    Call<List<Design>> design(@Path("name") String name);
 
-    @POST("design/{id}")
-    Call<Design> design(@Path("id") int id, @Body Design des);
+    @GET("{artist}/design")
+    Call<List<Design>> design(@Path("artist") String name);
 
-    @GET("design")
-    Call<List<Design>> newDesign();
+    @GET("{artist}/design")
+    Call<List<Design>> design(@Path("artist") String name, @Query("status") String status);
 
-    @DELETE("design/{id}")
-    Call<List<ArtWork>> deleteDesign(@Path("id") int id);
+    @POST("{artist}/design/{work_name}")
+    Call<Design> design(@Path("artist") String name, @Path("work_name") String workName, @Body Design tat);
 
-    @GET("piercing/{name}")
-    Call<List<Piercing>> piercing(@Path("name") String name);
+    @DELETE("{artist}/design/{work_name}")
+    Call<List<ArtWork>> deleteDesign(@Path("artist") String name, @Path("work_name") String workName);
 
-    @GET("piercing")
-    Call<List<Piercing>> newPiercing();
 
-    @POST("piercing/{id}")
-    Call<Piercing> piercing(@Path("id") int id, @Body Piercing piercing);
+    @GET("{artist}/piercing")
+    Call<List<Piercing>> piercing(@Path("artist") String name);
 
-    @DELETE("piercing/{id}")
-    Call<List<ArtWork>> deletePiercing(@Path("id") int id);
+    @GET("{artist}/piercing")
+    Call<List<Piercing>> piercing(@Path("artist") String name, @Query("status") String status);
 
-    @GET("dreadlocks/{id}")
-    Call<Dreadlocks> dreadlocks(@Path("id") long id);
+    @POST("{artist}/piercing/{work_name}")
+    Call<Piercing> piercing(@Path("artist") String name, @Path("work_name") String workName, @Body Piercing tat);
 
-    @GET("dreadlocks")
-    Call<List<Dreadlocks>> newDreadlocks();
+    @DELETE("{artist}/piercing/{work_name}")
+    Call<List<ArtWork>> deletePiercing(@Path("artist") String name, @Path("work_name") String workName);
 
-    @GET("dreadlocks/{name}")
-    Call<List<Dreadlocks>> dreadlocks(@Path("name") String name);
 
-    @POST("dreadlocks/{id}")
-    Call<Dreadlocks> dreadlocks(@Path("id") int id, @Body Dreadlocks tat);
+    @GET("{artist}/dreadlocks")
+    Call<List<Dreadlocks>> dreadlocks(@Path("artist") String name);
 
-    @DELETE("dreadlocks/{id}")
-    Call<List<ArtWork>> deleteDreadlocks(@Path("id") int id);
+    @GET("{artist}/dreadlocks")
+    Call<List<Dreadlocks>> dreadlocks(@Path("artist") String name, @Query("status") String status);
+
+    @POST("{artist}/dreadlocks/{work_name}")
+    Call<Dreadlocks> dreadlocks(@Path("artist") String name, @Path("work_name") String workName, @Body Dreadlocks tat);
+
+    @DELETE("{artist}/dreadlocks/{work_name}")
+    Call<List<ArtWork>> deleteDreadlocks(@Path("artist") String name, @Path("work_name") String workName);
+
 
     @Multipart
     @POST("upload")

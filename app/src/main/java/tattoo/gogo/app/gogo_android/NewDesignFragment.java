@@ -3,15 +3,12 @@ package tattoo.gogo.app.gogo_android;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import tattoo.gogo.app.gogo_android.api.GogoApi;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
 import tattoo.gogo.app.gogo_android.model.Design;
-import tattoo.gogo.app.gogo_android.model.Tattoo;
 
 import static android.content.ContentValues.TAG;
 
@@ -43,7 +40,7 @@ public class NewDesignFragment extends NewWorkFragment {
 
 
     protected void sendToApi() {
-        GogoApi.getApi().design(ThreadLocalRandom.current().nextInt(0, 10000), mDesign)
+        GogoApi.getApi().design(getArtist(), mDesign.getShortName(), mDesign)
                 .enqueue(new Callback<Design>() {
                     @Override
                     public void onResponse(Call<Design> call, Response<Design> response) {

@@ -14,6 +14,9 @@ public class GogoConst {
     static final long ONE_MINUTE_IN_MILLIS = 60000; //millisecs
     public static final String GOGO_TATTOO = "gogo.tattoo";
     public static final int SHAKE_THRESHOLD = 800;
+    public static final String HEADER_AUTHONRIZATION = "auth";
+    public static final String HEADER_X_CLIENT_ID = "client_id";
+    public static final String O_AUTH_AUTHENTICATION = "gogo-android";
 
     public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZZZ");
     public static SimpleDateFormat watermarkDateFormat = new SimpleDateFormat("yyyy/MM/dd");

@@ -8,21 +8,22 @@
     tools:context="tattoo.gogo.app.gogo_android.MainActivityFragment"
     tools:showIn="@layout/activity_main">
     <ImageView
+        android:id="@+id/iv_banner"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/banner_height"
         android:src="@drawable/banner"
-        android:layout_above="@+id/iv_artist_aid"
-        android:layout_below="@+id/tv_welcome_message"
         android:scaleType="centerCrop"/>
     <TextView
+        android:id="@+id/tv_slogan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/slogan"
         android:gravity="center"
-        android:layout_above="@+id/iv_artist_gogo"
+        android:layout_alignBaseline="@id/iv_banner"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginBottom="30dp"
+        android:layout_marginTop="70dp"
         android:textColor="@color/slogan_white"
         android:textSize="@dimen/slogan_text_size"
         android:textStyle="bold"
@@ -50,50 +51,40 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:padding="18dp"
         android:textStyle="italic"
         android:text="@string/description"
-        android:layout_below="@id/iv_artist_gogo"
+        android:layout_below="@+id/rv_artists"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:textSize="12sp"
-        android:layout_marginTop="33dp"/>
+        android:padding="24dp"/>
 
     <ImageView
         android:layout_width="490dp"
         android:layout_height="283dp"
         android:src="@drawable/doge"
+        android:id="@+id/iv_doge"
+        android:visibility="visible"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/iv_doge"
-        android:visibility="visible"/>
+        android:layout_alignParentStart="true"/>
 
-    <ImageView
-        android:id="@+id/iv_artist_aid"
-        android:layout_width="@dimen/iv_artist_unselected"
-        android:layout_height="@dimen/iv_artist_unselected"
-        android:padding="10dp"
-        android:layout_toLeftOf="@id/iv_artist_gogo"
-        android:layout_alignBottom="@id/iv_artist_gogo"
-        android:tag="aid"
-        android:elevation="2dp"/>
-    <ImageView
-        android:id="@+id/iv_artist_xizi"
-        android:layout_width="@dimen/iv_artist_unselected"
-        android:layout_height="@dimen/iv_artist_unselected"
-        android:padding="10dp"
-        android:layout_toRightOf="@id/iv_artist_gogo"
-        android:layout_alignBottom="@id/iv_artist_gogo"
-        android:tag="xizi"
-        android:elevation="4dp"/>
-    <ImageView
-        android:id="@id/iv_artist_gogo"
-        android:layout_width="@dimen/iv_artist_selected"
-        android:layout_height="@dimen/iv_artist_selected"
-        android:layout_centerInParent="true"
-        android:tag="gogo"
-        android:elevation="6dp"/>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_artists"
+        android:layout_height="150dp"
+        android:layout_below="@id/iv_banner"
+        android:layout_width="wrap_content"
+        android:layout_marginTop="-55dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:horizontalSpacing="10dp"
+        android:isScrollContainer="false"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="10dp"
+
+        />
+
     <TextView
         android:id="@+id/tv_debug_info"
         android:layout_width="wrap_content"

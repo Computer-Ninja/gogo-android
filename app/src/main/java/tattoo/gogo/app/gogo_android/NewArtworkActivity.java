@@ -60,6 +60,7 @@ public class NewArtworkActivity extends GogoActivity
     private static final String TAG = "NewArtworkActivity";
     public static final String ARG_ARTIST = "artist";
     public static final String ARG_ARTWORK_TYPE = "type";
+    private String mArtistName = "gogo";
 
     @Override
     int getLayout() {
@@ -74,9 +75,9 @@ public class NewArtworkActivity extends GogoActivity
 //        getSupportFragmentManager().beginTransaction()
 //                .add(R.id.fragment_container, new NewTattooFragment(), null)
 //                .commit();
-
+        mArtistName = ((GogoAndroid) getApplication()).getArtist();
         NewWorkListFragment listFr = NewWorkListFragment.newInstance(1,
-                ((GogoAndroid) getApplication()).getArtist(),
+                mArtistName,
                 mArtworkType);
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.fragment_container, listFr, null)
@@ -113,7 +114,7 @@ public class NewArtworkActivity extends GogoActivity
                                 hideLoading();
                                 AnalyticsUtil.sendEvent(mTracker, "context_menu", "refresh_photo", hash);
                             } else {
-                                deleteArtwork(artWork.getId());
+                                deleteArtwork(artWork.getShortName());
                             }
                         })
                 .setOnCancelListener(dialog -> {
@@ -177,7 +178,7 @@ public class NewArtworkActivity extends GogoActivity
                 .commit();
     }
 
-    public void deleteArtwork(int artworkId) {
+    public void deleteArtwork(String artworkName) {
         showLoading();
         Callback<List<ArtWork>> callback = new Callback<List<ArtWork>>() {
             @Override
@@ -196,15 +197,15 @@ public class NewArtworkActivity extends GogoActivity
             }
         };
         if (mArtworkType.equals(ArtFragment.ARTWORK_TYPE_TATTOO)) {
-            GogoApi.getApi().deleteTattoo(artworkId).enqueue(callback);
+            GogoApi.getApi().deleteTattoo(mArtistName, artworkName).enqueue(callback);
         } else if (mArtworkType.equals(ArtFragment.ARTWORK_TYPE_DESIGN)) {
-            GogoApi.getApi().deleteDesign(artworkId).enqueue(callback);
+            GogoApi.getApi().deleteDesign(mArtistName, artworkName).enqueue(callback);
         } else if (mArtworkType.equals(ArtFragment.ARTWORK_TYPE_HENNA)) {
-            GogoApi.getApi().deleteHenna(artworkId).enqueue(callback);
+            GogoApi.getApi().deleteHenna(mArtistName, artworkName).enqueue(callback);
         } else if (mArtworkType.equals(ArtFragment.ARTWORK_TYPE_PIERCING)) {
-            GogoApi.getApi().deletePiercing(artworkId).enqueue(callback);
+            GogoApi.getApi().deletePiercing(mArtistName, artworkName).enqueue(callback);
         } else if (mArtworkType.equals(ArtFragment.ARTWORK_TYPE_DREADLOCKS)) {
-            GogoApi.getApi().deleteDreadlocks(artworkId).enqueue(callback);
+            GogoApi.getApi().deleteDreadlocks(mArtistName, artworkName).enqueue(callback);
         }
     }
 

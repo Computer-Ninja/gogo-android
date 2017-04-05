@@ -3,15 +3,12 @@ package tattoo.gogo.app.gogo_android;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import tattoo.gogo.app.gogo_android.api.GogoApi;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
 import tattoo.gogo.app.gogo_android.model.Dreadlocks;
-import tattoo.gogo.app.gogo_android.model.Piercing;
 
 import static android.content.ContentValues.TAG;
 
@@ -51,7 +48,7 @@ public class NewDreadlockFragment extends NewWorkFragment {
     }
 
     protected void sendToApi() {
-        GogoApi.getApi().dreadlocks(ThreadLocalRandom.current().nextInt(0, 10000), mDreads)
+        GogoApi.getApi().dreadlocks(getArtist(), mDreads.getShortName(), mDreads)
                 .enqueue(new Callback<Dreadlocks>() {
                     @Override
                     public void onResponse(Call<Dreadlocks> call, Response<Dreadlocks> response) {

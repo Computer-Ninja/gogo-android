@@ -11,4 +11,5 @@
     <dimen name="iv_artist_padding_unselected">10dp</dimen>
     <dimen name="iv_artist_padding_selected">0dp</dimen>
     <dimen name="appbar_padding_top">8dp</dimen>
+    <dimen name="banner_height">250dp</dimen>
 </resources>

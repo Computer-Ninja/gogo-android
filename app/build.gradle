@@ -53,8 +53,8 @@ android {
         applicationId "tattoo.gogo.app.gogo_android"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 10
-        versionName "0.0.10-alpha"
+        versionCode 12
+        versionName "0.1.1-alpha"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -66,6 +66,12 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
     }
 }
 

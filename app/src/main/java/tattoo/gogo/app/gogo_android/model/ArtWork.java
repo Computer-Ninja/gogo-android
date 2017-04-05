@@ -190,7 +190,9 @@ public class ArtWork implements Parcelable {
     }
 
     public String getShortName() {
-        return getClass().getSimpleName();
+        return getTitle().toLowerCase()
+                .replace(" ", "_")
+                .replace("'","");
     }
 
     @Override

@@ -5,7 +5,6 @@ import android.util.Log;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.concurrent.ThreadLocalRandom;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -38,7 +37,7 @@ public class NewTattooFragment extends NewWorkFragment {
 
 
     protected void sendToApi() {
-        GogoApi.getApi().tattoo(ThreadLocalRandom.current().nextInt(0, 10000), mTattoo)
+        GogoApi.getApi().tattoo(getArtist(), mTattoo.getShortName(), mTattoo)
                 .enqueue(new Callback<Tattoo>() {
                     @Override
                     public void onResponse(Call<Tattoo> call, Response<Tattoo> response) {

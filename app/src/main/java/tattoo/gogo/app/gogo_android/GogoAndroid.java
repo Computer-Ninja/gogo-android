@@ -1,6 +1,7 @@
 package tattoo.gogo.app.gogo_android;
 
 import android.app.Application;
+import android.content.Context;
 import android.os.StrictMode;
 
 import com.crashlytics.android.Crashlytics;
@@ -10,12 +11,18 @@ import com.google.android.gms.analytics.Tracker;
 
 import io.fabric.sdk.android.Fabric;
 public class GogoAndroid extends Application {
+    private static GogoAndroid mInstance;
     private Tracker mTracker;
     private String mArtist = "gogo";
+
+    public static Context getInstance() {
+        return mInstance;
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        mInstance = this;
         Fabric.with(this, new Crashlytics(), new CrashlyticsNdk());
 
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
@@ -42,5 +49,7 @@ public class GogoAndroid extends Application {
     public String getArtist() {
         return mArtist;
     }
+
+
 
 }

@@ -211,19 +211,19 @@ public class NewWorkListFragment extends ArtFragment {
         };
         switch (mArtworkType) {
             case ARTWORK_TYPE_TATTOO:
-                GogoApi.getApi().newTattoo().enqueue(callback);
+                GogoApi.getApi().tattoo(getArtist(), "wip").enqueue(callback);
                 break;
             case ARTWORK_TYPE_DESIGN:
-                GogoApi.getApi().newDesign().enqueue(callback);
+                GogoApi.getApi().design(getArtist(), "wip").enqueue(callback);
                 break;
             case ARTWORK_TYPE_HENNA:
-                GogoApi.getApi().newHenna().enqueue(callback);
+                GogoApi.getApi().henna(getArtist(), "wip").enqueue(callback);
                 break;
             case ARTWORK_TYPE_PIERCING:
-                GogoApi.getApi().newPiercing().enqueue(callback);
+                GogoApi.getApi().piercing(getArtist(), "wip").enqueue(callback);
                 break;
             case ARTWORK_TYPE_DREADLOCKS:
-                GogoApi.getApi().newDreadlocks().enqueue(callback);
+                GogoApi.getApi().dreadlocks(getArtist(), "wip").enqueue(callback);
                 break;
         }
     }
