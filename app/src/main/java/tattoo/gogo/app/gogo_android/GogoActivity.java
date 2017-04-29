@@ -3,18 +3,14 @@ package tattoo.gogo.app.gogo_android;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -41,32 +37,20 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.google.android.gms.analytics.Tracker;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import tattoo.gogo.app.gogo_android.api.GogoApi;
-import tattoo.gogo.app.gogo_android.api.UploadResponse;
 import tattoo.gogo.app.gogo_android.utils.AnalyticsUtil;
 import tattoo.gogo.app.gogo_android.utils.IntentUtils;
 
@@ -495,10 +479,16 @@ abstract class GogoActivity extends AppCompatActivity implements
 
         ArrayList<Uri> files = new ArrayList<>();
 
-        for (View view : views) {
-            Uri uri = getImageUri(this, getBitmapFromView(view));
-            if (uri != null) {
-                files.add(uri);
+        System.gc();
+        for (int j = 0; j < views.size(); j++) {
+            View view = views.get(j);
+            try {
+                Uri uri = getImageUri(this, getBitmapFromView(view));
+                if (uri != null) {
+                    files.add(uri);
+                }
+            } catch (OutOfMemoryError x) {
+                System.gc();
             }
         }
 
