@@ -104,7 +104,7 @@ public class NewArtworkActivity extends GogoActivity
                                 savePhoto(hash);
                                 AnalyticsUtil.sendEvent(mTracker, "context_menu", "save_photo", hash);
                             } else if (position == 1) {
-                                sharePhoto(iv);
+                                sharePhoto(iv, "");
                                 AnalyticsUtil.sendEvent(mTracker, "context_menu", "share_photo", hash);
                             } else if (position == 2) {
                                 shareOriginalPhoto(hash);

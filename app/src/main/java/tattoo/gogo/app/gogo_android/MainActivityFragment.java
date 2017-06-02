@@ -1,6 +1,5 @@
 package tattoo.gogo.app.gogo_android;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -22,8 +21,14 @@ import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
+import java.util.List;
+
 import butterknife.BindView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import tattoo.gogo.app.gogo_android.api.GogoApi;
+import tattoo.gogo.app.gogo_android.model.Artist;
 import tattoo.gogo.app.gogo_android.utils.CircleTransform;
 
 
@@ -100,20 +105,32 @@ public class MainActivityFragment extends ArtFragment {
             tvDebugInfo.setText(GogoApi.HOST_URL);
         }
 
-        horizontalAdapter = new HorizontalPhotosAdapter(getContext());
-        rvArtists.setAdapter(horizontalAdapter);
-        horizontalAdapter.notifyDataSetChanged();
 
-        LinearLayoutManager horizontalLayoutManagaer = new LinearLayoutManager(getContext(),
-                LinearLayoutManager.HORIZONTAL, false);
-        rvArtists.setLayoutManager(horizontalLayoutManagaer);
-        rvArtists.setAdapter(horizontalAdapter);
+
+        GogoApi.getApi().artists().enqueue(new Callback<List<Artist>>() {
+            @Override
+            public void onResponse(Call<List<Artist>> call, Response<List<Artist>> response) {
+
+                horizontalAdapter = new HorizontalPhotosAdapter(response.body());
+                rvArtists.setAdapter(horizontalAdapter);
+                horizontalAdapter.notifyDataSetChanged();
+
+                LinearLayoutManager horizontalLayoutManagaer = new LinearLayoutManager(getContext(),
+                        LinearLayoutManager.HORIZONTAL, false);
+                rvArtists.setLayoutManager(horizontalLayoutManagaer);
+                rvArtists.setAdapter(horizontalAdapter);
+            }
+
+            @Override
+            public void onFailure(Call<List<Artist>> call, Throwable t) {
+
+            }
+        });
     }
 
     public class HorizontalPhotosAdapter extends RecyclerView.Adapter<HorizontalPhotosAdapter.MyViewHolder> {
 
-        private Context context;
-        private LayoutInflater inflater;
+        private List<Artist> artists;
 
         public class MyViewHolder extends RecyclerView.ViewHolder {
 
@@ -127,9 +144,8 @@ public class MainActivityFragment extends ArtFragment {
             }
         }
 
-
-        public HorizontalPhotosAdapter(Context context) {
-            this.context = context;
+        public HorizontalPhotosAdapter(List<Artist> artistList) {
+            artists = artistList;
         }
 
         @Override
@@ -145,29 +161,15 @@ public class MainActivityFragment extends ArtFragment {
 
         @Override
         public void onBindViewHolder(final MyViewHolder holder, final int position) {
+            Artist artist = artists.get(position);
 
-            //holder.riv.setImageBitmap(bitmapList.get(position));
-            switch (position){
-                case 0:
-                    loadArtist(holder.riv, GogoConst.MAIN_URL + "gogo/images/gogo.jpg", "gogo");
-                    break;
-                case 1:
-                    loadArtist(holder.riv, GogoConst.MAIN_URL + "aid/images/aid.png", "aid");
-                    break;
-                case 2:
-                    loadArtist(holder.riv, GogoConst.MAIN_URL + "xizi/images/xizi.jpg", "xizi");
-                    break;
-                case 3:
-                    loadArtist(holder.riv, GogoConst.MAIN_URL + "kate/images/kate.jpg", "kate");
-                    break;
-            }
+            loadArtist(holder.riv, GogoConst.IPFS_GATEWAY_URL + artist.getAvatarIpfs(), artist.getLink());
 
         }
 
-
         @Override
         public int getItemCount() {
-            return 4;
+            return artists.size();
         }
     }
 

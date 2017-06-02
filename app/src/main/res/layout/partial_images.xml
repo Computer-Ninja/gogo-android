@@ -30,4 +30,27 @@
 
 
     </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/ll_images_nav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btn_upload_process"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/upload_process_photo"
+            android:textAllCaps="true"
+            android:layout_weight="1"/>
+        <Button
+            android:id="@+id/btn_upload_final"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAllCaps="true"
+            android:text="@string/upload_final_photo"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
 </merge>

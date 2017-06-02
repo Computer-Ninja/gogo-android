@@ -114,6 +114,22 @@ public class ArtworkActivity extends GogoActivity
 
     }
 
+    @Override
+    public void navigateTo(String artworkName) {
+        mViewPager.setCurrentItem(findArtworkPositionByName(artworkName), true);
+    }
+
+    private int findArtworkPositionByName(String artworkName) {
+        int count = 0;
+        for (ArtWork a : mArtworks) {
+            if (a.getShortName().equals(artworkName)) {
+                return count;
+            }
+            count++;
+        }
+        return 0;
+    }
+
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.

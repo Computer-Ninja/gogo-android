@@ -13,6 +13,7 @@ import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
+import tattoo.gogo.app.gogo_android.model.Artist;
 import tattoo.gogo.app.gogo_android.model.Design;
 import tattoo.gogo.app.gogo_android.model.Dreadlocks;
 import tattoo.gogo.app.gogo_android.model.Henna;
@@ -84,6 +85,8 @@ public interface GogoService {
     @DELETE("{artist}/dreadlocks/{work_name}")
     Call<List<ArtWork>> deleteDreadlocks(@Path("artist") String name, @Path("work_name") String workName);
 
+    @GET("/artists")
+    Call<List<Artist>> artists();
 
     @Multipart
     @POST("upload")

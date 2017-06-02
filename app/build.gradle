@@ -47,14 +47,15 @@ repositories {
 //}
 
 android {
-    compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "tattoo.gogo.app.gogo_android"
-        minSdkVersion 16
+        minSdkVersion 17
         targetSdkVersion 25
-        versionCode 13
-        versionName "0.1.2-alpha"
+        compileSdkVersion 25
+        versionCode 15
+
+        versionName "0.1.5-alpha"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

@@ -145,6 +145,11 @@ public class ArtworkListActivity extends GogoActivity
 
     }
 
+    @Override
+    public void navigateTo(String artworkName) {
+
+    }
+
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.

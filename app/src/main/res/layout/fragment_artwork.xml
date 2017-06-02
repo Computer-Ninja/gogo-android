@@ -25,6 +25,35 @@
             android:textColor="@color/colorPrimaryDark"/>
 
         <LinearLayout
+            android:id="@+id/ll_artwork_nav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
+            android:gravity="center"
+            android:textSize="22sp"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:textColor="@color/colorPrimaryDark">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_previous"
+                android:text="@string/previous_work"
+                android:textColor="@color/colorPrimary"
+                android:visibility="invisible"
+                android:layout_weight="1"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_next"
+                android:gravity="right"
+                android:textColor="@color/colorPrimary"
+                android:visibility="invisible"
+                android:text="@string/next_work"
+                android:layout_weight="1"/>
+            </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/ll_artwork_images"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

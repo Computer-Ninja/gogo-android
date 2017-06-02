@@ -82,6 +82,8 @@ public abstract class NewWorkFragment extends ArtFragment {
     @Nullable @BindView(R.id.ll_gender_selection) LinearLayout llGenderSelection;
     @BindView(R.id.ll_process_images) LinearLayout llProcessImages;
     @BindView(R.id.ll_final_image) LinearLayout llFinalImage;
+    @BindView(R.id.btn_upload_process) Button btnUploadProcess;
+    @BindView(R.id.btn_upload_final) Button btnUploadFinal;
 
     Handler handler = new Handler(Looper.getMainLooper() /*UI thread*/);
     protected Runnable workRunnable;
@@ -238,6 +240,8 @@ public abstract class NewWorkFragment extends ArtFragment {
             return true;
         });
 
+        btnUploadProcess.setOnClickListener(v -> startDialog(false));
+        btnUploadFinal.setOnClickListener(v -> startDialog(true));
     }
 
     protected abstract void sendToApi();

@@ -3,6 +3,7 @@
     <string name="app_name_short" translatable="false">gogo.tattoo</string>
     <string name="action_settings">Settings</string>
     <string name="welcome_message">Welcome to gogo.tattoo Android app.</string>
+    <string name="description">Recognition for artists, trust for clients, authenticity for tattoos</string>
     <string name="hint_tattoo_title">Tattoo title</string>
     <string name="hint_made_at">Where was it made?</string>
     <string name="hint_made_by">Who made it?</string>
@@ -52,4 +53,6 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="error_please_give_title">Please give a title to this work</string>
     <string name="delete">Delete</string>
+    <string name="previous_work"><![CDATA[< Previous]]></string>
+    <string name="next_work"><![CDATA[Next >]]></string>
 </resources>

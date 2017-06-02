@@ -242,7 +242,7 @@ abstract class GogoActivity extends AppCompatActivity implements
                                 savePhoto(hash);
                                 AnalyticsUtil.sendEvent(mTracker, "context_menu", "save_photo", hash);
                             } else if (position == 1) {
-                                sharePhoto(iv);
+                                sharePhoto(iv, "");
                                 AnalyticsUtil.sendEvent(mTracker, "context_menu", "share_photo", hash);
                             } else if (position == 2) {
                                 shareOriginalPhoto(hash);
@@ -398,18 +398,18 @@ abstract class GogoActivity extends AppCompatActivity implements
         new PhotoSave(true).execute(hash);
     }
 
-    public void sharePhoto(View view) {
+    public void sharePhoto(View view, String text) {
         if (!haveStoragePermission()) {
             requestPermission(PERMISSION_REQUEST_STORAGE);
             return;
         }
         showLoading();
-        broadcastBitmapToApps(Collections.singletonList(view));
+        broadcastBitmapToApps(Collections.singletonList(view), text);
         hideLoading();
 
     }
 
-    public void sharePhotos(List<View> views) {
+    public void sharePhotos(List<View> views, String text) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected void onPreExecute() {
@@ -424,7 +424,7 @@ abstract class GogoActivity extends AppCompatActivity implements
             @Override
             protected Void doInBackground(Void... voids) {
                 if (haveStoragePermission()) {
-                    broadcastBitmapToApps(views);
+                    broadcastBitmapToApps(views, text);
                 }
                 return null;
             }
@@ -468,7 +468,7 @@ abstract class GogoActivity extends AppCompatActivity implements
         return returnedBitmap;
     }
 
-    public void broadcastBitmapToApps(List<View> views) {
+    public void broadcastBitmapToApps(List<View> views, String text) {
         boolean multipleFiles = true;
         if (views.size() == 1) {
             multipleFiles = false;
@@ -497,6 +497,7 @@ abstract class GogoActivity extends AppCompatActivity implements
         } else {
             i.putExtra(Intent.EXTRA_STREAM, files.get(0));
         }
+        i.putExtra(Intent.EXTRA_TEXT, text);
 
         try {
             startActivity(Intent.createChooser(i, getString(R.string.share_to)));

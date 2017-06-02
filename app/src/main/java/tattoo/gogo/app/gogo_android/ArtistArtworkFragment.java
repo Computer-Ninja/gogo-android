@@ -47,6 +47,9 @@ public class ArtistArtworkFragment extends ArtFragment {
     @BindView(R.id.iv_qr_gogogithub) ImageView ivQRgithub;
     @BindView(R.id.tv_gogo_link) TextView tvGogoLink;
     @BindView(R.id.tv_github_link) TextView tvGithubLink;
+    @BindView(R.id.ll_artwork_nav) LinearLayout llNav;
+    @BindView(R.id.tv_previous) TextView tvPrevious;
+    @BindView(R.id.tv_next) TextView tvNext;
 
 
     private ArtWork mArtwork;
@@ -116,6 +119,16 @@ public class ArtistArtworkFragment extends ArtFragment {
         String title = mArtistName.toLowerCase() + "/"
                 + ((GogoActivity) getActivity()).mArtworkType.toLowerCase() + "/";
         ((GogoActivity) getActivity()).setGogoTitle(title);
+
+        if (mArtwork.getPrevious() != null && !mArtwork.getPrevious().isEmpty()) {
+            llNav.setVisibility(View.VISIBLE);
+            tvPrevious.setVisibility(View.VISIBLE);
+            tvPrevious.setOnClickListener(v -> {
+                mListener.navigateTo(mArtwork.getPrevious());
+            });
+        } else {
+            llNav.setVisibility(View.GONE);
+        }
     }
 
 
@@ -126,7 +139,7 @@ public class ArtistArtworkFragment extends ArtFragment {
         menu.clear();
 
         menu.add(R.string.share_all).setOnMenuItemClickListener(menuItem -> {
-            mListener.sharePhotos(mViews);
+            mListener.sharePhotos(mViews, mArtwork.getLink());
             return false;
         });
 
@@ -164,8 +177,9 @@ public class ArtistArtworkFragment extends ArtFragment {
 
         void savePhoto(String hash);
         void shareOriginalPhoto(String hash);
-        void sharePhoto(View view);
-        void sharePhotos(List<View> views);
+        void sharePhoto(View view, String text);
+        void sharePhotos(List<View> views, String text);
+        void navigateTo(String artworkName);
 
         void showLoading();
         void hideLoading();
@@ -226,14 +240,14 @@ public class ArtistArtworkFragment extends ArtFragment {
                 if (qrGogoBitmap != null) {
                     ivQRgogo.setImageBitmap(qrGogoBitmap);
                     ivQRgogo.setOnClickListener(v -> {
-                        mListener.sharePhoto(ivQRgogo);
+                        mListener.sharePhoto(ivQRgogo, mArtwork.getLink());
                     });
                 } else {
                     ivQRgogo.setVisibility(GONE);
                 }
                 if (qrGithubBitmap != null) {
                     ivQRgithub.setImageBitmap(qrGithubBitmap);
-                    ivQRgithub.setOnClickListener(v -> mListener.sharePhoto(ivQRgithub));
+                    ivQRgithub.setOnClickListener(v -> mListener.sharePhoto(ivQRgithub, mArtwork.getLink()));
                 } else {
                     ivQRgithub.setVisibility(GONE);
                 }

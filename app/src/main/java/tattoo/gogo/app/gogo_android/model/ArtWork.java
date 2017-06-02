@@ -44,6 +44,7 @@ public class ArtWork implements Parcelable {
     String gender = "female";
     String extra = "";
     String type = "";
+    String previous = "";
 
     public ArtWork() {
     }
@@ -63,6 +64,8 @@ public class ArtWork implements Parcelable {
         duration_min = in.readInt();
         gender = in.readString();
         extra = in.readString();
+        type = in.readString();
+        previous = in.readString();
     }
 
     public static final Creator<ArtWork> CREATOR = new Creator<ArtWork>() {
@@ -189,6 +192,13 @@ public class ArtWork implements Parcelable {
         this.extra = extra;
     }
 
+    public String getPrevious() {
+        return previous;
+    }
+
+    public void setPrevious(String previous) {
+        this.previous = previous;
+    }
     public String getShortName() {
         return getTitle().toLowerCase()
                 .replace(" ", "_")
@@ -216,6 +226,8 @@ public class ArtWork implements Parcelable {
         dest.writeInt(duration_min);
         dest.writeString(gender);
         dest.writeString(extra);
+        dest.writeString(type);
+        dest.writeString(previous);
     }
 
     public String getType() {
