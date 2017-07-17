@@ -32,6 +32,8 @@ public class ArtWork implements Parcelable {
     String image_ipfs = "";
     @SerializedName("images_ipfs")
     ArrayList<String> images_ipfs = new ArrayList<>();
+    @SerializedName("videos_ipfs")
+    ArrayList<String> videos_ipfs = new ArrayList<>();
     @SerializedName("made_at_country")
     String made_at_country = "China";
     @SerializedName("made_at_city")
@@ -45,6 +47,8 @@ public class ArtWork implements Parcelable {
     String extra = "";
     String type = "";
     String previous = "";
+    @SerializedName("blockchain")
+    Blockchain blockchain;
 
     public ArtWork() {
     }
@@ -58,6 +62,7 @@ public class ArtWork implements Parcelable {
         bodypart = in.createStringArray();
         image_ipfs = in.readString();
         images_ipfs = in.createStringArrayList();
+        videos_ipfs = in.createStringArrayList();
         made_at_country = in.readString();
         made_at_city = in.readString();
         made_at_shop = in.readString();
@@ -66,6 +71,7 @@ public class ArtWork implements Parcelable {
         extra = in.readString();
         type = in.readString();
         previous = in.readString();
+        blockchain = in.readParcelable(Blockchain.class.getClassLoader());
     }
 
     public static final Creator<ArtWork> CREATOR = new Creator<ArtWork>() {
@@ -160,6 +166,14 @@ public class ArtWork implements Parcelable {
         this.images_ipfs = images_ipfs;
     }
 
+    public ArrayList<String> getVideosIpfs() {
+        return videos_ipfs;
+    }
+
+    public void setVideosIpfs(ArrayList<String> videos_ipfs) {
+        this.videos_ipfs = videos_ipfs;
+    }
+
     public String getMadeAtCountry() {
         return made_at_country;
     }
@@ -220,6 +234,7 @@ public class ArtWork implements Parcelable {
         dest.writeStringArray(bodypart);
         dest.writeString(image_ipfs);
         dest.writeStringList(images_ipfs);
+        dest.writeStringList(videos_ipfs);
         dest.writeString(made_at_country);
         dest.writeString(made_at_city);
         dest.writeString(made_at_shop);
@@ -228,6 +243,7 @@ public class ArtWork implements Parcelable {
         dest.writeString(extra);
         dest.writeString(type);
         dest.writeString(previous);
+        dest.writeParcelable(blockchain, 0);
     }
 
     public String getType() {
@@ -253,4 +269,13 @@ public class ArtWork implements Parcelable {
     public void setId(int id) {
         this.id = id;
     }
+
+    public Blockchain getBlockchain() {
+        return blockchain;
+    }
+
+    public void setBlockchain(Blockchain blockchain) {
+        this.blockchain = blockchain;
+    }
+
 }

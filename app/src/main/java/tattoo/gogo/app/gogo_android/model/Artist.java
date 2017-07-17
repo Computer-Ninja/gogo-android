@@ -149,5 +149,6 @@ public class Artist implements Parcelable {
     String locationNow;
     @SerializedName("avatar_ipfs")
     String avatarIpfs;
+    String link;
 
 }

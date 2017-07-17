@@ -1,10 +1,13 @@
 package tattoo.gogo.app.gogo_android;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -39,17 +42,28 @@ public class ArtistArtworkFragment extends ArtFragment {
 
     private String mArtistName;
 
-    @BindView(R.id.tv_artwork_title) TextView tvTitle;
-    @BindView(R.id.ll_artwork_images) LinearLayout llImages;
-    @BindView(R.id.tv_artwork_made_date) TextView tvMadeDate;
-    @BindView(R.id.tv_artwork_made_published) TextView tvPublishedDate;
-    @BindView(R.id.iv_qr_gogotattoo) ImageView ivQRgogo;
-    @BindView(R.id.iv_qr_gogogithub) ImageView ivQRgithub;
-    @BindView(R.id.tv_gogo_link) TextView tvGogoLink;
-    @BindView(R.id.tv_github_link) TextView tvGithubLink;
-    @BindView(R.id.ll_artwork_nav) LinearLayout llNav;
-    @BindView(R.id.tv_previous) TextView tvPrevious;
-    @BindView(R.id.tv_next) TextView tvNext;
+    @BindView(R.id.tv_artwork_title)
+    TextView tvTitle;
+    @BindView(R.id.ll_artwork_images)
+    LinearLayout llImages;
+    @BindView(R.id.tv_artwork_made_date)
+    TextView tvMadeDate;
+    @BindView(R.id.tv_artwork_made_published)
+    TextView tvPublishedDate;
+    @BindView(R.id.iv_qr_gogotattoo)
+    ImageView ivQRgogo;
+    @BindView(R.id.iv_qr_gogogithub)
+    ImageView ivQRgithub;
+    @BindView(R.id.tv_gogo_link)
+    TextView tvGogoLink;
+    @BindView(R.id.tv_github_link)
+    TextView tvGithubLink;
+    @BindView(R.id.ll_artwork_nav)
+    LinearLayout llNav;
+    @BindView(R.id.tv_previous)
+    TextView tvPrevious;
+    @BindView(R.id.tv_next)
+    TextView tvNext;
 
 
     private ArtWork mArtwork;
@@ -143,6 +157,45 @@ public class ArtistArtworkFragment extends ArtFragment {
             return false;
         });
 
+        menu.add(R.string.copy_link).setOnMenuItemClickListener(menuItem -> {
+            copyLink(makeLink(GogoConst.MAIN_URL));
+            return false;
+        });
+
+        menu.add(R.string.copy_link_github).setOnMenuItemClickListener(menuItem -> {
+            copyLink(GogoConst.GITHUB_URL);
+            return false;
+        });
+
+        if (!mArtwork.getVideosIpfs().isEmpty()) {
+            menu.add(R.string.watch_process_video).setOnMenuItemClickListener(menuItem -> {
+                copyLink(GogoConst.IPFS_GATEWAY_URL + mArtwork.getVideosIpfs().get(0));
+                return false;
+            });
+
+        }
+        if (mArtwork.getBlockchain() != null) {
+            if (mArtwork.getBlockchain().getSteem() != null)
+            menu.add(R.string.copy_link_steem).setOnMenuItemClickListener(menuItem -> {
+                copyLink(GogoConst.STEEMIT_URL + mArtwork.getBlockchain().getSteem());
+                return false;
+            });
+
+            if (mArtwork.getBlockchain().getGolos() != null)
+            menu.add(R.string.copy_link_golos).setOnMenuItemClickListener(menuItem -> {
+                copyLink(GogoConst.GOLOS_URL + mArtwork.getBlockchain().getGolos());
+                return false;
+            });
+        }
+    }
+
+    private void copyLink(String link) {
+        ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("app.gogo.tattoo", link);
+        clipboard.setPrimaryClip(clip);
+        Snackbar.make(mToolbar, link, Snackbar.LENGTH_LONG)
+                .setAction(R.string.open_url, v -> IntentUtils.opentUrl(getContext(), link))
+                .show();
     }
 
 
@@ -176,12 +229,17 @@ public class ArtistArtworkFragment extends ArtFragment {
     public interface OnArtistArtworkFragmentInteractionListener {
 
         void savePhoto(String hash);
+
         void shareOriginalPhoto(String hash);
+
         void sharePhoto(View view, String text);
+
         void sharePhotos(List<View> views, String text);
+
         void navigateTo(String artworkName);
 
         void showLoading();
+
         void hideLoading();
 
         void showContextMenu(ImageView iv, String hash, OnImageRefreshListener l);
@@ -208,8 +266,8 @@ public class ArtistArtworkFragment extends ArtFragment {
         tvGithubLink.setOnClickListener(view -> IntentUtils.opentUrl(getActivity(), gogoGithubLink));
 
         new AsyncTask<Void, Void, Boolean>() {
-             Bitmap qrGithubBitmap;
-             Bitmap qrGogoBitmap;
+            Bitmap qrGithubBitmap;
+            Bitmap qrGogoBitmap;
 
             @Override
             protected Boolean doInBackground(Void... params) {
