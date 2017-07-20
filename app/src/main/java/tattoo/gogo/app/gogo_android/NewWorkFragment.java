@@ -48,8 +48,8 @@ import tattoo.gogo.app.gogo_android.model.ArtWork;
 import tattoo.gogo.app.gogo_android.utils.IntentUtils;
 
 import static android.os.Environment.getExternalStorageDirectory;
-import static android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 import static android.view.View.GONE;
+import static tattoo.gogo.app.gogo_android.GogoActivity.GALLERY_VIDEO;
 import static tattoo.gogo.app.gogo_android.GogoActivity.PERMISSION_REQUEST_CAMERA;
 import static tattoo.gogo.app.gogo_android.GogoActivity.PERMISSION_REQUEST_STORAGE;
 import static tattoo.gogo.app.gogo_android.MainActivity.GALLERY_PICTURE;
@@ -62,28 +62,57 @@ public abstract class NewWorkFragment extends ArtFragment {
     protected OkHttpClient client;
     private boolean isFinalPhotoUloaded = false;
 
-    @BindView(R.id.input_title) EditText etTitle;
-    @BindView(R.id.input_made_by) EditText etAuthor;
-    @BindView(R.id.input_made_at) EditText etMadeAt;
-    @BindView(R.id.input_made_city) EditText etMadeCity;
-    @BindView(R.id.input_made_country) EditText etMadeCountry;
-    @BindView(R.id.tv_future_link) TextView tvLink;
-    @BindView(R.id.tv_future_link_availability) TextView tvTitleAvailability;
-    @BindView(R.id.input_made_date) EditText etMadeDate;
-    @BindView(R.id.input_time_elapsed) EditText etTimeDuration;
-    @BindView(R.id.iv_qr_gogotattoo) ImageView ivQRgogo;
-    @BindView(R.id.iv_qr_gogogithub) ImageView ivQRgithub;
-    @BindView(R.id.tv_gogo_link) TextView tvGogoLink;
-    @BindView(R.id.tv_github_link) TextView tvGithubLink;
-    @BindView(R.id.tet_body_parts) ImprovedTagsEditText tetBodyParts;
-    @BindView(R.id.tet_tags) ImprovedTagsEditText tetTags;
-    @Nullable @BindView(R.id.btn_female) Button btnFemale;
-    @Nullable @BindView(R.id.btn_male) Button btnMale;
-    @Nullable @BindView(R.id.ll_gender_selection) LinearLayout llGenderSelection;
-    @BindView(R.id.ll_process_images) LinearLayout llProcessImages;
-    @BindView(R.id.ll_final_image) LinearLayout llFinalImage;
-    @BindView(R.id.btn_upload_process) Button btnUploadProcess;
-    @BindView(R.id.btn_upload_final) Button btnUploadFinal;
+    @BindView(R.id.input_title)
+    EditText etTitle;
+    @BindView(R.id.input_made_by)
+    EditText etAuthor;
+    @BindView(R.id.input_made_at)
+    EditText etMadeAt;
+    @BindView(R.id.input_made_city)
+    EditText etMadeCity;
+    @BindView(R.id.input_made_country)
+    EditText etMadeCountry;
+    @BindView(R.id.tv_future_link)
+    TextView tvLink;
+    @BindView(R.id.tv_future_link_availability)
+    TextView tvTitleAvailability;
+    @BindView(R.id.input_made_date)
+    EditText etMadeDate;
+    @BindView(R.id.input_time_elapsed)
+    EditText etTimeDuration;
+    @BindView(R.id.iv_qr_gogotattoo)
+    ImageView ivQRgogo;
+    @BindView(R.id.iv_qr_gogogithub)
+    ImageView ivQRgithub;
+    @BindView(R.id.tv_gogo_link)
+    TextView tvGogoLink;
+    @BindView(R.id.tv_github_link)
+    TextView tvGithubLink;
+    @BindView(R.id.tet_body_parts)
+    ImprovedTagsEditText tetBodyParts;
+    @BindView(R.id.tet_tags)
+    ImprovedTagsEditText tetTags;
+    @Nullable
+    @BindView(R.id.btn_female)
+    Button btnFemale;
+    @Nullable
+    @BindView(R.id.btn_male)
+    Button btnMale;
+    @Nullable
+    @BindView(R.id.ll_gender_selection)
+    LinearLayout llGenderSelection;
+    @BindView(R.id.ll_process_images)
+    LinearLayout llProcessImages;
+    @BindView(R.id.ll_videos)
+    LinearLayout llVideos;
+    @BindView(R.id.ll_final_image)
+    LinearLayout llFinalImage;
+    @BindView(R.id.btn_upload_process)
+    Button btnUploadProcess;
+    @BindView(R.id.btn_upload_final)
+    Button btnUploadFinal;
+    @BindView(R.id.btn_upload_video)
+    Button btnUploadVideo;
 
     Handler handler = new Handler(Looper.getMainLooper() /*UI thread*/);
     protected Runnable workRunnable;
@@ -240,8 +269,9 @@ public abstract class NewWorkFragment extends ArtFragment {
             return true;
         });
 
-        btnUploadProcess.setOnClickListener(v -> startDialog(false));
-        btnUploadFinal.setOnClickListener(v -> startDialog(true));
+        btnUploadProcess.setOnClickListener(v -> startDialog(false, false));
+        btnUploadFinal.setOnClickListener(v -> startDialog(true, false));
+        btnUploadVideo.setOnClickListener(v -> startDialog(false, true));
     }
 
     protected abstract void sendToApi();
@@ -253,18 +283,18 @@ public abstract class NewWorkFragment extends ArtFragment {
         menu.clear();
 
         menu.add(R.string.upload_process_photo).setOnMenuItemClickListener(item -> {
-            startDialog(false);
+            startDialog(false, false);
             return true;
         });
         if (!isFinalPhotoUloaded) {
             menu.add(R.string.upload_final_photo).setOnMenuItemClickListener(item -> {
-                startDialog(true);
+                startDialog(true, false);
                 return true;
             });
         }
     }
 
-    private void startDialog(boolean isFinal) {
+    private void startDialog(boolean isFinal, boolean isVideo) {
         AlertDialog.Builder myAlertDialog = new AlertDialog.Builder(
                 getActivity());
         myAlertDialog.setTitle(R.string.upload_photo);
@@ -277,9 +307,11 @@ public abstract class NewWorkFragment extends ArtFragment {
                     }
                     hideFab();
                     updateArtwork();
-                    Intent pictureActionIntent = new Intent(Intent.ACTION_PICK, EXTERNAL_CONTENT_URI);
-                    ga.startActivityForResult(pictureActionIntent, GALLERY_PICTURE
+                    Intent pictureActionIntent = new Intent(Intent.ACTION_PICK,
+                            isVideo ? MediaStore.Video.Media.EXTERNAL_CONTENT_URI : android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    ga.startActivityForResult(pictureActionIntent, isVideo ? GALLERY_VIDEO : GALLERY_PICTURE
                             + (isFinal ? 1000 : 0));
+
                 });
 
         myAlertDialog.setNegativeButton(R.string.from_camera,
@@ -380,7 +412,7 @@ public abstract class NewWorkFragment extends ArtFragment {
         Label label = new Label();
         label.setMadeAt(mArtWork.getMadeAtShop());
         label.setMadeDate(mArtWork.getDate());
-        ((NewArtworkActivity)getActivity()).setLatestLabel(label);
+        ((NewArtworkActivity) getActivity()).setLatestLabel(label);
     }
 
     protected void updateQRcodes() {
@@ -446,7 +478,7 @@ public abstract class NewWorkFragment extends ArtFragment {
     protected String makeLink(String mainUrl) {
         String tattooTitleLinkified = mArtWork.getTitle().toLowerCase()
                 .replace(" ", "_")
-                .replace("'","");
+                .replace("'", "");
         return mainUrl + getArtist() + "/" + mArtWork.getType() + "/" + tattooTitleLinkified;
     }
 

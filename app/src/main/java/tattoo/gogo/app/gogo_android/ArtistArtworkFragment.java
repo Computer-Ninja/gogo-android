@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
 
@@ -46,6 +48,8 @@ public class ArtistArtworkFragment extends ArtFragment {
     TextView tvTitle;
     @BindView(R.id.ll_artwork_images)
     LinearLayout llImages;
+    @BindView(R.id.ll_artwork_videos)
+    LinearLayout llVideos;
     @BindView(R.id.tv_artwork_made_date)
     TextView tvMadeDate;
     @BindView(R.id.tv_artwork_made_published)
@@ -69,6 +73,7 @@ public class ArtistArtworkFragment extends ArtFragment {
     private ArtWork mArtwork;
     private OnArtistArtworkFragmentInteractionListener mListener;
     private List<View> mViews = new ArrayList<>();
+    private List<View> mVideoViews = new ArrayList<>();
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -287,6 +292,10 @@ public class ArtistArtworkFragment extends ArtFragment {
 
                 loadImages();
 
+                loadVideos();
+
+                mListener.hideLoading();
+
                 if (qrGithubBitmap != null) {
                     mViews.add(ivQRgithub);
                 } else if (qrGogoBitmap != null) {
@@ -324,7 +333,15 @@ public class ArtistArtworkFragment extends ArtFragment {
         if (iv != null) {
             mViews.add(iv);
         }
-        mListener.hideLoading();
+    }
+
+    private void loadVideos() {
+        for (String hash : mArtwork.getVideosIpfs()){
+            View iv =  addVideo(hash);
+            if (iv != null) {
+                mVideoViews.add(iv);
+            }
+        }
     }
 
     private ImageView addImage(final String imageIpfs) {
@@ -342,7 +359,25 @@ public class ArtistArtworkFragment extends ArtFragment {
         return iv;
 
     }
+    private VideoView addVideo(final String hash) {
+        if (getContext() == null) {
+            return null;
+        }
+        final VideoView vv = new VideoView(getContext());
+        //iv.setAdjustViewBounds(true);
+        //iv.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        vv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 2500));
+        vv.setPadding(8, 8, 8, 8);
+        llVideos.addView(vv);
+        vv.setOnClickListener(v -> IntentUtils.opentUrl(getContext(), GogoConst.IPFS_GATEWAY_URL + hash));
 
+        vv.setVideoURI(Uri.parse(GogoConst.IPFS_GATEWAY_URL + hash));
+        vv.start();
+//        vv.setImageResource(R.drawable.doge);
+
+        return vv;
+
+    }
     private void loadImage(final String hash, final ImageView iv) {
         Glide.with(this)
                 .load(GogoConst.IPFS_GATEWAY_URL + hash)

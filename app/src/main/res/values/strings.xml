@@ -62,4 +62,5 @@
     <string name="copy_link_golos">Copy Golos link</string>
     <string name="watch_process_video">Watch Video</string>
     <string name="open_url">Open</string>
+    <string name="upload_video">Upload Video</string>
 </resources>

@@ -258,12 +258,28 @@ public class NewArtworkActivity extends GogoActivity
             isFinal = true;
         }
 
-        if (resultCode == RESULT_OK && requestCode == CAMERA_REQUEST) {
-            onCameraPhotoResult(isFinal);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == CAMERA_REQUEST) {
+                onCameraPhotoResult(isFinal);
 
-        } else if (resultCode == RESULT_OK && requestCode == GALLERY_PICTURE) {
-            onGalleryPhotoResult(data, isFinal);
+            } else if (requestCode == GALLERY_PICTURE) {
+                onGalleryPhotoResult(data, isFinal);
+            } else {
+                Uri selectedVideo = data.getData();
+                String[] filePath = {MediaStore.Images.Media.DATA};
+                Cursor c = getContentResolver().query(selectedVideo, filePath,
+                        null, null, null);
+                c.moveToFirst();
+                int columnIndex = c.getColumnIndex(filePath[0]);
+                selectedImagePath = c.getString(columnIndex);
+                c.close();
+                uploadVideo();
+            }
         }
+    }
+
+    private void onVideoChosen(Intent data) {
+        Log.d(TAG, "onVideoChosen() called with: data = [" + data + "]");
     }
 
     private void onGalleryPhotoResult(Intent data, boolean isFinal) {
@@ -376,6 +392,45 @@ public class NewArtworkActivity extends GogoActivity
         });
     }
 
+    private void uploadVideo() {
+
+        File file = new File(selectedImagePath);
+
+        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+
+        MultipartBody.Part multipartBody = MultipartBody.Part.createFormData("uploadfile", file.getName(), requestFile);
+
+        //MultipartBody.Part multipartBody = MultipartBody.Part.createFormData("file",file2.getName(),requestFile);
+        GogoApi.getApi().upload(((GogoAndroid) getApplication()).getArtist(), latestLabel.getMadeAt(), GogoConst.watermarkDateFormat.format(new Date()), multipartBody).enqueue(new Callback<UploadResponse>() {
+            @Override
+            public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
+                onVideoUploadSuccess(response);
+            }
+
+            @Override
+            public void onFailure(Call<UploadResponse> call, Throwable t) {
+                Log.d("failure", "message = " + t.getMessage());
+                Log.d("failure", "cause = " + t.getCause());
+                Snackbar.make(mToolbar, "Failure: " + t, Snackbar.LENGTH_LONG).show();
+                hideLoading();
+                setRequestedOrientation(mSavedOrientation);
+            }
+        });
+    }
+
+    private void onVideoUploadSuccess(Response<UploadResponse> response) {
+        Log.d("Success", "Code: " + response.code());
+        Log.d("Success", "Message: " + response.message());
+        hideLoading();
+        setRequestedOrientation(mSavedOrientation);
+        String hash = response.body().getHash();
+        Log.d("Success", "Hash: " + hash);
+        Snackbar.make(mToolbar, "Success: " + hash, Snackbar.LENGTH_LONG).show();
+        //IntentUtils.opentUrl(MainActivity.this, GogoConst.IPFS_GATEWAY_URL + hash);
+
+    }
+
+
     private void onFileUploadSuccess(Response<UploadResponse> response, Bitmap bitmap, boolean isFinal) {
         Log.d("Success", "Code: " + response.code());
         Log.d("Success", "Message: " + response.message());
@@ -386,8 +441,9 @@ public class NewArtworkActivity extends GogoActivity
         Snackbar.make(mToolbar, "Success: " + hash, Snackbar.LENGTH_LONG).show();
         //IntentUtils.opentUrl(MainActivity.this, GogoConst.IPFS_GATEWAY_URL + hash);
 
-        NewWorkFragment fr = (NewWorkFragment) getSupportFragmentManager()
-                .findFragmentByTag(((GogoAndroid) getApplication()).getArtist() + "/tattoo");
+        NewWorkFragment fr =
+                (NewWorkFragment) getSupportFragmentManager()
+                        .findFragmentByTag(((GogoAndroid) getApplication()).getArtist() + "/tattoo");
         if (fr != null) {
             fr.addImage(hash, bitmap, isFinal);
         }
@@ -411,6 +467,7 @@ public class NewArtworkActivity extends GogoActivity
         if (fr != null) {
             fr.addImage(hash, bitmap, isFinal);
         }
+
     }
 
     private void storeImageToSDCard(Bitmap processedBitmap) throws IOException {

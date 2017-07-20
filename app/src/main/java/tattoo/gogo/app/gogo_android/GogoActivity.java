@@ -66,6 +66,7 @@ abstract class GogoActivity extends AppCompatActivity implements
     protected static final int PERMISSION_REQUEST_STORAGE = 2;
     protected static final int PERMISSION_REQUEST_CAMERA = 1;
     public static final int GALLERY_PICTURE = 3;
+    public static final int GALLERY_VIDEO = 5;
     public static final int CAMERA_REQUEST = 4;
     boolean isFabOpen;
     Animation fab_open;
