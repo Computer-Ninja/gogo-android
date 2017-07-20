@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -18,8 +19,10 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -27,6 +30,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
 import com.moandjiezana.toml.TomlWriter;
@@ -36,6 +40,7 @@ import net.glxn.qrgen.core.image.ImageType;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Date;
 
 import butterknife.BindView;
@@ -58,6 +63,7 @@ import static tattoo.gogo.app.gogo_android.MainActivity.GALLERY_PICTURE;
  * Created by delirium on 2/26/17.
  */
 public abstract class NewWorkFragment extends ArtFragment {
+    private static final String TAG = "NewWorkFragment";
     protected static final String IS_FINAL = "is_final";
     protected OkHttpClient client;
     private boolean isFinalPhotoUloaded = false;
@@ -128,8 +134,13 @@ public abstract class NewWorkFragment extends ArtFragment {
         populateWithDelay(etAuthor, getArtist(), 600);
         populateWithDelay(etTitle, mArtWork.getTitle(), 200);
         populateWithDelay(etMadeAt, mArtWork.getMadeAtShop(), 1000);
-        String dateToday = GogoConst.watermarkDateFormat.format(new Date());
-        populateWithDelay(etMadeDate, dateToday, 1400);
+        String date = null;
+        try {
+            date = GogoConst.watermarkDateFormat.format(GogoConst.sdf.parse(mArtWork.getMadeDate()));
+        } catch (ParseException p) {
+            date = GogoConst.watermarkDateFormat.format(new Date());
+        }
+        populateWithDelay(etMadeDate, date, 1400);
         populateWithDelay(etTimeDuration, String.valueOf(mArtWork.getDurationMin()), 400);
         populateWithDelay(etMadeCity, String.valueOf(mArtWork.getMadeAtCity()), 200);
         populateWithDelay(etMadeCountry, String.valueOf(mArtWork.getMadeAtCountry()), 700);
@@ -149,10 +160,6 @@ public abstract class NewWorkFragment extends ArtFragment {
                         .placeholder(R.drawable.progress_animation)
                         .into(iv);
             }
-
-            if (!isAdded()) {
-                return;
-            }
             if (!mArtWork.getImageIpfs().isEmpty()) {
                 ImageView iv = createImageView(mArtWork.getImageIpfs(), true);
                 addImageView(iv, true);
@@ -160,6 +167,17 @@ public abstract class NewWorkFragment extends ArtFragment {
                         .load(GogoConst.IPFS_GATEWAY_URL + mArtWork.getImageIpfs())
                         .placeholder(R.drawable.progress_animation)
                         .into(iv);
+            }
+
+            if (!mArtWork.getVideosIpfs().isEmpty()) {
+                llVideos.setVisibility(View.VISIBLE);
+            }
+            for (String hash : mArtWork.getVideosIpfs()) {
+
+                VideoView vv = createVideoView(hash);
+                llVideos.addView(vv);
+                vv.setVideoURI(Uri.parse(GogoConst.IPFS_GATEWAY_URL + hash));
+                vv.start();
             }
         });
 
@@ -269,9 +287,19 @@ public abstract class NewWorkFragment extends ArtFragment {
             return true;
         });
 
-        btnUploadProcess.setOnClickListener(v -> startDialog(false, false));
-        btnUploadFinal.setOnClickListener(v -> startDialog(true, false));
-        btnUploadVideo.setOnClickListener(v -> startDialog(false, true));
+        btnUploadProcess.setOnClickListener(v -> startDialog(false));
+        btnUploadFinal.setOnClickListener(v -> startDialog(true));
+        btnUploadVideo.setOnClickListener(v -> {
+            final GogoActivity ga = ((GogoActivity) getActivity());
+            if (!ga.haveStoragePermission()) {
+                ga.requestPermission(PERMISSION_REQUEST_STORAGE);
+                return;
+            }
+            hideFab();
+            updateArtwork();
+            Intent pictureActionIntent = new Intent(Intent.ACTION_PICK,MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+            ga.startActivityForResult(pictureActionIntent, GALLERY_VIDEO);
+        });
     }
 
     protected abstract void sendToApi();
@@ -283,18 +311,18 @@ public abstract class NewWorkFragment extends ArtFragment {
         menu.clear();
 
         menu.add(R.string.upload_process_photo).setOnMenuItemClickListener(item -> {
-            startDialog(false, false);
+            startDialog(false);
             return true;
         });
         if (!isFinalPhotoUloaded) {
             menu.add(R.string.upload_final_photo).setOnMenuItemClickListener(item -> {
-                startDialog(true, false);
+                startDialog(true);
                 return true;
             });
         }
     }
 
-    private void startDialog(boolean isFinal, boolean isVideo) {
+    private void startDialog(boolean isFinal) {
         AlertDialog.Builder myAlertDialog = new AlertDialog.Builder(
                 getActivity());
         myAlertDialog.setTitle(R.string.upload_photo);
@@ -307,10 +335,8 @@ public abstract class NewWorkFragment extends ArtFragment {
                     }
                     hideFab();
                     updateArtwork();
-                    Intent pictureActionIntent = new Intent(Intent.ACTION_PICK,
-                            isVideo ? MediaStore.Video.Media.EXTERNAL_CONTENT_URI : android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    ga.startActivityForResult(pictureActionIntent, isVideo ? GALLERY_VIDEO : GALLERY_PICTURE
-                            + (isFinal ? 1000 : 0));
+                    Intent pictureActionIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    ga.startActivityForResult(pictureActionIntent, GALLERY_PICTURE + (isFinal ? 1000 : 0));
 
                 });
 
@@ -411,7 +437,7 @@ public abstract class NewWorkFragment extends ArtFragment {
         }
         Label label = new Label();
         label.setMadeAt(mArtWork.getMadeAtShop());
-        label.setMadeDate(mArtWork.getDate());
+        label.setMadeDate(mArtWork.getMadeDate());
         ((NewArtworkActivity) getActivity()).setLatestLabel(label);
     }
 
@@ -533,5 +559,59 @@ public abstract class NewWorkFragment extends ArtFragment {
         });
 
         return iv;
+    }
+
+    public void addVideo(String hash) {
+        if (!isAdded()) {
+            return;
+        }
+        showViews();
+        mArtWork.getVideosIpfs().add(hash);
+        VideoView vv = createVideoView(hash);
+        llVideos.addView(vv);
+        vv.setVideoURI(Uri.parse(GogoConst.IPFS_GATEWAY_URL + hash));
+        vv.start();
+        llVideos.setVisibility(View.VISIBLE);
+    }
+
+    private float mDownX;
+    private float mDownY;
+    private final float SCROLL_THRESHOLD = 10;
+    private boolean isOnClick;
+
+    protected VideoView createVideoView(String hash) {
+        VideoView vv = new VideoView(getContext());
+        LinearLayout.LayoutParams ll = new LinearLayout.LayoutParams(520, 880);
+        ll.setMargins(8, 8, 8, 8);
+        vv.setLayoutParams(ll);
+        vv.setOnTouchListener((v, event) -> {
+            switch (event.getAction() & MotionEvent.ACTION_MASK) {
+                case MotionEvent.ACTION_DOWN:
+                    mDownX = event.getX();
+                    mDownY = event.getY();
+                    isOnClick = true;
+                    break;
+                case MotionEvent.ACTION_UP:
+                    if (isOnClick) {
+                        try {
+                            llVideos.removeView(vv);
+                            mArtWork.getVideosIpfs().remove(hash);
+                        } catch (Exception x){
+
+                        }
+                    }
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    if (isOnClick && (Math.abs(mDownX - event.getX()) > SCROLL_THRESHOLD || Math.abs(mDownY - event.getY()) > SCROLL_THRESHOLD)) {
+                        isOnClick = false;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return true;
+        });
+        vv.setOnPreparedListener(mp -> mp.setLooping(true));
+        return vv;
     }
 }

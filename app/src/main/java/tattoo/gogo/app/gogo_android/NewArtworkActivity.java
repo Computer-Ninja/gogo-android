@@ -30,6 +30,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -287,8 +288,7 @@ public class NewArtworkActivity extends GogoActivity
 
             Uri selectedImage = data.getData();
             String[] filePath = {MediaStore.Images.Media.DATA};
-            Cursor c = getContentResolver().query(selectedImage, filePath,
-                    null, null, null);
+            Cursor c = getContentResolver().query(selectedImage, filePath, null, null, null);
             c.moveToFirst();
             int columnIndex = c.getColumnIndex(filePath[0]);
             selectedImagePath = c.getString(columnIndex);
@@ -304,7 +304,6 @@ public class NewArtworkActivity extends GogoActivity
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                uploadFile(bitmap, isFinal);
             }
             uploadFile(bitmap, isFinal);
 
@@ -375,7 +374,15 @@ public class NewArtworkActivity extends GogoActivity
         MultipartBody.Part multipartBody = MultipartBody.Part.createFormData("uploadfile", file.getName(), requestFile);
 
         //MultipartBody.Part multipartBody = MultipartBody.Part.createFormData("file",file2.getName(),requestFile);
-        GogoApi.getApi().upload(((GogoAndroid) getApplication()).getArtist(), latestLabel.getMadeAt(), GogoConst.watermarkDateFormat.format(new Date()), multipartBody).enqueue(new Callback<UploadResponse>() {
+        String dateString = null;
+        try {
+            dateString = GogoConst.watermarkDateFormat.format(GogoConst.sdf.parse(latestLabel.getMadeDate()));
+        } catch (ParseException e) {
+            dateString = GogoConst.watermarkDateFormat.format(new Date());
+        }
+        GogoApi.getApi().upload(((GogoAndroid) getApplication()).getArtist(), latestLabel.getMadeAt(),
+                dateString, multipartBody).enqueue(new Callback<UploadResponse>() {
+
             @Override
             public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
                 onFileUploadSuccess(response, bitmap, isFinal);
@@ -401,7 +408,15 @@ public class NewArtworkActivity extends GogoActivity
         MultipartBody.Part multipartBody = MultipartBody.Part.createFormData("uploadfile", file.getName(), requestFile);
 
         //MultipartBody.Part multipartBody = MultipartBody.Part.createFormData("file",file2.getName(),requestFile);
-        GogoApi.getApi().upload(((GogoAndroid) getApplication()).getArtist(), latestLabel.getMadeAt(), GogoConst.watermarkDateFormat.format(new Date()), multipartBody).enqueue(new Callback<UploadResponse>() {
+        String dateString = null;
+        try {
+            dateString = GogoConst.watermarkDateFormat.format(GogoConst.sdf.parse(latestLabel.getMadeDate()));
+        } catch (ParseException e) {
+            dateString = GogoConst.watermarkDateFormat.format(new Date());
+        }
+        GogoApi.getApi().upload(((GogoAndroid) getApplication()).getArtist(), latestLabel.getMadeAt(),
+                dateString, multipartBody).enqueue(new Callback<UploadResponse>() {
+
             @Override
             public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
                 onVideoUploadSuccess(response);
@@ -427,6 +442,10 @@ public class NewArtworkActivity extends GogoActivity
         Log.d("Success", "Hash: " + hash);
         Snackbar.make(mToolbar, "Success: " + hash, Snackbar.LENGTH_LONG).show();
         //IntentUtils.opentUrl(MainActivity.this, GogoConst.IPFS_GATEWAY_URL + hash);
+        NewWorkFragment fr = (NewWorkFragment) getFragment();
+        if (fr != null) {
+            fr.addVideo(hash);
+        }
 
     }
 
@@ -441,32 +460,16 @@ public class NewArtworkActivity extends GogoActivity
         Snackbar.make(mToolbar, "Success: " + hash, Snackbar.LENGTH_LONG).show();
         //IntentUtils.opentUrl(MainActivity.this, GogoConst.IPFS_GATEWAY_URL + hash);
 
-        NewWorkFragment fr =
-                (NewWorkFragment) getSupportFragmentManager()
-                        .findFragmentByTag(((GogoAndroid) getApplication()).getArtist() + "/tattoo");
+        NewWorkFragment fr = (NewWorkFragment) getFragment();
         if (fr != null) {
             fr.addImage(hash, bitmap, isFinal);
         }
-        fr = (NewWorkFragment) getSupportFragmentManager()
-                .findFragmentByTag(((GogoAndroid) getApplication()).getArtist() + "/design");
-        if (fr != null) {
-            fr.addImage(hash, bitmap, isFinal);
-        }
-        fr = (NewWorkFragment) getSupportFragmentManager()
-                .findFragmentByTag(((GogoAndroid) getApplication()).getArtist() + "/henna");
-        if (fr != null) {
-            fr.addImage(hash, bitmap, isFinal);
-        }
-        fr = (NewWorkFragment) getSupportFragmentManager()
-                .findFragmentByTag(((GogoAndroid) getApplication()).getArtist() + "/piercing");
-        if (fr != null) {
-            fr.addImage(hash, bitmap, isFinal);
-        }
-        fr = (NewWorkFragment) getSupportFragmentManager()
-                .findFragmentByTag(((GogoAndroid) getApplication()).getArtist() + "/dreadlocks");
-        if (fr != null) {
-            fr.addImage(hash, bitmap, isFinal);
-        }
+
+    }
+
+    private Fragment getFragment() {
+        String artist = ((GogoAndroid) getApplication()).getArtist();
+        return getSupportFragmentManager().findFragmentByTag(artist + "/" + mArtworkType);
 
     }
 

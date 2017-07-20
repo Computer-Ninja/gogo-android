@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -359,6 +360,12 @@ public class ArtistArtworkFragment extends ArtFragment {
         return iv;
 
     }
+
+    private float mDownX;
+    private float mDownY;
+    private final float SCROLL_THRESHOLD = 10;
+    private boolean isOnClick;
+
     private VideoView addVideo(final String hash) {
         if (getContext() == null) {
             return null;
@@ -366,11 +373,36 @@ public class ArtistArtworkFragment extends ArtFragment {
         final VideoView vv = new VideoView(getContext());
         //iv.setAdjustViewBounds(true);
         //iv.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-        vv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 2500));
+        LinearLayout.LayoutParams ll = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 2500);
+        ll.setMargins(8, 8, 8, 8);
+        vv.setLayoutParams(ll);
         vv.setPadding(8, 8, 8, 8);
         llVideos.addView(vv);
-        vv.setOnClickListener(v -> IntentUtils.opentUrl(getContext(), GogoConst.IPFS_GATEWAY_URL + hash));
 
+        vv.setOnTouchListener((v, event) -> {
+            switch (event.getAction() & MotionEvent.ACTION_MASK) {
+                case MotionEvent.ACTION_DOWN:
+                    mDownX = event.getX();
+                    mDownY = event.getY();
+                    isOnClick = true;
+                    break;
+                case MotionEvent.ACTION_UP:
+                    if (isOnClick) {
+                        copyLink(GogoConst.IPFS_GATEWAY_URL + hash);
+                    }
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    if (isOnClick && (Math.abs(mDownX - event.getX()) > SCROLL_THRESHOLD || Math.abs(mDownY - event.getY()) > SCROLL_THRESHOLD)) {
+                        isOnClick = false;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return true;
+        });
+        vv.setOnClickListener(v -> IntentUtils.opentUrl(getContext(), GogoConst.IPFS_GATEWAY_URL + hash));
+        vv.setOnPreparedListener(mp -> mp.setLooping(true));
         vv.setVideoURI(Uri.parse(GogoConst.IPFS_GATEWAY_URL + hash));
         vv.start();
 //        vv.setImageResource(R.drawable.doge);
