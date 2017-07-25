@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content">
+    <ImageView
+        android:id="@+id/iv_thumbnail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:adjustViewBounds="true"
+        android:background="@color/slogan_white"
+        android:clickable="true"
+        android:minHeight="200dp" />
+
+    <tattoo.gogo.app.gogo_android.view.GogoVideoView
+        android:id="@+id/gvv_video"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:clickable="true"
+        android:minHeight="1dp"
+        android:visibility="invisible" />
+
+    <ProgressBar
+        android:id="@+id/pb_loading"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_gravity="center"
+        android:padding="180dp"
+        android:visibility="invisible" />
+
+
+    <ImageView
+        android:id="@+id/iv_play_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:clickable="true"
+        android:padding="1dp"
+
+        android:src="@mipmap/ic_play_circle_outline_black_48dp"
+        android:tint="@android:color/holo_red_dark" />
+</FrameLayout>

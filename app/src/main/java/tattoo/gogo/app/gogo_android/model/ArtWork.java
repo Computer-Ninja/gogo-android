@@ -24,7 +24,7 @@ public class ArtWork implements Parcelable {
     String link = "gogo/tattoo/";
     String title = "";
     @SerializedName("made_date")
-    String made_date = "2017-02-25T20:01:06+03:00";
+    String made_date = "";
     String date = "2017-02-25T20:01:06+03:00";
     String[] tags = {"cover",  "color",  "black and gray", "bird", "animal", "dragon", "flower", "koi"};
     String[] bodypart = {"shoulder", "arm", "chest", "leg"};

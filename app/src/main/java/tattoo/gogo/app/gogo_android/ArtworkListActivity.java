@@ -26,8 +26,8 @@ import java.util.Locale;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
 
 public class ArtworkListActivity extends GogoActivity
-        implements ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
-        ArtistArtworkListFragment.OnArtistArtworkFragmentInteractionListener, ViewPager.OnPageChangeListener {
+        implements
+        ArtistArtworkListFragment.OnArtistArtworkListFragmentInteractionListener, ViewPager.OnPageChangeListener {
     private static final String TAG = "ArtworkListActivity";
 
     /**
@@ -93,7 +93,7 @@ public class ArtworkListActivity extends GogoActivity
     }
 
     @Override
-    public void loadThumbnail(WeakReference<Fragment> fr, ArtworkRecyclerViewAdapter.ViewHolder holder) {
+    public void loadThumbnail(WeakReference<Fragment> fr, ArtworkListRecyclerViewAdapter.ViewHolder holder) {
         Log.d(TAG, "loadThumbnail: " + holder.mItem.getTitle());
         if (fr.get() == null) {
             Log.d(TAG, "loadThumbnail: Fragment is null");
@@ -145,10 +145,6 @@ public class ArtworkListActivity extends GogoActivity
 
     }
 
-    @Override
-    public void navigateTo(String artworkName) {
-
-    }
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to

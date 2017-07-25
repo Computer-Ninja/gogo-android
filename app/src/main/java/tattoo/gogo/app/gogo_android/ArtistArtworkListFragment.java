@@ -28,13 +28,13 @@ import static android.content.ContentValues.TAG;
 /**
  * A fragment representing a list of Artist's Artworks.
  * <p/>
- * Activities containing this fragment MUST implement the {@link OnArtistArtworkFragmentInteractionListener}
+ * Activities containing this fragment MUST implement the {@link OnArtistArtworkListFragmentInteractionListener}
  * interface.
  */
 public class ArtistArtworkListFragment extends ArtFragment {
 
     private int mColumnCount = 1;
-    private OnArtistArtworkFragmentInteractionListener mListener;
+    private OnArtistArtworkListFragmentInteractionListener mListener;
     private ArrayList<ArtWork> mWorks = new ArrayList<>();
     private String mArtistName;
     private String mArtworkType;
@@ -228,7 +228,7 @@ public class ArtistArtworkListFragment extends ArtFragment {
         mRecyclerView.setItemViewCacheSize(20);
         mRecyclerView.setDrawingCacheEnabled(true);
         //mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-        mRecyclerView.setAdapter(new ArtworkRecyclerViewAdapter(ArtistArtworkListFragment.this, mWorks, mListener, mArtistName));
+        mRecyclerView.setAdapter(new ArtworkListRecyclerViewAdapter(ArtistArtworkListFragment.this, mWorks, mListener, mArtistName));
         final LinearLayoutManager lm = (LinearLayoutManager) mRecyclerView.getLayoutManager();
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -258,8 +258,8 @@ public class ArtistArtworkListFragment extends ArtFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof ArtistArtworkListFragment.OnArtistArtworkFragmentInteractionListener) {
-            mListener = (ArtistArtworkListFragment.OnArtistArtworkFragmentInteractionListener) context;
+        if (context instanceof ArtistArtworkListFragment.OnArtistArtworkListFragmentInteractionListener) {
+            mListener = (OnArtistArtworkListFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnArtistTattooFragmentInteractionListener");
@@ -282,9 +282,9 @@ public class ArtistArtworkListFragment extends ArtFragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnArtistArtworkFragmentInteractionListener {
+    public interface OnArtistArtworkListFragmentInteractionListener {
 
-        void loadThumbnail(WeakReference<Fragment> fr, ArtworkRecyclerViewAdapter.ViewHolder holder);
+        void loadThumbnail(WeakReference<Fragment> fr, ArtworkListRecyclerViewAdapter.ViewHolder holder);
 
         void onListFragmentInteraction(WeakReference<Fragment> tWeakReference, String mArtistName, List<ArtWork> mValues, int position);
     }

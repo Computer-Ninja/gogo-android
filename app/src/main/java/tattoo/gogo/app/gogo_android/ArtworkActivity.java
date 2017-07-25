@@ -8,8 +8,11 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.List;
 
 import tattoo.gogo.app.gogo_android.model.ArtWork;
 
@@ -117,6 +120,21 @@ public class ArtworkActivity extends GogoActivity
     @Override
     public void navigateTo(String artworkName) {
         mViewPager.setCurrentItem(findArtworkPositionByName(artworkName), true);
+    }
+
+    @Override
+    public void showContextMenu(ImageView iv, String hash, ArtistArtworkFragment.OnImageRefreshListener l) {
+
+    }
+
+    @Override
+    public void loadThumbnail(WeakReference<Fragment> fr, ArtworkRecyclerViewAdapter.ViewHolder holder) {
+
+    }
+
+    @Override
+    public void onListFragmentInteraction(WeakReference<Fragment> tWeakReference, String mArtistName, List<ArtWork> mValues, int position) {
+
     }
 
     private int findArtworkPositionByName(String artworkName) {

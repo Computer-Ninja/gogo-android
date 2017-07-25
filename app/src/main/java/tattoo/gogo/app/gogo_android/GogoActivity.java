@@ -228,7 +228,7 @@ abstract class GogoActivity extends AppCompatActivity implements
         setGogoTitle(title);
     }
 
-    public void showContextMenu(final ImageView iv, final String hash, final ArtistArtworkFragment.OnImageRefreshListener refresh) {
+    public void showContextMenu(final ImageView iv, final String hash, final ArtistOldArtworkFragment.OnImageRefreshListener refresh) {
         ArrayList<String> items = new ArrayList<>();
         items.add(getString(R.string.save_to_phone));
         items.add(getString(R.string.share_to));
