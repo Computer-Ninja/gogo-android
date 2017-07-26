@@ -66,7 +66,7 @@ public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecy
             //holder.imageLoaderProgressBar.setVisibility(View.VISIBLE);
             holder.videoPlayImageButton.setVisibility(View.VISIBLE);
             holder.videoView.setVisibility(View.VISIBLE);
-            holder.ivThumbnail.setVisibility(View.GONE);
+            //holder.ivThumbnail.setVisibility(View.GONE);
 
             //mListener.loadVideo(new WeakReference<>(mFragment), holder);
 
@@ -138,6 +138,7 @@ public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecy
         GogoVideoView videoView;
         @BindView(R.id.iv_thumbnail)
         ImageView ivThumbnail;
+        View mView;
 
         String hash;
 
@@ -148,6 +149,7 @@ public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecy
         public VideoViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
+            mView = view;
             videoView.setOnPreparedListener(mp -> {
                 Log.v("Video", "onPrepared" + videoView.getVideoPath());
                 int width = mp.getVideoWidth();
@@ -203,7 +205,7 @@ public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecy
                 currentVideoViewHolder = VideoViewHolder.this;
 
                 videoPlayImageButton.setVisibility(View.INVISIBLE);
-                //imageLoaderProgressBar.setVisibility(View.VISIBLE);
+                imageLoaderProgressBar.setVisibility(View.VISIBLE);
                 videoView.setVisibility(View.VISIBLE);
                 ivThumbnail.setVisibility(View.INVISIBLE);
                 if (!getHash().equals(videoView.getVideoPath())) {
@@ -214,7 +216,7 @@ public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecy
                     if (videoView.isPrepared()) {
                         imageLoaderProgressBar.setVisibility(View.INVISIBLE);
                     } else {
-                        //imageLoaderProgressBar.setVisibility(View.VISIBLE);
+                        imageLoaderProgressBar.setVisibility(View.VISIBLE);
                     }
                     videoView.requestFocus();
                     videoView.seekTo(0);

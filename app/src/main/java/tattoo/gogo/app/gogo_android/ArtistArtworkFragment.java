@@ -14,6 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MotionEvent;
@@ -64,19 +65,6 @@ public class ArtistArtworkFragment extends ArtFragment implements ArtworkRecycle
     TextView tvPrevious;
     @BindView(R.id.tv_next)
     TextView tvNext;
-
-//    @BindView(R.id.tv_artwork_made_date)
-//    TextView tvMadeDate;
-//    @BindView(R.id.tv_artwork_made_published)
-//    TextView tvPublishedDate;
-//    @BindView(R.id.iv_qr_gogotattoo)
-//    ImageView ivQRgogo;
-//    @BindView(R.id.iv_qr_gogogithub)
-//    ImageView ivQRgithub;
-//    @BindView(R.id.tv_gogo_link)
-//    TextView tvGogoLink;
-//    @BindView(R.id.tv_github_link)
-//    TextView tvGithubLink;
 
 
     private ArtWork mArtwork;
@@ -151,7 +139,7 @@ public class ArtistArtworkFragment extends ArtFragment implements ArtworkRecycle
             }
 
         });
-        //updateFooter();
+        updateFooter();
 
         String title = mArtistName.toLowerCase() + "/"
                 + ((GogoActivity) getActivity()).mArtworkType.toLowerCase() + "/";
@@ -176,6 +164,10 @@ public class ArtistArtworkFragment extends ArtFragment implements ArtworkRecycle
         menu.clear();
 
         menu.add(R.string.share_all).setOnMenuItemClickListener(menuItem -> {
+            for (int i = 0; i < mArtwork.getImagesIpfs().size(); i++) {
+                if (rvList.getLayoutManager().findViewByPosition(i) != null)
+                    mViews.add(rvList.getLayoutManager().findViewByPosition(i).findViewById(R.id.iv_thumbnail));
+            }
             mListener.sharePhotos(mViews, mArtwork.getLink());
             return false;
         });
@@ -199,16 +191,16 @@ public class ArtistArtworkFragment extends ArtFragment implements ArtworkRecycle
         }
         if (mArtwork.getBlockchain() != null) {
             if (mArtwork.getBlockchain().getSteem() != null)
-            menu.add(R.string.copy_link_steem).setOnMenuItemClickListener(menuItem -> {
-                copyLink(GogoConst.STEEMIT_URL + mArtwork.getBlockchain().getSteem());
-                return false;
-            });
+                menu.add(R.string.copy_link_steem).setOnMenuItemClickListener(menuItem -> {
+                    copyLink(GogoConst.STEEMIT_URL + mArtwork.getBlockchain().getSteem());
+                    return false;
+                });
 
             if (mArtwork.getBlockchain().getGolos() != null)
-            menu.add(R.string.copy_link_golos).setOnMenuItemClickListener(menuItem -> {
-                copyLink(GogoConst.GOLOS_URL + mArtwork.getBlockchain().getGolos());
-                return false;
-            });
+                menu.add(R.string.copy_link_golos).setOnMenuItemClickListener(menuItem -> {
+                    copyLink(GogoConst.GOLOS_URL + mArtwork.getBlockchain().getGolos());
+                    return false;
+                });
         }
     }
 
@@ -259,11 +251,11 @@ public class ArtistArtworkFragment extends ArtFragment implements ArtworkRecycle
                 //.override(outMetrics.widthPixels, outMetrics.heightPixels)
                 .into(holder.ivThumbnail);
 
-//        holder.mView.setOnLongClickListener(view -> {
-//            showContextMenu(holder.ivThumbnail, holder.mItem.getImageIpfs(),
-//                    (hash, iv) -> loadThumbnail(fr, holder));
-//            return true;
-//        });
+        holder.ivThumbnail.setOnLongClickListener(view -> {
+            ((GogoActivity) getActivity()).showContextMenu(holder.ivThumbnail, holder.hash,
+                    (hash, iv) -> loadThumbnail(fr, holder));
+            return true;
+        });
     }
 
     @Override
@@ -309,85 +301,110 @@ public class ArtistArtworkFragment extends ArtFragment implements ArtworkRecycle
     }
 
 
-//    protected void updateFooter() {
-//        try {
-//            String shortMadeDate = GogoConst.watermarkDateFormat.format(GogoConst.sdf.parse(mArtwork.getMadeDate()));
-//            tvMadeDate.setText(getString(R.string.tv_made_date, shortMadeDate));
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-//        try {
-//            String shortPublishDate = GogoConst.watermarkDateFormat.format(GogoConst.sdf.parse(mArtwork.getDate()));
-//            tvPublishedDate.setText(getString(R.string.tv_publish_date, shortPublishDate));
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-//
-//        ivQRgogo.setImageResource(R.drawable.progress_animation);
-//        ivQRgithub.setImageResource(R.drawable.progress_animation);
-//        ivQRgogo.setVisibility(View.VISIBLE);
-//        ivQRgithub.setVisibility(View.VISIBLE);
-//        tvGogoLink.setVisibility(View.VISIBLE);
-//        tvGithubLink.setVisibility(View.VISIBLE);
-//        final String gogoTattooLink = makeLink(GogoConst.MAIN_URL);
-//        final String gogoGithubLink = makeLink(GogoConst.GITHUB_URL);
-//        tvGogoLink.setText(gogoTattooLink);
-//        tvGogoLink.setOnClickListener(view -> IntentUtils.opentUrl(getActivity(), gogoTattooLink));
-//        tvGithubLink.setText(gogoGithubLink);
-//        tvGithubLink.setOnClickListener(view -> IntentUtils.opentUrl(getActivity(), gogoGithubLink));
-//
-//        new AsyncTask<Void, Void, Boolean>() {
-//            Bitmap qrGithubBitmap;
-//            Bitmap qrGogoBitmap;
-//
-//            @Override
-//            protected Boolean doInBackground(Void... params) {
-//                try {
-//                    qrGogoBitmap = makeQRcode(gogoTattooLink);
-//                    qrGithubBitmap = makeQRcode(gogoGithubLink);
-//                } catch (OutOfMemoryError e) {
-//                    return false;
-//                }
-//                return true;
-//            }
-//
-//            @Override
-//            protected void onPostExecute(Boolean aVoid) {
-//                super.onPostExecute(aVoid);
-//                loadQRviews();
-//
-//                //loadImages();
-//
-//                //loadVideos();
-//
-//
-//                mListener.hideLoading();
-//
-//                if (qrGithubBitmap != null) {
-//                    mViews.add(ivQRgithub);
-//                } else if (qrGogoBitmap != null) {
-//                    mViews.add(ivQRgogo);
-//                }
-//            }
-//
-//            private void loadQRviews() {
-//                if (qrGogoBitmap != null) {
-//                    ivQRgogo.setImageBitmap(qrGogoBitmap);
-//                    ivQRgogo.setOnClickListener(v -> {
-//                        mListener.sharePhoto(ivQRgogo, mArtwork.getLink());
-//                    });
-//                } else {
-//                    ivQRgogo.setVisibility(GONE);
-//                }
-//                if (qrGithubBitmap != null) {
-//                    ivQRgithub.setImageBitmap(qrGithubBitmap);
-//                    ivQRgithub.setOnClickListener(v -> mListener.sharePhoto(ivQRgithub, mArtwork.getLink()));
-//                } else {
-//                    ivQRgithub.setVisibility(GONE);
-//                }
-//            }
-//        }.execute();
-//    }
+    protected void updateFooter() {
+
+        final String gogoTattooLink = makeLink(GogoConst.MAIN_URL);
+        final String gogoGithubLink = makeLink(GogoConst.GITHUB_URL);
+
+        new AsyncTask<Void, Void, Boolean>() {
+            public LinearLayout footerView;
+            Bitmap qrGithubBitmap;
+            Bitmap qrGogoBitmap;
+            TextView tvMadeDate;
+            TextView tvPublishedDate;
+            ImageView ivQRgogo;
+            ImageView ivQRgithub;
+            TextView tvGogoLink;
+            TextView tvGithubLink;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+
+                footerView = (LinearLayout) LayoutInflater.from(getActivity()).inflate(R.layout.artwork_footer, null, false);
+
+                tvMadeDate = (TextView) footerView.findViewById(R.id.tv_artwork_made_date);
+                tvPublishedDate = (TextView) footerView.findViewById(R.id.tv_artwork_made_published);
+                ivQRgogo = (ImageView) footerView.findViewById(R.id.iv_qr_gogotattoo);
+                ivQRgithub = (ImageView) footerView.findViewById(R.id.iv_qr_gogogithub);
+                tvGogoLink = (TextView) footerView.findViewById(R.id.tv_gogo_link);
+                tvGithubLink = (TextView) footerView.findViewById(R.id.tv_github_link);
+                try {
+                    String shortMadeDate = GogoConst.watermarkDateFormat.format(GogoConst.sdf.parse(mArtwork.getMadeDate()));
+                    tvMadeDate.setText(getString(R.string.tv_made_date, shortMadeDate));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    String shortPublishDate = GogoConst.watermarkDateFormat.format(GogoConst.sdf.parse(mArtwork.getDate()));
+                    tvPublishedDate.setText(getString(R.string.tv_publish_date, shortPublishDate));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                ivQRgogo.setImageResource(R.drawable.progress_animation);
+                ivQRgithub.setImageResource(R.drawable.progress_animation);
+                ivQRgogo.setVisibility(View.VISIBLE);
+                ivQRgithub.setVisibility(View.VISIBLE);
+                tvGogoLink.setVisibility(View.VISIBLE);
+                tvGithubLink.setVisibility(View.VISIBLE);
+                tvGogoLink.setText(gogoTattooLink);
+                tvGogoLink.setOnClickListener(view -> IntentUtils.opentUrl(getActivity(), gogoTattooLink));
+                tvGithubLink.setText(gogoGithubLink);
+                tvGithubLink.setOnClickListener(view -> IntentUtils.opentUrl(getActivity(), gogoGithubLink));
+            }
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                try {
+                    qrGogoBitmap = makeQRcode(gogoTattooLink);
+                    qrGithubBitmap = makeQRcode(gogoGithubLink);
+                } catch (OutOfMemoryError e) {
+                    return false;
+                }
+                return true;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aVoid) {
+                super.onPostExecute(aVoid);
+
+
+                loadQRviews();
+
+                //loadImages();
+
+                //loadVideos();
+
+
+                mListener.hideLoading();
+
+                if (qrGithubBitmap != null) {
+                    mViews.add(ivQRgithub);
+                } else if (qrGogoBitmap != null) {
+                    mViews.add(ivQRgogo);
+                }
+                //rvList.addView(footerView);
+            }
+
+            private void loadQRviews() {
+                if (qrGogoBitmap != null) {
+                    ivQRgogo.setImageBitmap(qrGogoBitmap);
+                    ivQRgogo.setOnClickListener(v -> {
+                        mListener.sharePhoto(ivQRgogo, mArtwork.getLink());
+                    });
+                } else {
+                    ivQRgogo.setVisibility(GONE);
+                }
+                if (qrGithubBitmap != null) {
+                    ivQRgithub.setImageBitmap(qrGithubBitmap);
+                    ivQRgithub.setOnClickListener(v -> mListener.sharePhoto(ivQRgithub, mArtwork.getLink()));
+                } else {
+                    ivQRgithub.setVisibility(GONE);
+                }
+            }
+        }.execute();
+    }
 
     private void loadImages() {
         for (String hash : mArtwork.getImagesIpfs()) {
@@ -403,8 +420,8 @@ public class ArtistArtworkFragment extends ArtFragment implements ArtworkRecycle
     }
 
     private void loadVideos() {
-        for (String hash : mArtwork.getVideosIpfs()){
-            View iv =  addVideo(hash);
+        for (String hash : mArtwork.getVideosIpfs()) {
+            View iv = addVideo(hash);
             if (iv != null) {
                 mVideoViews.add(iv);
             }
@@ -476,6 +493,7 @@ public class ArtistArtworkFragment extends ArtFragment implements ArtworkRecycle
         return vv;
 
     }
+
     private void loadImage(final String hash, final ImageView iv) {
         Glide.with(this)
                 .load(GogoConst.IPFS_GATEWAY_URL + hash)

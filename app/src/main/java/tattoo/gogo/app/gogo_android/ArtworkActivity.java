@@ -123,11 +123,6 @@ public class ArtworkActivity extends GogoActivity
     }
 
     @Override
-    public void showContextMenu(ImageView iv, String hash, ArtistArtworkFragment.OnImageRefreshListener l) {
-
-    }
-
-    @Override
     public void loadThumbnail(WeakReference<Fragment> fr, ArtworkRecyclerViewAdapter.ViewHolder holder) {
 
     }
