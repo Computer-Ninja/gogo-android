@@ -17,7 +17,7 @@ import java.util.List;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
 
 public class ArtworkActivity extends GogoActivity
-        implements ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
+        implements ArtistOldArtworkFragment.OnArtistArtworkFragmentInteractionListener,
         ViewPager.OnPageChangeListener {
     private static final String TAG = "ArtworkListActivity";
     public static final String ARG_ARTWORKS = "artworks";
@@ -122,10 +122,10 @@ public class ArtworkActivity extends GogoActivity
         mViewPager.setCurrentItem(findArtworkPositionByName(artworkName), true);
     }
 
-    @Override
-    public void showContextMenu(ImageView iv, String hash, ArtistArtworkFragment.OnImageRefreshListener l) {
-
-    }
+//    @Override
+//    public void showContextMenu(ImageView iv, String hash, ArtistArtworkFragment.OnImageRefreshListener l) {
+//
+//    }
 
     @Override
     public void loadThumbnail(WeakReference<Fragment> fr, ArtworkRecyclerViewAdapter.ViewHolder holder) {
@@ -160,7 +160,7 @@ public class ArtworkActivity extends GogoActivity
 
         @Override
         public Fragment getItem(int position) {
-            return ArtistArtworkFragment.newInstance(getArtist(), mArtworks.get(position), mArtworkType);
+            return ArtistOldArtworkFragment.newInstance(getArtist(), mArtworks.get(position), mArtworkType);
         }
 
         @Override

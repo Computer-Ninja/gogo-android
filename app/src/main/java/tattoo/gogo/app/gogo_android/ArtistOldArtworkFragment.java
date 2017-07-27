@@ -115,7 +115,7 @@ public class ArtistOldArtworkFragment extends ArtFragment {
 
     @Override
     protected int getLayout() {
-        return R.layout.fragment_artwork;
+        return R.layout.fragment_artwork_old;
     }
 
     @Override
