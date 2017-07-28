@@ -76,10 +76,6 @@ abstract public class ArtFragment extends Fragment {
         mFabButton.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
     }
 
-    protected Bitmap makeQRcode(String link) throws OutOfMemoryError {
-        return QRCode.from(link).withSize(1024, 1024).bitmap();
-    }
-
     protected String getArtist() {
         if (isAdded()) {
             return ((GogoAndroid) getActivity().getApplication()).getArtist();

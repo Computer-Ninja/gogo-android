@@ -1,7 +1,9 @@
 package tattoo.gogo.app.gogo_android;
 
+import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -10,65 +12,87 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import net.glxn.qrgen.android.QRCode;
+
 import java.lang.ref.WeakReference;
+import java.text.ParseException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
+import tattoo.gogo.app.gogo_android.utils.IntentUtils;
 import tattoo.gogo.app.gogo_android.utils.UIUtils;
 import tattoo.gogo.app.gogo_android.view.GogoVideoView;
+
+import static android.view.View.GONE;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link ArtWork} and makes a call to the
  * specified {@link ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
  */
-public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecyclerViewAdapter.VideoViewHolder> {
+public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    private static final int TYPE_IMAGE = 1;
+    private static final int TYPE_VIDEO = 2;
+    private static final int TYPE_FOOTER = 3;
 
     private final ArtWork mArtwork;
-    private final ArtworkRecyclerViewAdapter.OnArtistArtworkFragmentInteractionListener mListener;
+    private final ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener mListener;
     private final Fragment mFragment;
 
     public ArtworkRecyclerViewAdapter(Fragment fr, ArtWork artwork,
-                                      ArtworkRecyclerViewAdapter.OnArtistArtworkFragmentInteractionListener listener) {
+                                      ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener listener) {
         mArtwork = artwork;
         mListener = listener;
         mFragment = fr;
     }
 
     @Override
-    public VideoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.art_item, parent, false);
-        return new VideoViewHolder(view);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        if (viewType == TYPE_FOOTER) {
+            return new FooterViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.artwork_footer, parent, false));
+        } else if (viewType == TYPE_VIDEO) {
+            return new VideoViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.art_item_video, parent, false));
+        } else {
+            return new ImageViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.art_item_image, parent, false));
+        }
     }
 
     @Override
-    public void onBindViewHolder(final VideoViewHolder holder, int position) {
+    public int getItemViewType(int position) {
+        if (position <= mArtwork.getImagesIpfs().size()) {
+            return TYPE_IMAGE;
+        } else if (position == getItemCount() - 1) {
+            return TYPE_FOOTER;
+        } else {
+            return TYPE_VIDEO;
+        }
+    }
+
+    @Override
+    public void onBindViewHolder(final RecyclerView.ViewHolder hldr, int position) {
         int imageCount = mArtwork.getImagesIpfs().size();
-        if (position <= imageCount) {
+        if (hldr instanceof ImageViewHolder) {
+            ImageViewHolder holder = (ImageViewHolder) hldr;
             if (position == mArtwork.getImagesIpfs().size()) {
                 holder.hash = mArtwork.getImageIpfs();
             } else {
                 holder.hash = mArtwork.getImagesIpfs().get(position);
             }
-
-            //holder.imageLoaderProgressBar.setVisibility(View.GONE);
-            holder.videoPlayImageButton.setVisibility(View.GONE);
-            holder.videoView.setVisibility(View.GONE);
             mListener.loadThumbnail(new WeakReference<>(mFragment), holder);
 
-        } else {
+        } else if (hldr instanceof VideoViewHolder){
+            VideoViewHolder holder = (VideoViewHolder) hldr;
             holder.hash = GogoConst.IPFS_GATEWAY_URL + mArtwork.getVideosIpfs().get(position - imageCount - 1);
 
-            //holder.imageLoaderProgressBar.setVisibility(View.VISIBLE);
-            holder.videoPlayImageButton.setVisibility(View.VISIBLE);
-            holder.videoView.setVisibility(View.VISIBLE);
-            //holder.ivThumbnail.setVisibility(View.GONE);
-
             //mListener.loadVideo(new WeakReference<>(mFragment), holder);
+
+        } else {
+            updateFooter((FooterViewHolder) hldr);
 
         }
 //        holder.mView.setOnClickListener(v -> {
@@ -80,22 +104,101 @@ public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecy
 //        });
     }
 
+
+    protected void updateFooter(FooterViewHolder holder) {
+
+        holder.ivQRgogo.setImageResource(R.drawable.progress_animation);
+        holder.ivQRgithub.setImageResource(R.drawable.progress_animation);
+        holder.ivQRgogo.setVisibility(View.VISIBLE);
+        holder.ivQRgithub.setVisibility(View.VISIBLE);
+        holder.tvGogoLink.setVisibility(View.VISIBLE);
+        holder.tvGithubLink.setVisibility(View.VISIBLE);
+        final String gogoTattooLink = GogoConst.MAIN_URL + mArtwork.getLink();
+        final String gogoGithubLink = GogoConst.GITHUB_URL + mArtwork.getLink();
+        holder.tvGogoLink.setText(gogoTattooLink);
+        holder.tvGogoLink.setOnClickListener(view -> IntentUtils.opentUrl(mFragment.getContext(), gogoTattooLink));
+        holder.tvGithubLink.setText(gogoGithubLink);
+        holder.tvGithubLink.setOnClickListener(view -> IntentUtils.opentUrl(mFragment.getContext(), gogoGithubLink));
+        try {
+            String shortMadeDate = GogoConst.watermarkDateFormat.format(GogoConst.sdf.parse(mArtwork.getMadeDate()));
+            holder.tvMadeDate.setText(mFragment.getString(R.string.tv_made_date, shortMadeDate));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        try {
+            String shortPublishDate = GogoConst.watermarkDateFormat.format(GogoConst.sdf.parse(mArtwork.getDate()));
+            holder.tvPublishedDate.setText(mFragment.getString(R.string.tv_publish_date, shortPublishDate));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        new AsyncTask<Void, Void, Boolean>() {
+            Bitmap qrGithubBitmap;
+            Bitmap qrGogoBitmap;
+
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                try {
+                    qrGogoBitmap = UIUtils.makeQRcode(gogoTattooLink);
+                    qrGithubBitmap = UIUtils.makeQRcode(gogoGithubLink);
+                } catch (OutOfMemoryError e) {
+                    return false;
+                }
+                return true;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aVoid) {
+                super.onPostExecute(aVoid);
+                loadQRviews();
+
+                //mListener.hideLoading();
+
+//                if (qrGithubBitmap != null) {
+//                    mViews.add(ivQRgithub);
+//                } else if (qrGogoBitmap != null) {
+//                    mViews.add(ivQRgogo);
+//                }
+            }
+
+            private void loadQRviews() {
+                if (qrGogoBitmap != null) {
+                    holder.ivQRgogo.setImageBitmap(qrGogoBitmap);
+                    holder.ivQRgogo.setOnClickListener(v -> {
+                        mListener.sharePhoto(holder.ivQRgogo, mArtwork.getLink());
+                    });
+                } else {
+                    holder.ivQRgogo.setVisibility(GONE);
+                }
+                if (qrGithubBitmap != null) {
+                    holder.ivQRgithub.setImageBitmap(qrGithubBitmap);
+                    holder.ivQRgithub.setOnClickListener(v -> mListener.sharePhoto(holder.ivQRgithub, mArtwork.getLink()));
+                } else {
+                    holder.ivQRgithub.setVisibility(GONE);
+                }
+            }
+        }.execute();
+    }
+
     @Override
-    public void onViewDetachedFromWindow(VideoViewHolder holder) {
+    public void onViewDetachedFromWindow(RecyclerView.ViewHolder holder) {
         super.onViewDetachedFromWindow(holder);
         //
     }
 
     @Override
-    public void onViewRecycled(VideoViewHolder holder) {
+    public void onViewRecycled(RecyclerView.ViewHolder holder) {
         super.onViewRecycled(holder);
-        Glide.clear(holder.ivThumbnail);
-
-        if (holder == currentVideoViewHolder) {
-            currentVideoViewHolder = null;
-            holder.stopVideo();
+        if (holder instanceof ImageViewHolder) {
+            Glide.clear(((ImageViewHolder) holder).ivThumbnail);
+        } else if (holder instanceof VideoViewHolder) {
+            if (holder == currentVideoViewHolder) {
+                currentVideoViewHolder = null;
+                ((VideoViewHolder) holder).stopVideo();
+            }
+            ((VideoViewHolder) holder).videoView.stopPlayback();
         }
-        holder.videoView.stopPlayback();
         super.onViewRecycled(holder);
     }
 
@@ -107,7 +210,7 @@ public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecy
 
     @Override
     public int getItemCount() {
-        return mArtwork.getImagesIpfs().size() + mArtwork.getVideosIpfs().size() + 1;
+        return mArtwork.getImagesIpfs().size() + mArtwork.getVideosIpfs().size() + 2;
         //    return mArtwork.getVideosIpfs().size();
     }
 
@@ -127,7 +230,19 @@ public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecy
 
     }
 
-    VideoViewHolder currentVideoViewHolder;
+    private VideoViewHolder currentVideoViewHolder;
+
+    class ImageViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.iv_thumbnail)
+        ImageView ivThumbnail;
+
+        String hash;
+
+        public ImageViewHolder(View view) {
+            super(view);
+            ButterKnife.bind(this, view);
+        }
+    }
 
     class VideoViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.iv_play_btn)
@@ -254,9 +369,27 @@ public class ArtworkRecyclerViewAdapter extends RecyclerView.Adapter<ArtworkRecy
         }
     }
 
-    interface OnArtistArtworkFragmentInteractionListener {
-        void loadThumbnail(WeakReference<Fragment> fr, ArtworkRecyclerViewAdapter.VideoViewHolder holder);
 
-        void loadVideo(WeakReference<Fragment> fr, ArtworkRecyclerViewAdapter.VideoViewHolder holder);
+    class FooterViewHolder extends RecyclerView.ViewHolder {
+
+        @BindView(R.id.tv_artwork_made_date)
+        TextView tvMadeDate;
+        @BindView(R.id.tv_artwork_made_published)
+        TextView tvPublishedDate;
+        @BindView(R.id.iv_qr_gogotattoo)
+        ImageView ivQRgogo;
+        @BindView(R.id.iv_qr_gogogithub)
+        ImageView ivQRgithub;
+        @BindView(R.id.tv_gogo_link)
+        TextView tvGogoLink;
+        @BindView(R.id.tv_github_link)
+        TextView tvGithubLink;
+
+
+        public FooterViewHolder(View view) {
+            super(view);
+            ButterKnife.bind(this, view);
+        }
     }
+
 }

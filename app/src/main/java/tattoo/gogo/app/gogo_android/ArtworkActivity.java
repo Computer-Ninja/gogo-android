@@ -6,9 +6,16 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -123,8 +130,29 @@ public class ArtworkActivity extends GogoActivity
     }
 
     @Override
-    public void loadThumbnail(WeakReference<Fragment> fr, ArtworkRecyclerViewAdapter.ViewHolder holder) {
+    public void loadThumbnail(WeakReference<Fragment> fr, ArtworkRecyclerViewAdapter.ImageViewHolder holder) {
+        if (fr.get() == null) {
+            Log.d(TAG, "loadThumbnail: Fragment is null");
+            return;
+        }
+        final String url = GogoConst.IPFS_GATEWAY_URL + holder.hash;
+        holder.ivThumbnail.setVisibility(View.VISIBLE);
+        Display display = getWindowManager().getDefaultDisplay();
+        final DisplayMetrics outMetrics = new DisplayMetrics();
+        display.getMetrics(outMetrics);
 
+        Glide.with(fr.get())
+                .load(url)
+                .placeholder(R.drawable.progress_animation)
+                .error(R.drawable.doge)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .override(outMetrics.widthPixels, outMetrics.heightPixels)
+                .into(holder.ivThumbnail);
+
+        holder.ivThumbnail.setOnLongClickListener(view -> {
+            showContextMenu(holder.ivThumbnail, holder.hash, (hash, iv) -> loadThumbnail(fr, holder));
+            return true;
+        });
     }
 
     @Override

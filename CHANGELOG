@@ -1,3 +1,7 @@
+[0.0.12-alpha]
+ + improved artwork view with recycled view, both photos and images are now in separate viewholders
+ + improved sharing
+
 [0.0.11-alpha]
  + videos are displayed in tattoo list
  + possible to upload/edit watermarked videos
