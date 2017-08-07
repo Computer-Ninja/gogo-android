@@ -10,10 +10,12 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 
 import io.fabric.sdk.android.Fabric;
+import tattoo.gogo.app.gogo_android.model.Artist;
+
 public class GogoAndroid extends Application {
     private static GogoAndroid mInstance;
     private Tracker mTracker;
-    private String mArtist = "gogo";
+    private Artist mArtist;
 
     public static Context getInstance() {
         return mInstance;
@@ -42,11 +44,11 @@ public class GogoAndroid extends Application {
         return mTracker;
     }
 
-    public void setArtist(String artist) {
+    public void setArtist(Artist artist) {
         this.mArtist = artist;
     }
 
-    public String getArtist() {
+    public Artist getArtist() {
         return mArtist;
     }
 

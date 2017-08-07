@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 
 import tattoo.gogo.app.gogo_android.model.ArtWork;
+import tattoo.gogo.app.gogo_android.model.Artist;
 
 public class ArtworkListActivity extends GogoActivity
         implements
@@ -65,7 +66,7 @@ public class ArtworkListActivity extends GogoActivity
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
-        setGogoTitle(getArtist() + "/" + getCurrentArtType(0, true).toString().toLowerCase());
+        setGogoTitle(getArtist().getLink() + "/" + getCurrentArtType(0, true).toString().toLowerCase());
 
     }
 
@@ -137,7 +138,7 @@ public class ArtworkListActivity extends GogoActivity
     @Override
     public void onPageSelected(int position) {
         mArtworkType = getCurrentArtType(position, true).toString().toLowerCase();
-        setGogoTitle(getArtist() + "/" + mArtworkType);
+        setGogoTitle(getArtist().getLink() + "/" + mArtworkType);
     }
 
     @Override
@@ -176,7 +177,7 @@ public class ArtworkListActivity extends GogoActivity
                     break;
 
             }
-            return ArtistArtworkListFragment.newInstance(1, getArtist(), type);
+            return ArtistArtworkListFragment.newInstance(1, getArtist().getLink(), type);
         }
 
         @Override
@@ -211,7 +212,7 @@ public class ArtworkListActivity extends GogoActivity
     }
 
 
-    protected String getArtist() {
+    protected Artist getArtist() {
         return ((GogoAndroid) getApplication()).getArtist();
     }
 }

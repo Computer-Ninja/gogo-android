@@ -224,7 +224,7 @@ abstract class GogoActivity extends AppCompatActivity implements
     }
 
     protected void setGogoTitle() {
-        String title = ((GogoAndroid) getApplication()).getArtist() + "/" + mArtworkType.toLowerCase();
+        String title = ((GogoAndroid) getApplication()).getArtist().getLink() + "/" + mArtworkType.toLowerCase();
         setGogoTitle(title);
     }
 

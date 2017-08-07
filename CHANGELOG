@@ -1,4 +1,10 @@
-[0.0.12-alpha]
+[0.0.14-alpha]
+ + adding Next artwork navigation
+
+[0.0.13-alpha]
+ + artists current studio and location is populated from api
+
+ [0.0.12-alpha]
  + improved artwork view with recycled view, both photos and images are now in separate viewholders
  + improved sharing
 

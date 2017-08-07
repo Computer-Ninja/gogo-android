@@ -23,6 +23,7 @@ public class Artist implements Parcelable {
         origin = in.readString();
         locationNow = in.readString();
         avatarIpfs = in.readString();
+        currentStudio = in.readString();
     }
 
     @Override
@@ -37,6 +38,7 @@ public class Artist implements Parcelable {
         dest.writeString(origin);
         dest.writeString(locationNow);
         dest.writeString(avatarIpfs);
+        dest.writeString(currentStudio);
     }
 
     @Override
@@ -150,5 +152,16 @@ public class Artist implements Parcelable {
     @SerializedName("avatar_ipfs")
     String avatarIpfs;
     String link;
+
+    public String getCurrentStudio() {
+        return currentStudio;
+    }
+
+    public void setCurrentStudio(String currentStudio) {
+        this.currentStudio = currentStudio;
+    }
+
+    @SerializedName("current_studio")
+    String currentStudio;
 
 }

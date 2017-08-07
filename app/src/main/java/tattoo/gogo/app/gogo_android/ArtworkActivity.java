@@ -12,7 +12,6 @@ import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -22,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import tattoo.gogo.app.gogo_android.model.ArtWork;
+import tattoo.gogo.app.gogo_android.model.Artist;
 
 public class ArtworkActivity extends GogoActivity
         implements ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
@@ -116,7 +116,7 @@ public class ArtworkActivity extends GogoActivity
     }
 
     private String getPageTitle(int position) {
-        return  mArtworks.get(position).getLink();
+        return mArtworks.get(position).getLink();
     }
 
     @Override
@@ -183,7 +183,19 @@ public class ArtworkActivity extends GogoActivity
 
         @Override
         public Fragment getItem(int position) {
-            return ArtistArtworkFragment.newInstance(getArtist(), mArtworks.get(position), mArtworkType);
+            ArtWork theArtwork = mArtworks.get(position);
+            String nextArtwork = null;
+            for (ArtWork artWork : mArtworks) {
+                if (theArtwork.getShortName().equals(artWork.getPrevious())) {
+                    nextArtwork = artWork.getShortName();
+                    break;
+                }
+            }
+            if (nextArtwork != null) {
+                return ArtistArtworkFragment.newInstance(getArtist().getLink(), theArtwork,
+                        mArtworkType, nextArtwork);
+            } else
+                return ArtistArtworkFragment.newInstance(getArtist().getLink(), theArtwork, mArtworkType);
         }
 
         @Override
@@ -197,7 +209,7 @@ public class ArtworkActivity extends GogoActivity
         }
     }
 
-    protected String getArtist() {
+    protected Artist getArtist() {
         return ((GogoAndroid) getApplication()).getArtist();
     }
 }

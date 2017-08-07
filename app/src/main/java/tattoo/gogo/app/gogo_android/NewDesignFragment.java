@@ -40,7 +40,7 @@ public class NewDesignFragment extends NewWorkFragment {
 
 
     protected void sendToApi() {
-        GogoApi.getApi().design(getArtist(), mDesign.getShortName(), mDesign)
+        GogoApi.getApi().design(mArtist.getLink(), mDesign.getShortName(), mDesign)
                 .enqueue(new Callback<Design>() {
                     @Override
                     public void onResponse(Call<Design> call, Response<Design> response) {

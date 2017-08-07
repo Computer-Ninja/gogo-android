@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import butterknife.BindView;
+import tattoo.gogo.app.gogo_android.model.Artist;
 import tattoo.gogo.app.gogo_android.utils.ShakeDetector;
 
 public class MainActivity extends GogoActivity {
@@ -24,6 +25,8 @@ public class MainActivity extends GogoActivity {
     View newPiercing;
     @BindView(R.id.fl_new_henna)
     View newHenna;
+
+    private Artist mArtist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +58,7 @@ public class MainActivity extends GogoActivity {
         view.setOnClickListener(v -> {
             animateFAB();
             Intent i = new Intent(MainActivity.this, NewArtworkActivity.class);
-            i.putExtra(NewArtworkActivity.ARG_ARTIST, ((GogoAndroid) getApplication()).getArtist());
+            i.putExtra(NewArtworkActivity.ARG_ARTIST, mArtist);
             i.putExtra(NewArtworkActivity.ARG_ARTWORK_TYPE, type);
             startActivity(i);
         });
@@ -182,6 +185,10 @@ public class MainActivity extends GogoActivity {
 
     public void setOnShakeListener(OnShakeListener listener) {
         this.mListener = listener;
+    }
+
+    public void setArtist(Artist mArtist) {
+        this.mArtist = mArtist;
     }
 
     public interface OnShakeListener {

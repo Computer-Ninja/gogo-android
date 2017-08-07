@@ -112,13 +112,18 @@ public class MainActivityFragment extends ArtFragment {
             public void onResponse(Call<List<Artist>> call, Response<List<Artist>> response) {
 
                 horizontalAdapter = new HorizontalPhotosAdapter(response.body());
-                rvArtists.setAdapter(horizontalAdapter);
-                horizontalAdapter.notifyDataSetChanged();
-
                 LinearLayoutManager horizontalLayoutManagaer = new LinearLayoutManager(getContext(),
                         LinearLayoutManager.HORIZONTAL, false);
                 rvArtists.setLayoutManager(horizontalLayoutManagaer);
                 rvArtists.setAdapter(horizontalAdapter);
+                horizontalAdapter.notifyDataSetChanged();
+                rvArtists.postDelayed(() -> {
+                    RecyclerView.ViewHolder view = rvArtists.findViewHolderForAdapterPosition(0);
+                    if (view != null) {
+                        view.itemView.performLongClick();
+                    }
+                }, 100);
+
             }
 
             @Override
@@ -162,8 +167,9 @@ public class MainActivityFragment extends ArtFragment {
         @Override
         public void onBindViewHolder(final MyViewHolder holder, final int position) {
             Artist artist = artists.get(position);
+            holder.riv.setImageResource(R.drawable.doge);
 
-            loadArtist(holder.riv, GogoConst.IPFS_GATEWAY_URL + artist.getAvatarIpfs(), artist.getLink());
+            loadArtist(holder.riv, GogoConst.IPFS_GATEWAY_URL + artist.getAvatarIpfs(), artist);
 
         }
 
@@ -173,7 +179,7 @@ public class MainActivityFragment extends ArtFragment {
         }
     }
 
-    private void loadArtist(ImageView iv, String link, final String artistName) {
+    private void loadArtist(ImageView iv, String link, final Artist artist) {
 
         //hpArtists.addView(iv);
 
@@ -184,24 +190,26 @@ public class MainActivityFragment extends ArtFragment {
                 // for demonstration purposes, let's just set it to an ImageView
                 iv.setImageBitmap(bitmap.getBitmap());
                 iv.setOnClickListener(v -> {
-                    setArtistView(artistName);
+                    setArtistView(artist);
                     startActivity(new Intent(getContext(), ArtworkListActivity.class));
                 });
                 iv.setOnLongClickListener(view -> {
-                    setArtistView(artistName);
+                    setArtistView(artist);
                     return true;
                 });
             }
         };
         Glide.with(getContext())
                 .load(link)
+                .placeholder(R.drawable.doge)
                 .bitmapTransform(new CircleTransform(getContext()))
                 .into(target);
     }
 
-    private void setArtistView(String artistName) {
-        setArtist(artistName);
-        ((GogoActivity)getActivity()).setGogoTitle(artistName);
+    private void setArtistView(Artist artist) {
+        ((MainActivity) getActivity()).setArtist(artist);
+        ((GogoAndroid) getActivity().getApplication()).setArtist(artist);
+        ((GogoActivity)getActivity()).setGogoTitle(artist.getLink());
 
     }
 

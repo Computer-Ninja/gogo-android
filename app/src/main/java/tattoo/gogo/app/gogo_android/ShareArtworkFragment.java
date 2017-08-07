@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MotionEvent;
@@ -22,7 +21,6 @@ import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
 
-import java.lang.ref.WeakReference;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -323,12 +321,6 @@ public class ShareArtworkFragment extends ArtFragment {
                 //loadVideos();
 
                 mListener.hideLoading();
-
-                if (qrGithubBitmap != null) {
-                    mViews.add(ivQRgithub);
-                } else if (qrGogoBitmap != null) {
-                    mViews.add(ivQRgogo);
-                }
             }
 
             private void loadQRviews() {

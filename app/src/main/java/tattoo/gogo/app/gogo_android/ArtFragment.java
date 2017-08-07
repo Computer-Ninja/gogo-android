@@ -1,7 +1,6 @@
 package tattoo.gogo.app.gogo_android;
 
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
@@ -14,8 +13,6 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
-import net.glxn.qrgen.android.QRCode;
-
 import butterknife.ButterKnife;
 
 /**
@@ -26,6 +23,7 @@ abstract public class ArtFragment extends Fragment {
 
     public static final String ARG_COLUMN_COUNT = "column-count";
     public static final String ARG_ARTIST_NAME = "artist-name";
+    public static final String ARG_ARTIST = "artist";
     public static final String ARG_ARTWORK_TYPE = "artwork-type";
 
     public static final String ARTWORK_TYPE_TATTOO = "tattoo";
@@ -55,6 +53,7 @@ abstract public class ArtFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+
         mToolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         mFabButton = (FloatingActionButton) getActivity().findViewById(R.id.fab);
     }
@@ -74,19 +73,6 @@ abstract public class ArtFragment extends Fragment {
     protected void showViews() {
         mToolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
         mFabButton.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
-    }
-
-    protected String getArtist() {
-        if (isAdded()) {
-            return ((GogoAndroid) getActivity().getApplication()).getArtist();
-        }
-        return "";
-    }
-
-    protected void setArtist(String name) {
-        if (isAdded()) {
-            ((GogoAndroid) getActivity().getApplication()).setArtist(name);
-        }
     }
 
     public void handleShakeEvent(int count) {

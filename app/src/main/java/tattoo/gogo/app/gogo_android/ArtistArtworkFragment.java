@@ -3,18 +3,12 @@ package tattoo.gogo.app.gogo_android;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.Display;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MotionEvent;
@@ -25,11 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.VideoView;
 
-import com.bumptech.glide.Glide;
-
 import java.lang.ref.WeakReference;
-import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -38,7 +28,6 @@ import tattoo.gogo.app.gogo_android.utils.IntentUtils;
 import tattoo.gogo.app.gogo_android.utils.NavUtil;
 import tattoo.gogo.app.gogo_android.view.SimpleDividerItemDecoration;
 
-import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 /**
@@ -53,6 +42,7 @@ public class ArtistArtworkFragment extends ArtFragment  {
 
     private static final String ARG_ARTIST_NAME = "artist-name";
     private static final String ARG_ARTWORK_TYPE = "artwork-type";
+    private static final String ARG_ARTWORK_NEXT = "artwork-next";
     static final String ARG_ARTWORK = "artwork";
 
 
@@ -71,6 +61,7 @@ public class ArtistArtworkFragment extends ArtFragment  {
     private String mArtistName;
     private ArtWork mArtwork;
     private String mArtworkType;
+    private String mArtworkNext;
     private OnArtistArtworkFragmentInteractionListener mListener;
     private ArtworkRecyclerViewAdapter mAdapter;
 
@@ -90,6 +81,15 @@ public class ArtistArtworkFragment extends ArtFragment  {
         fragment.setArguments(args);
         return fragment;
     }
+        ArtistArtworkFragment fragment = new ArtistArtworkFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_ARTIST_NAME, artistName);
+        args.putParcelable(ARG_ARTWORK, artWork);
+        args.putString(ARG_ARTWORK_TYPE, artWorkType);
+        args.putString(ARG_ARTWORK_NEXT, nextArtwok);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -100,6 +100,7 @@ public class ArtistArtworkFragment extends ArtFragment  {
             mArtistName = getArguments().getString(ARG_ARTIST_NAME, "gogo");
             mArtwork = getArguments().getParcelable(ARG_ARTWORK);
             mArtworkType = getArguments().getString(ARG_ARTWORK_TYPE);
+            mArtworkNext = getArguments().getString(ARG_ARTWORK_NEXT);
         }
 
     }
@@ -155,8 +156,13 @@ public class ArtistArtworkFragment extends ArtFragment  {
             tvPrevious.setOnClickListener(v -> {
                 mListener.navigateTo(mArtwork.getPrevious());
             });
-        } else {
-            llNav.setVisibility(View.GONE);
+        }
+        if (mArtworkNext != null) {
+            llNav.setVisibility(VISIBLE);
+            tvNext.setVisibility(VISIBLE);
+            tvNext.setOnClickListener(v -> {
+                mListener.navigateTo(mArtworkNext);
+            });
         }
     }
 

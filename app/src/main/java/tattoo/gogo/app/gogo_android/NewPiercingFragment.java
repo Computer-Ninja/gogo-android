@@ -39,7 +39,7 @@ public class NewPiercingFragment extends NewWorkFragment {
     }
 
     protected void sendToApi() {
-        GogoApi.getApi().piercing(getArtist(), mPiercing.getShortName(), mPiercing)
+        GogoApi.getApi().piercing(mArtist.getLink(), mPiercing.getShortName(), mPiercing)
                 .enqueue(new Callback<Piercing>() {
                     @Override
                     public void onResponse(Call<Piercing> call, Response<Piercing> response) {
