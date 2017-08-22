@@ -77,10 +77,12 @@ public class ArtistArtworkFragment extends ArtFragment  {
         Bundle args = new Bundle();
         args.putString(ARG_ARTIST_NAME, artistName);
         args.putParcelable(ARG_ARTWORK, artWork);
-        args.putString(ARG_ARTWORK_TYPE, artWorkType);
         fragment.setArguments(args);
         return fragment;
     }
+
+
+    public static ArtistArtworkFragment newInstance(String artistName, ArtWork artWork, String artWorkType, String nextArtwok) {
         ArtistArtworkFragment fragment = new ArtistArtworkFragment();
         Bundle args = new Bundle();
         args.putString(ARG_ARTIST_NAME, artistName);

@@ -45,7 +45,7 @@ public class ShareArtworkFragment extends ArtFragment {
     public static final int PADDING_TO_ADD = 4;
     public static final int PADDING_TO_IGNORE = 128;
 
-    private String mArtistName;
+    private String mArtistName = "";
 
     @BindView(R.id.tv_artwork_title)
     TextView tvTitle;
@@ -140,18 +140,10 @@ public class ShareArtworkFragment extends ArtFragment {
         //hideViews();
         updateQRcodes();
 
-        String title = mArtistName.toLowerCase() + "/" + mArtworkType.toLowerCase() + "/";
-        ((GogoActivity) getActivity()).setGogoTitle(title);
+//        String title = mArtistName.toLowerCase() + "/" + mArtworkType.toLowerCase() + "/";
+  //      ((GogoActivity) getActivity()).setGogoTitle(title);
 
-        if (mArtwork.getPrevious() != null && !mArtwork.getPrevious().isEmpty()) {
-            llNav.setVisibility(View.VISIBLE);
-            tvPrevious.setVisibility(View.VISIBLE);
-            tvPrevious.setOnClickListener(v -> {
-                mListener.navigateTo(mArtwork.getPrevious());
-            });
-        } else {
             llNav.setVisibility(View.GONE);
-        }
         ((GogoActivity) getActivity()).fab.show();
         ((GogoActivity) getActivity()).fab.setOnClickListener(v -> sharePhotos());
     }
@@ -466,7 +458,7 @@ public class ShareArtworkFragment extends ArtFragment {
     }
 
     protected String makeLink(String mainUrl) {
-        return mainUrl + mArtistName.toLowerCase() + "/" + ((GogoActivity) getActivity()).mArtworkType.toLowerCase() + "/" + mArtwork.getLink();
+        return mainUrl + mArtwork.getLink();
     }
 
 }
