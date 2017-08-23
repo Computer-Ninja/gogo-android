@@ -78,6 +78,7 @@ public class GogoApi {
                             return false;
                         }
                     })
+                    .setLenient()
                     .create();
             Retrofit retrofit = new Retrofit.Builder()
                     .client(client)

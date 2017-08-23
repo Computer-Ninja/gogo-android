@@ -44,4 +44,9 @@
     <string name="share_original_to">分享照片源文件</string>
     <string name="photo_download_for_sharing">获得源文件中</string>
     <string name="something_went_wrong">运行失败 请通知以帮助我们改进</string>
+    <string name="error_please_give_title">请先给这个作品酷的名字</string>
+    <string name="error_choose_artist_first">请长按艺术家头像为其发布新作品</string>
+    <string name="upload_process_photo">上传过程照片</string>
+    <string name="upload_final_photo">上传首页显示照片</string>
+    <string name="upload_video">上传视频</string>
 </resources>

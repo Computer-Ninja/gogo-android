@@ -35,7 +35,7 @@ public class NewHennaFragment extends NewWorkFragment {
     }
 
     protected void sendToApi() {
-        GogoApi.getApi().henna(getArtist(), mHenna.getShortName(), mHenna)
+        GogoApi.getApi().henna(mArtist.getLink(), mHenna.getShortName(), mHenna)
                 .enqueue(new Callback<Henna>() {
                     @Override
                     public void onResponse(Call<Henna> call, Response<Henna> response) {

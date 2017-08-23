@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,10 +15,10 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MotionEvent;
@@ -50,6 +49,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
+import tattoo.gogo.app.gogo_android.model.Artist;
 import tattoo.gogo.app.gogo_android.utils.IntentUtils;
 
 import static android.os.Environment.getExternalStorageDirectory;
@@ -67,7 +67,9 @@ public abstract class NewWorkFragment extends ArtFragment {
     protected static final String IS_FINAL = "is_final";
     protected OkHttpClient client;
     private boolean isFinalPhotoUloaded = false;
+    protected Artist mArtist;
 
+    @BindView(R.id.nsv_scroll) NestedScrollView nestedScrollView;
     @BindView(R.id.input_title)
     EditText etTitle;
     @BindView(R.id.input_made_by)
@@ -131,19 +133,30 @@ public abstract class NewWorkFragment extends ArtFragment {
         setHasOptionsMenu(true);
 
         mArtWork = newArtWork();
-        populateWithDelay(etAuthor, getArtist(), 600);
+        mArtist = ((GogoAndroid) getActivity().getApplication()).getArtist();
+        populateWithDelay(etAuthor, mArtist.getName(), 600);
         populateWithDelay(etTitle, mArtWork.getTitle(), 200);
-        populateWithDelay(etMadeAt, mArtWork.getMadeAtShop(), 1000);
+        populateWithDelay(etMadeAt, mArtist.getCurrentStudio(), 1000);
         String date = null;
         try {
             date = GogoConst.watermarkDateFormat.format(GogoConst.sdf.parse(mArtWork.getMadeDate()));
         } catch (ParseException p) {
             date = GogoConst.watermarkDateFormat.format(new Date());
         }
+        try {
+            String locationCity = mArtist.getLocationNow().split(",")[0];
+            String locationCountry = mArtist.getLocationNow().split(",")[1];
+
+            populateWithDelay(etMadeCity, locationCity, 200);
+            populateWithDelay(etMadeCountry, locationCountry, 700);
+        } catch (Exception x) {
+            x.printStackTrace();
+            populateWithDelay(etMadeCity, mArtWork.getMadeAtCity(), 200);
+            populateWithDelay(etMadeCountry, mArtWork.getMadeAtCountry(), 700);
+
+        }
         populateWithDelay(etMadeDate, date, 1400);
         populateWithDelay(etTimeDuration, String.valueOf(mArtWork.getDurationMin()), 400);
-        populateWithDelay(etMadeCity, String.valueOf(mArtWork.getMadeAtCity()), 200);
-        populateWithDelay(etMadeCountry, String.valueOf(mArtWork.getMadeAtCountry()), 700);
 
         tetTags.setTags(mArtWork.getTags());
         tetBodyParts.setTags(mArtWork.getBodypart());
@@ -229,7 +242,7 @@ public abstract class NewWorkFragment extends ArtFragment {
 
             @Override
             public void afterTextChanged(Editable authorName) {
-                setArtist(authorName.toString().trim());
+                mArtist.setName(authorName.toString().trim());
                 updateLink();
             }
         });
@@ -254,7 +267,7 @@ public abstract class NewWorkFragment extends ArtFragment {
                     if (!isAdded()) {
                         return;
                     }
-                    if (mArtWork.getTitle().length() < 4 || getArtist().isEmpty()) {
+                    if (mArtWork.getTitle().length() < 4) {
                         ivQRgogo.setVisibility(GONE);
                         ivQRgithub.setVisibility(GONE);
                         tvGogoLink.setVisibility(GONE);
@@ -290,6 +303,12 @@ public abstract class NewWorkFragment extends ArtFragment {
         btnUploadProcess.setOnClickListener(v -> startDialog(false));
         btnUploadFinal.setOnClickListener(v -> startDialog(true));
         btnUploadVideo.setOnClickListener(v -> {
+            if (etTitle.getText().toString().trim().isEmpty()) {
+                etTitle.requestFocus();
+                nestedScrollView.smoothScrollTo(0, etTitle.getTop());
+                Snackbar.make(mToolbar, R.string.error_please_give_title, Snackbar.LENGTH_LONG).show();
+                return;
+            }
             final GogoActivity ga = ((GogoActivity) getActivity());
             if (!ga.haveStoragePermission()) {
                 ga.requestPermission(PERMISSION_REQUEST_STORAGE);
@@ -297,7 +316,7 @@ public abstract class NewWorkFragment extends ArtFragment {
             }
             hideFab();
             updateArtwork();
-            Intent pictureActionIntent = new Intent(Intent.ACTION_PICK,MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+            Intent pictureActionIntent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
             ga.startActivityForResult(pictureActionIntent, GALLERY_VIDEO);
         });
     }
@@ -323,6 +342,12 @@ public abstract class NewWorkFragment extends ArtFragment {
     }
 
     private void startDialog(boolean isFinal) {
+        if (etTitle.getText().toString().trim().isEmpty()) {
+            etTitle.requestFocus();
+            nestedScrollView.smoothScrollTo(0, etTitle.getTop());
+            Snackbar.make(mToolbar, R.string.error_please_give_title, Snackbar.LENGTH_LONG).show();
+            return;
+        }
         AlertDialog.Builder myAlertDialog = new AlertDialog.Builder(
                 getActivity());
         myAlertDialog.setTitle(R.string.upload_photo);
@@ -505,7 +530,7 @@ public abstract class NewWorkFragment extends ArtFragment {
         String tattooTitleLinkified = mArtWork.getTitle().toLowerCase()
                 .replace(" ", "_")
                 .replace("'", "");
-        return mainUrl + getArtist() + "/" + mArtWork.getType() + "/" + tattooTitleLinkified;
+        return mainUrl + mArtist.getLink() + "/" + mArtWork.getType() + "/" + tattooTitleLinkified;
     }
 
 
@@ -596,7 +621,7 @@ public abstract class NewWorkFragment extends ArtFragment {
                         try {
                             llVideos.removeView(vv);
                             mArtWork.getVideosIpfs().remove(hash);
-                        } catch (Exception x){
+                        } catch (Exception x) {
 
                         }
                     }
@@ -613,5 +638,9 @@ public abstract class NewWorkFragment extends ArtFragment {
         });
         vv.setOnPreparedListener(mp -> mp.setLooping(true));
         return vv;
+    }
+
+    public void setArtist(Artist artist) {
+        this.mArtist = artist;
     }
 }

@@ -66,6 +66,13 @@
             android:label="@string/title_activity_artworks"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+
+        <activity
+            android:name=".ShareArtworkActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/title_activity_share_artwork"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
     </application>
 
 </manifest>

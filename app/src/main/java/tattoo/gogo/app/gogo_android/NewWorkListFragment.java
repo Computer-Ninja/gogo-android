@@ -22,6 +22,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import tattoo.gogo.app.gogo_android.api.GogoApi;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
+import tattoo.gogo.app.gogo_android.model.Artist;
 
 import static android.content.ContentValues.TAG;
 
@@ -36,7 +37,7 @@ public class NewWorkListFragment extends ArtFragment {
     private int mColumnCount = 1;
     private OnNewWorkFragmentInteractionListener mListener;
     private ArrayList<ArtWork> mWorks = new ArrayList<>();
-    private String mArtistName;
+    private Artist mArtist;
     private String mArtworkType;
     private List<ArtWork> mAllWorks = new ArrayList<>();
     private Bundle savedState = null;
@@ -53,11 +54,11 @@ public class NewWorkListFragment extends ArtFragment {
     }
 
     @SuppressWarnings("unused")
-    public static NewWorkListFragment newInstance(int columnCount, String artistName, String artType) {
+    public static NewWorkListFragment newInstance(int columnCount, Artist artist, String artType) {
         NewWorkListFragment fragment = new NewWorkListFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
-        args.putString(ARG_ARTIST_NAME, artistName);
+        args.putParcelable(ARG_ARTIST, artist);
         args.putString(ARG_ARTWORK_TYPE, artType);
         fragment.setArguments(args);
         return fragment;
@@ -70,11 +71,11 @@ public class NewWorkListFragment extends ArtFragment {
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-            mArtistName = getArguments().getString(ARG_ARTIST_NAME, "gogo");
+            mArtist = getArguments().getParcelable(ARG_ARTIST);
             mArtworkType = getArguments().getString(ARG_ARTWORK_TYPE, ARTWORK_TYPE_TATTOO);
         }
 
-        getActivity().setTitle(GogoConst.GOGO_TATTOO + "/" + mArtistName + "/" + mArtworkType);
+        getActivity().setTitle(GogoConst.GOGO_TATTOO + "/" + mArtist.getLink() + "/" + mArtworkType);
 
     }
 
@@ -211,19 +212,19 @@ public class NewWorkListFragment extends ArtFragment {
         };
         switch (mArtworkType) {
             case ARTWORK_TYPE_TATTOO:
-                GogoApi.getApi().tattoo(getArtist(), "wip").enqueue(callback);
+                GogoApi.getApi().tattoo(mArtist.getLink(), "wip").enqueue(callback);
                 break;
             case ARTWORK_TYPE_DESIGN:
-                GogoApi.getApi().design(getArtist(), "wip").enqueue(callback);
+                GogoApi.getApi().design(mArtist.getLink(), "wip").enqueue(callback);
                 break;
             case ARTWORK_TYPE_HENNA:
-                GogoApi.getApi().henna(getArtist(), "wip").enqueue(callback);
+                GogoApi.getApi().henna(mArtist.getLink(), "wip").enqueue(callback);
                 break;
             case ARTWORK_TYPE_PIERCING:
-                GogoApi.getApi().piercing(getArtist(), "wip").enqueue(callback);
+                GogoApi.getApi().piercing(mArtist.getLink(), "wip").enqueue(callback);
                 break;
             case ARTWORK_TYPE_DREADLOCKS:
-                GogoApi.getApi().dreadlocks(getArtist(), "wip").enqueue(callback);
+                GogoApi.getApi().dreadlocks(mArtist.getLink(), "wip").enqueue(callback);
                 break;
         }
     }
@@ -233,7 +234,7 @@ public class NewWorkListFragment extends ArtFragment {
         mRecyclerView.setItemViewCacheSize(20);
         mRecyclerView.setDrawingCacheEnabled(true);
         //mRecyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-        mRecyclerView.setAdapter(new NewWorkRecyclerViewAdapter(NewWorkListFragment.this, mWorks, mListener, mArtistName));
+        mRecyclerView.setAdapter(new NewWorkRecyclerViewAdapter(NewWorkListFragment.this, mWorks, mListener, mArtist.getLink()));
         final LinearLayoutManager lm = (LinearLayoutManager) mRecyclerView.getLayoutManager();
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override

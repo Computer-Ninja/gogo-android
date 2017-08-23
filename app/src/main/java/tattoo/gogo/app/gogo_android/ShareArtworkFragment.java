@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MotionEvent;
@@ -22,7 +21,6 @@ import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
 
-import java.lang.ref.WeakReference;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +28,7 @@ import java.util.List;
 import butterknife.BindView;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
 import tattoo.gogo.app.gogo_android.utils.IntentUtils;
-
-import static android.view.View.GONE;
+import tattoo.gogo.app.gogo_android.utils.UIUtils;
 
 /**
  * A fragment representing a list of Items.
@@ -39,14 +36,16 @@ import static android.view.View.GONE;
  * Activities containing this fragment MUST implement the {@link OnArtistArtworkFragmentInteractionListener}
  * interface.
  */
-@Deprecated
-public class ArtistOldArtworkFragment extends ArtFragment {
+public class ShareArtworkFragment extends ArtFragment {
 
-    private static final String ARG_ARTIST_NAME = "artist-name";
-    private static final String ARG_ARTWORK_TYPE = "artwork-type";
-    static final String ARG_ARTWORK = "artwork";
+    public static final String ARG_ARTIST_NAME = "artist-name";
+    public static final String ARG_ARTWORK_TYPE = "artwork-type";
+    public static final String ARG_ARTWORK = "artwork";
 
-    private String mArtistName;
+    public static final int PADDING_TO_ADD = 4;
+    public static final int PADDING_TO_IGNORE = 128;
+
+    private String mArtistName = "";
 
     @BindView(R.id.tv_artwork_title)
     TextView tvTitle;
@@ -78,16 +77,17 @@ public class ArtistOldArtworkFragment extends ArtFragment {
     private OnArtistArtworkFragmentInteractionListener mListener;
     private List<View> mViews = new ArrayList<>();
     private List<View> mVideoViews = new ArrayList<>();
+    private String mArtworkType;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ArtistOldArtworkFragment() {
+    public ShareArtworkFragment() {
     }
 
-    public static ArtistOldArtworkFragment newInstance(String artistName, ArtWork artWork, String artWorkType) {
-        ArtistOldArtworkFragment fragment = new ArtistOldArtworkFragment();
+    public static ShareArtworkFragment newInstance(String artistName, ArtWork artWork, String artWorkType) {
+        ShareArtworkFragment fragment = new ShareArtworkFragment();
         Bundle args = new Bundle();
         args.putString(ARG_ARTIST_NAME, artistName);
         args.putParcelable(ARG_ARTWORK, artWork);
@@ -104,6 +104,7 @@ public class ArtistOldArtworkFragment extends ArtFragment {
         if (getArguments() != null) {
             mArtistName = getArguments().getString(ARG_ARTIST_NAME, "gogo");
             mArtwork = getArguments().getParcelable(ARG_ARTWORK);
+            mArtworkType = getArguments().getString(ARG_ARTWORK_TYPE);
         }
 
     }
@@ -139,19 +140,28 @@ public class ArtistOldArtworkFragment extends ArtFragment {
         //hideViews();
         updateQRcodes();
 
-        String title = mArtistName.toLowerCase() + "/"
-                + ((GogoActivity) getActivity()).mArtworkType.toLowerCase() + "/";
-        ((GogoActivity) getActivity()).setGogoTitle(title);
+//        String title = mArtistName.toLowerCase() + "/" + mArtworkType.toLowerCase() + "/";
+  //      ((GogoActivity) getActivity()).setGogoTitle(title);
 
-        if (mArtwork.getPrevious() != null && !mArtwork.getPrevious().isEmpty()) {
-            llNav.setVisibility(View.VISIBLE);
-            tvPrevious.setVisibility(View.VISIBLE);
-            tvPrevious.setOnClickListener(v -> {
-                mListener.navigateTo(mArtwork.getPrevious());
-            });
-        } else {
             llNav.setVisibility(View.GONE);
+        ((GogoActivity) getActivity()).fab.show();
+        ((GogoActivity) getActivity()).fab.setOnClickListener(v -> sharePhotos());
+    }
+
+    private void sharePhotos() {
+        List<View> viewsToShare = new ArrayList<>();
+        for (View view : mViews) {
+            if (view.getPaddingBottom() == PADDING_TO_ADD) {
+                viewsToShare.add(view);
+            }
         }
+        if (ivQRgithub.getPaddingBottom() == PADDING_TO_ADD) {
+            viewsToShare.add(ivQRgithub);
+        }
+        if (ivQRgogo.getPaddingBottom() == PADDING_TO_ADD) {
+            viewsToShare.add(ivQRgogo);
+        }
+        mListener.sharePhotos(viewsToShare, mArtwork.getLink());
     }
 
 
@@ -162,7 +172,7 @@ public class ArtistOldArtworkFragment extends ArtFragment {
         menu.clear();
 
         menu.add(R.string.share_all).setOnMenuItemClickListener(menuItem -> {
-            mListener.sharePhotos(mViews, mArtwork.getLink());
+            sharePhotos();
             return false;
         });
 
@@ -185,16 +195,16 @@ public class ArtistOldArtworkFragment extends ArtFragment {
         }
         if (mArtwork.getBlockchain() != null) {
             if (mArtwork.getBlockchain().getSteem() != null)
-            menu.add(R.string.copy_link_steem).setOnMenuItemClickListener(menuItem -> {
-                copyLink(GogoConst.STEEMIT_URL + mArtwork.getBlockchain().getSteem());
-                return false;
-            });
+                menu.add(R.string.copy_link_steem).setOnMenuItemClickListener(menuItem -> {
+                    copyLink(GogoConst.STEEMIT_URL + mArtwork.getBlockchain().getSteem());
+                    return false;
+                });
 
             if (mArtwork.getBlockchain().getGolos() != null)
-            menu.add(R.string.copy_link_golos).setOnMenuItemClickListener(menuItem -> {
-                copyLink(GogoConst.GOLOS_URL + mArtwork.getBlockchain().getGolos());
-                return false;
-            });
+                menu.add(R.string.copy_link_golos).setOnMenuItemClickListener(menuItem -> {
+                    copyLink(GogoConst.GOLOS_URL + mArtwork.getBlockchain().getGolos());
+                    return false;
+                });
         }
     }
 
@@ -212,7 +222,7 @@ public class ArtistOldArtworkFragment extends ArtFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        if (context instanceof ArtistOldArtworkFragment.OnArtistArtworkFragmentInteractionListener) {
+        if (context instanceof ShareArtworkFragment.OnArtistArtworkFragmentInteractionListener) {
             mListener = (OnArtistArtworkFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
@@ -253,9 +263,9 @@ public class ArtistOldArtworkFragment extends ArtFragment {
 
         void showContextMenu(ImageView iv, String hash, OnImageRefreshListener l);
 
-        void loadThumbnail(WeakReference<Fragment> fr, ArtworkRecyclerViewAdapter.ViewHolder holder);
+        // void loadThumbnail(WeakReference<Fragment> fr, ArtworkRecyclerViewAdapter.ViewHolder holder);
 
-        void onListFragmentInteraction(WeakReference<Fragment> tWeakReference, String mArtistName, List<ArtWork> mValues, int position);
+        //void onListFragmentInteraction(WeakReference<Fragment> tWeakReference, String mArtistName, List<ArtWork> mValues, int position);
     }
 
     public interface OnImageRefreshListener {
@@ -285,8 +295,8 @@ public class ArtistOldArtworkFragment extends ArtFragment {
             @Override
             protected Boolean doInBackground(Void... params) {
                 try {
-                    qrGogoBitmap = makeQRcode(gogoTattooLink);
-                    qrGithubBitmap = makeQRcode(gogoGithubLink);
+                    qrGogoBitmap = UIUtils.makeQRcode(gogoTattooLink);
+                    qrGithubBitmap = UIUtils.makeQRcode(gogoGithubLink);
                 } catch (OutOfMemoryError e) {
                     return false;
                 }
@@ -300,15 +310,9 @@ public class ArtistOldArtworkFragment extends ArtFragment {
 
                 loadImages();
 
-                loadVideos();
+                //loadVideos();
 
                 mListener.hideLoading();
-
-                if (qrGithubBitmap != null) {
-                    mViews.add(ivQRgithub);
-                } else if (qrGogoBitmap != null) {
-                    mViews.add(ivQRgogo);
-                }
             }
 
             private void loadQRviews() {
@@ -317,14 +321,30 @@ public class ArtistOldArtworkFragment extends ArtFragment {
                     ivQRgogo.setOnClickListener(v -> {
                         mListener.sharePhoto(ivQRgogo, mArtwork.getLink());
                     });
+                    ivQRgogo.setPadding(PADDING_TO_IGNORE, PADDING_TO_IGNORE, PADDING_TO_IGNORE, PADDING_TO_IGNORE);
+                    ivQRgogo.setOnClickListener(v -> {
+                        if (v.getPaddingBottom() == PADDING_TO_IGNORE) {
+                            v.setPadding(PADDING_TO_ADD, PADDING_TO_ADD, PADDING_TO_ADD, PADDING_TO_ADD);
+                        } else {
+                            v.setPadding(PADDING_TO_IGNORE, PADDING_TO_IGNORE, PADDING_TO_IGNORE, PADDING_TO_IGNORE);
+                        }
+                    });
                 } else {
-                    ivQRgogo.setVisibility(GONE);
+                    ivQRgogo.setVisibility(View.GONE);
                 }
                 if (qrGithubBitmap != null) {
                     ivQRgithub.setImageBitmap(qrGithubBitmap);
                     ivQRgithub.setOnClickListener(v -> mListener.sharePhoto(ivQRgithub, mArtwork.getLink()));
+                    ivQRgithub.setPadding(PADDING_TO_IGNORE, PADDING_TO_IGNORE, PADDING_TO_IGNORE, PADDING_TO_IGNORE);
+                    ivQRgithub.setOnClickListener(v -> {
+                        if (v.getPaddingBottom() == PADDING_TO_IGNORE) {
+                            v.setPadding(PADDING_TO_ADD, PADDING_TO_ADD, PADDING_TO_ADD, PADDING_TO_ADD);
+                        } else {
+                            v.setPadding(PADDING_TO_IGNORE, PADDING_TO_IGNORE, PADDING_TO_IGNORE, PADDING_TO_IGNORE);
+                        }
+                    });
                 } else {
-                    ivQRgithub.setVisibility(GONE);
+                    ivQRgithub.setVisibility(View.GONE);
                 }
             }
         }.execute();
@@ -344,8 +364,8 @@ public class ArtistOldArtworkFragment extends ArtFragment {
     }
 
     private void loadVideos() {
-        for (String hash : mArtwork.getVideosIpfs()){
-            View iv =  addVideo(hash);
+        for (String hash : mArtwork.getVideosIpfs()) {
+            View iv = addVideo(hash);
             if (iv != null) {
                 mVideoViews.add(iv);
             }
@@ -360,7 +380,7 @@ public class ArtistOldArtworkFragment extends ArtFragment {
         iv.setAdjustViewBounds(true);
         iv.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         iv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        iv.setPadding(8, 8, 8, 8);
+        iv.setPadding(PADDING_TO_ADD, PADDING_TO_ADD, PADDING_TO_ADD, PADDING_TO_ADD);
         llImages.addView(iv);
 
         loadImage(imageIpfs, iv);
@@ -417,6 +437,7 @@ public class ArtistOldArtworkFragment extends ArtFragment {
         return vv;
 
     }
+
     private void loadImage(final String hash, final ImageView iv) {
         Glide.with(this)
                 .load(GogoConst.IPFS_GATEWAY_URL + hash)
@@ -427,10 +448,17 @@ public class ArtistOldArtworkFragment extends ArtFragment {
             mListener.showContextMenu(iv, hash, this::loadImage);
             return true;
         });
+        iv.setOnClickListener(v -> {
+            if (v.getPaddingBottom() == PADDING_TO_IGNORE) {
+                v.setPadding(PADDING_TO_ADD, PADDING_TO_ADD, PADDING_TO_ADD, PADDING_TO_ADD);
+            } else {
+                v.setPadding(PADDING_TO_IGNORE, PADDING_TO_IGNORE, PADDING_TO_IGNORE, PADDING_TO_IGNORE);
+            }
+        });
     }
 
     protected String makeLink(String mainUrl) {
-        return mainUrl + mArtistName.toLowerCase() + "/" + ((GogoActivity) getActivity()).mArtworkType.toLowerCase() + "/" + mArtwork.getLink();
+        return mainUrl + mArtwork.getLink();
     }
 
 }

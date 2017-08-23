@@ -2,62 +2,64 @@
 
 
 <LinearLayout
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
+    <TextView
+        android:id="@+id/tv_artwork_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/text_margin"
+        android:gravity="center"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="22sp"/>
+
+    <LinearLayout
+        android:id="@+id/ll_artwork_nav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/text_margin"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="22sp"
+        android:visibility="gone">
+
         <TextView
-            android:id="@+id/tv_artwork_title"
+            android:id="@+id/tv_previous"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
-            android:gravity="center"
-            android:textSize="22sp"
-            android:textColor="@color/colorPrimaryDark"/>
+            android:layout_weight="1"
+            android:text="@string/previous_work"
+            android:textColor="@color/colorPrimary"
+            android:visibility="invisible"/>
 
-        <LinearLayout
-            android:id="@+id/ll_artwork_nav"
+        <TextView
+            android:id="@+id/tv_next"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
-            android:gravity="center"
-            android:textSize="22sp"
-            android:orientation="horizontal"
-            android:visibility="gone"
-            android:textColor="@color/colorPrimaryDark">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/tv_previous"
-                android:text="@string/previous_work"
-                android:textColor="@color/colorPrimary"
-                android:visibility="invisible"
-                android:layout_weight="1"/>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/tv_next"
-                android:gravity="right"
-                android:textColor="@color/colorPrimary"
-                android:visibility="invisible"
-                android:text="@string/next_work"
-                android:layout_weight="1"/>
-            </LinearLayout>
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/list"
-            android:name="tattoo.gogo.app.gogo_android.ArtistArtworkFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="16dp"
-            android:layout_marginLeft="4dp"
-            android:layout_marginRight="4dp"
-            app:layoutManager="LinearLayoutManager"
-            tools:context="tattoo.gogo.app.gogo_android.ArtistTattooFragment"
-            tools:listitem="@layout/art_item"/>
-
-
+            android:layout_weight="1"
+            android:gravity="right"
+            android:text="@string/next_work"
+            android:textColor="@color/colorPrimary"
+            android:visibility="invisible"/>
     </LinearLayout>
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/list"
+        android:name="tattoo.gogo.app.gogo_android.ArtistArtworkFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="16dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        app:layoutManager="LinearLayoutManager"
+        tools:context="tattoo.gogo.app.gogo_android.ArtistTattooFragment"
+        tools:listitem="@layout/art_item_video"/>
+
+</LinearLayout>

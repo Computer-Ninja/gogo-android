@@ -2,10 +2,13 @@ package tattoo.gogo.app.gogo_android.utils;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
+
+import net.glxn.qrgen.android.QRCode;
 
 public class UIUtils {
     private static int screenWidth = -1;
@@ -40,5 +43,9 @@ public class UIUtils {
         layout.width = width;
         layout.height = height;
         view.setLayoutParams(layout);
+    }
+
+    public static Bitmap makeQRcode(String link) throws OutOfMemoryError {
+        return QRCode.from(link).withSize(1024, 1024).bitmap();
     }
 }

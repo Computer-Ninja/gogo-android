@@ -48,7 +48,7 @@ public class NewDreadlockFragment extends NewWorkFragment {
     }
 
     protected void sendToApi() {
-        GogoApi.getApi().dreadlocks(getArtist(), mDreads.getShortName(), mDreads)
+        GogoApi.getApi().dreadlocks(mArtist.getLink(), mDreads.getShortName(), mDreads)
                 .enqueue(new Callback<Dreadlocks>() {
                     @Override
                     public void onResponse(Call<Dreadlocks> call, Response<Dreadlocks> response) {

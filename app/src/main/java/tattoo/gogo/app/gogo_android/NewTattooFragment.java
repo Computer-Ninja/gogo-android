@@ -37,7 +37,7 @@ public class NewTattooFragment extends NewWorkFragment {
 
 
     protected void sendToApi() {
-        GogoApi.getApi().tattoo(getArtist(), mTattoo.getShortName(), mTattoo)
+        GogoApi.getApi().tattoo(mArtist.getLink(), mTattoo.getShortName(), mTattoo)
                 .enqueue(new Callback<Tattoo>() {
                     @Override
                     public void onResponse(Call<Tattoo> call, Response<Tattoo> response) {

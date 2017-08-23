@@ -47,8 +47,6 @@
     <string name="from_camera">From Camera</string>
     <string name="error_camera_capture">Error while capturing image.</string>
     <string name="gallery_cancelled">Cancelled</string>
-    <string name="upload_process_photo">Upload process photo</string>
-    <string name="upload_final_photo">Upload final photo</string>
     <string name="title_activity_artworks">Artworks</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="error_please_give_title">Please give a title to this work</string>
@@ -62,5 +60,9 @@
     <string name="copy_link_golos">Copy Golos link</string>
     <string name="watch_process_video">Watch Video</string>
     <string name="open_url">Open</string>
+    <string name="upload_process_photo">Upload process photo</string>
+    <string name="upload_final_photo">Upload final photo</string>
     <string name="upload_video">Upload Video</string>
+    <string name="title_activity_share_artwork">Sharing is caring...</string>
+    <string name="error_choose_artist_first">Please choose an artist with long tap first.</string>
 </resources>

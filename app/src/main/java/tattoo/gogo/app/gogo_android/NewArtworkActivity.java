@@ -44,6 +44,7 @@ import retrofit2.Response;
 import tattoo.gogo.app.gogo_android.api.GogoApi;
 import tattoo.gogo.app.gogo_android.api.UploadResponse;
 import tattoo.gogo.app.gogo_android.model.ArtWork;
+import tattoo.gogo.app.gogo_android.model.Artist;
 import tattoo.gogo.app.gogo_android.model.Design;
 import tattoo.gogo.app.gogo_android.model.Dreadlocks;
 import tattoo.gogo.app.gogo_android.model.Henna;
@@ -61,7 +62,7 @@ public class NewArtworkActivity extends GogoActivity
     private static final String TAG = "NewArtworkActivity";
     public static final String ARG_ARTIST = "artist";
     public static final String ARG_ARTWORK_TYPE = "type";
-    private String mArtistName = "gogo";
+    private Artist mArtist;
 
     @Override
     int getLayout() {
@@ -76,19 +77,20 @@ public class NewArtworkActivity extends GogoActivity
 //        getSupportFragmentManager().beginTransaction()
 //                .add(R.id.fragment_container, new NewTattooFragment(), null)
 //                .commit();
-        mArtistName = ((GogoAndroid) getApplication()).getArtist();
+        mArtist = getIntent().getParcelableExtra(ARG_ARTIST);
         NewWorkListFragment listFr = NewWorkListFragment.newInstance(1,
-                mArtistName,
+                mArtist,
                 mArtworkType);
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.fragment_container, listFr, null)
                 .commit();
 
+
         setGogoTitle();
     }
 
 
-    public void showContextMenu(final ImageView iv, final String hash, final ArtistOldArtworkFragment.OnImageRefreshListener refresh, ArtWork artWork) {
+    public void showContextMenu(final ImageView iv, final String hash, final ShareArtworkFragment.OnImageRefreshListener refresh, ArtWork artWork) {
         ArrayList<String> items = new ArrayList<>();
         items.add(getString(R.string.save_to_phone));
         items.add(getString(R.string.share_to));
@@ -174,7 +176,7 @@ public class NewArtworkActivity extends GogoActivity
             fr = NewDreadlockFragment.newInstance(artWork);
         }
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, fr, ((GogoAndroid) getApplication()).getArtist() + "/" + mArtworkType)
+                .replace(R.id.fragment_container, fr, ((GogoAndroid) getApplication()).getArtist().getLink() + "/" + mArtworkType)
                 .addToBackStack(null)
                 .commit();
     }
@@ -186,7 +188,7 @@ public class NewArtworkActivity extends GogoActivity
             public void onResponse(Call<List<ArtWork>> call, Response<List<ArtWork>> response) {
                 finish();
                 Intent i = new Intent(NewArtworkActivity.this, NewArtworkActivity.class);
-                i.putExtra(NewArtworkActivity.ARG_ARTIST, ((GogoAndroid) getApplication()).getArtist());
+                i.putExtra(NewArtworkActivity.ARG_ARTIST, mArtist);
                 i.putExtra(NewArtworkActivity.ARG_ARTWORK_TYPE, mArtworkType);
                 startActivity(i);
             }
@@ -198,15 +200,15 @@ public class NewArtworkActivity extends GogoActivity
             }
         };
         if (mArtworkType.equals(ArtFragment.ARTWORK_TYPE_TATTOO)) {
-            GogoApi.getApi().deleteTattoo(mArtistName, artworkName).enqueue(callback);
+            GogoApi.getApi().deleteTattoo(mArtist.getLink(), artworkName).enqueue(callback);
         } else if (mArtworkType.equals(ArtFragment.ARTWORK_TYPE_DESIGN)) {
-            GogoApi.getApi().deleteDesign(mArtistName, artworkName).enqueue(callback);
+            GogoApi.getApi().deleteDesign(mArtist.getLink(), artworkName).enqueue(callback);
         } else if (mArtworkType.equals(ArtFragment.ARTWORK_TYPE_HENNA)) {
-            GogoApi.getApi().deleteHenna(mArtistName, artworkName).enqueue(callback);
+            GogoApi.getApi().deleteHenna(mArtist.getLink(), artworkName).enqueue(callback);
         } else if (mArtworkType.equals(ArtFragment.ARTWORK_TYPE_PIERCING)) {
-            GogoApi.getApi().deletePiercing(mArtistName, artworkName).enqueue(callback);
+            GogoApi.getApi().deletePiercing(mArtist.getLink(), artworkName).enqueue(callback);
         } else if (mArtworkType.equals(ArtFragment.ARTWORK_TYPE_DREADLOCKS)) {
-            GogoApi.getApi().deleteDreadlocks(mArtistName, artworkName).enqueue(callback);
+            GogoApi.getApi().deleteDreadlocks(mArtist.getLink(), artworkName).enqueue(callback);
         }
     }
 
@@ -224,8 +226,9 @@ public class NewArtworkActivity extends GogoActivity
         } else if (mArtworkType.equals(ArtFragment.ARTWORK_TYPE_DREADLOCKS)) {
             fr = NewDreadlockFragment.newInstance(new Dreadlocks());
         }
+        fr.setArtist(mArtist);
         FragmentTransaction tr = getSupportFragmentManager().beginTransaction();
-        tr.replace(R.id.fragment_container, fr, ((GogoAndroid) getApplication()).getArtist() + "/" + mArtworkType);
+        tr.replace(R.id.fragment_container, fr, ((GogoAndroid) getApplication()).getArtist().getLink() + "/" + mArtworkType);
         if (addToBackStack) {
             tr.addToBackStack(null);
         }
@@ -380,7 +383,7 @@ public class NewArtworkActivity extends GogoActivity
         } catch (ParseException e) {
             dateString = GogoConst.watermarkDateFormat.format(new Date());
         }
-        GogoApi.getApi().upload(((GogoAndroid) getApplication()).getArtist(), latestLabel.getMadeAt(),
+        GogoApi.getApi().upload(((GogoAndroid) getApplication()).getArtist().getLink(), latestLabel.getMadeAt(),
                 dateString, multipartBody).enqueue(new Callback<UploadResponse>() {
 
             @Override
@@ -414,7 +417,7 @@ public class NewArtworkActivity extends GogoActivity
         } catch (ParseException e) {
             dateString = GogoConst.watermarkDateFormat.format(new Date());
         }
-        GogoApi.getApi().upload(((GogoAndroid) getApplication()).getArtist(), latestLabel.getMadeAt(),
+        GogoApi.getApi().upload(((GogoAndroid) getApplication()).getArtist().getLink(), latestLabel.getMadeAt(),
                 dateString, multipartBody).enqueue(new Callback<UploadResponse>() {
 
             @Override
@@ -445,6 +448,7 @@ public class NewArtworkActivity extends GogoActivity
         NewWorkFragment fr = (NewWorkFragment) getFragment();
         if (fr != null) {
             fr.addVideo(hash);
+            fr.sendToApi();
         }
 
     }
@@ -463,12 +467,13 @@ public class NewArtworkActivity extends GogoActivity
         NewWorkFragment fr = (NewWorkFragment) getFragment();
         if (fr != null) {
             fr.addImage(hash, bitmap, isFinal);
+            fr.sendToApi();
         }
 
     }
 
     private Fragment getFragment() {
-        String artist = ((GogoAndroid) getApplication()).getArtist();
+        String artist = ((GogoAndroid) getApplication()).getArtist().getLink();
         return getSupportFragmentManager().findFragmentByTag(artist + "/" + mArtworkType);
 
     }

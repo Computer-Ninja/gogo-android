@@ -224,11 +224,11 @@ abstract class GogoActivity extends AppCompatActivity implements
     }
 
     protected void setGogoTitle() {
-        String title = ((GogoAndroid) getApplication()).getArtist() + "/" + mArtworkType.toLowerCase();
+        String title = ((GogoAndroid) getApplication()).getArtist().getLink() + "/" + mArtworkType.toLowerCase();
         setGogoTitle(title);
     }
 
-    public void showContextMenu(final ImageView iv, final String hash, final ArtistOldArtworkFragment.OnImageRefreshListener refresh) {
+    public void showContextMenu(final ImageView iv, final String hash, final ArtistArtworkFragment.OnImageRefreshListener refresh) {
         ArrayList<String> items = new ArrayList<>();
         items.add(getString(R.string.save_to_phone));
         items.add(getString(R.string.share_to));
@@ -452,6 +452,9 @@ abstract class GogoActivity extends AppCompatActivity implements
 
     public static Bitmap getBitmapFromView(View view) {
         //Define a bitmap with the same size as the view
+        if (view.getWidth() == 0 || view.getHeight() == 0) {
+            return null;
+        }
         Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
         //Bind a canvas to it
         Canvas canvas = new Canvas(returnedBitmap);
@@ -484,7 +487,11 @@ abstract class GogoActivity extends AppCompatActivity implements
         for (int j = 0; j < views.size(); j++) {
             View view = views.get(j);
             try {
-                Uri uri = getImageUri(this, getBitmapFromView(view));
+                Bitmap bitmap = getBitmapFromView(view);
+                if (bitmap == null) {
+                    continue;
+                }
+                Uri uri = getImageUri(this, bitmap);
                 if (uri != null) {
                     files.add(uri);
                 }

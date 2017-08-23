@@ -6,18 +6,25 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
+import android.view.View;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 import tattoo.gogo.app.gogo_android.model.ArtWork;
+import tattoo.gogo.app.gogo_android.model.Artist;
 
 public class ArtworkActivity extends GogoActivity
-        implements ArtistOldArtworkFragment.OnArtistArtworkFragmentInteractionListener,
+        implements ArtistArtworkFragment.OnArtistArtworkFragmentInteractionListener,
         ViewPager.OnPageChangeListener {
     private static final String TAG = "ArtworkListActivity";
     public static final String ARG_ARTWORKS = "artworks";
@@ -109,7 +116,7 @@ public class ArtworkActivity extends GogoActivity
     }
 
     private String getPageTitle(int position) {
-        return  mArtworks.get(position).getLink();
+        return mArtworks.get(position).getLink();
     }
 
     @Override
@@ -122,13 +129,32 @@ public class ArtworkActivity extends GogoActivity
         mViewPager.setCurrentItem(findArtworkPositionByName(artworkName), true);
     }
 
-//    @Override
-//    public void showContextMenu(ImageView iv, String hash, ArtistArtworkFragment.OnImageRefreshListener l) {
-//
-//    }
+
 
     @Override
-    public void loadThumbnail(WeakReference<Fragment> fr, ArtworkRecyclerViewAdapter.ViewHolder holder) {
+    public void loadThumbnail(WeakReference<Fragment> fr, ArtworkRecyclerViewAdapter.ImageViewHolder holder) {
+        if (fr.get() == null) {
+            Log.d(TAG, "loadThumbnail: Fragment is null");
+            return;
+        }
+        final String url = GogoConst.IPFS_GATEWAY_URL + holder.hash;
+        holder.ivThumbnail.setVisibility(View.VISIBLE);
+        Display display = getWindowManager().getDefaultDisplay();
+        final DisplayMetrics outMetrics = new DisplayMetrics();
+        display.getMetrics(outMetrics);
+
+        Glide.with(fr.get())
+                .load(url)
+                .placeholder(R.drawable.progress_animation)
+                .error(R.drawable.doge)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .override(outMetrics.widthPixels, outMetrics.heightPixels)
+                .into(holder.ivThumbnail);
+
+        holder.ivThumbnail.setOnLongClickListener(view -> {
+            showContextMenu(holder.ivThumbnail, holder.hash, (hash, iv) -> loadThumbnail(fr, holder));
+            return true;
+        });
 
     }
 
@@ -160,7 +186,20 @@ public class ArtworkActivity extends GogoActivity
 
         @Override
         public Fragment getItem(int position) {
-            return ArtistOldArtworkFragment.newInstance(getArtist(), mArtworks.get(position), mArtworkType);
+            ArtWork theArtwork = mArtworks.get(position);
+            String nextArtwork = null;
+            for (ArtWork artWork : mArtworks) {
+                if (theArtwork.getShortName().equals(artWork.getPrevious())) {
+                    nextArtwork = artWork.getShortName();
+                    break;
+                }
+            }
+            if (nextArtwork != null) {
+                return ArtistArtworkFragment.newInstance(getArtist().getLink(), theArtwork,
+                        mArtworkType, nextArtwork);
+            } else
+                return ArtistArtworkFragment.newInstance(getArtist().getLink(), theArtwork, mArtworkType);
+
         }
 
         @Override
@@ -174,7 +213,7 @@ public class ArtworkActivity extends GogoActivity
         }
     }
 
-    protected String getArtist() {
+    protected Artist getArtist() {
         return ((GogoAndroid) getApplication()).getArtist();
     }
 }
